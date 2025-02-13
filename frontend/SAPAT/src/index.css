@@ -3,6 +3,16 @@
   themes: light --default;
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+
+@theme {
+  --color-darkbrown: #4A2611;
+  --color-deepbrown: #8B4513;
+  --color-charcoal-header: #333333;
+  --color-charcoal-body: #202020;
+  --color-green-accent: #C5D995;
+  --color-green-button: #5C8B57;
+  --color-red-button: #8B1313;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
