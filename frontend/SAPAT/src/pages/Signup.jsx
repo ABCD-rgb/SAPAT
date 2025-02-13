@@ -99,7 +99,7 @@ function Signup() {
 
                         <div className="mt-4 text-center">
                             <span className="text-gray-600">Already have an account? </span>
-                            <Link to="/login" className="text-green-600 hover:text-green-700 font-medium">
+                            <Link to="/" className="text-green-600 hover:text-green-700 font-medium">
                                 Sign in
                             </Link>
                         </div>
