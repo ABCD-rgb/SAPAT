@@ -1,89 +1,112 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 
 function Login() {
-    return (
-        <div className="min-h-screen w-full">
-            {/* Mobile background - hidden on desktop */}
-            <div className="md:hidden min-h-screen w-full fixed bg-left-top bg-no-repeat" 
-                style={{ backgroundImage: "url('/src/assets/mobile_bg.svg')" }}>
-            </div>
+  return (
+    <div className="min-h-screen w-full">
+      {/* Mobile background - hidden on desktop */}
+      <div
+        className="fixed min-h-screen w-full bg-left-top bg-no-repeat md:hidden"
+        style={{ backgroundImage: "url('/src/assets/mobile_bg.svg')" }}
+      ></div>
 
-            {/* Desktop background - hidden on mobile */}
-            <div className="hidden md:block min-h-screen w-full fixed bg-left-top bg-no-repeat" 
-                style={{ backgroundImage: "url('/src/assets/desktop_bg.svg')" }}>
-            </div>
+      {/* Desktop background - hidden on mobile */}
+      <div
+        className="fixed hidden min-h-screen w-full bg-left-top bg-no-repeat md:block"
+        style={{ backgroundImage: "url('/src/assets/desktop_bg.svg')" }}
+      ></div>
 
-            {/* Content wrapper - positioned above backgrounds */}
-            <div className="relative min-h-screen w-full flex flex-col md:flex-row items-center justify-center md:justify-evenly md:gap-8">
-                {/* Logo */}
-                <div className="flex justify-center items-center mb-10 md:mb-0">
-                    <img src="/src/assets/logo_word.png" alt="logo" className="w-1/2 h-1/2 md:w-full md:h-full" />
-                </div>
-
-                {/* Login modal */}
-                <div className="flex flex-col items-center justify-center w-7/8 md:w-145 h-115 md:h-172 p-6 px-10 mx-auto md:mx-0 bg-white rounded-lg shadow-lg">
-                    <form className="w-full space-y-8">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-charcoal-header mb-4">Login</h1>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-                            <input
-                                type="email"
-                                id="email"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                                placeholder="Enter your email"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                                placeholder="Enter your password"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm bg-green-button text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                            Sign in
-                        </button>
-                    </form>
-
-                    <div className="mt-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-300"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                            </div>
-                        </div>
-
-                        <button
-                            className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                        >
-                            <img
-                                className="h-5 w-5 mr-2"
-                                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                                alt="Google logo"
-                            />
-                            Sign in with Google
-                        </button>
-
-                        <div className="mt-4 text-center">
-                            <span className="text-gray-600">Don&apos;t have an account yet? </span>
-                            <Link to="/signup" className="text-green-600 hover:text-green-700 font-medium">
-                                Sign up
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      {/* Content wrapper - positioned above backgrounds */}
+      <div className="relative flex min-h-screen w-full flex-col items-center justify-center md:flex-row md:justify-evenly md:gap-8">
+        {/* Logo */}
+        <div className="mb-10 flex items-center justify-center md:mb-0">
+          <img
+            src="/src/assets/logo_word.png"
+            alt="logo"
+            className="h-1/2 w-1/2 md:h-full md:w-full"
+          />
         </div>
-    )
+
+        {/* Login modal */}
+        <div className="mx-auto flex h-115 w-7/8 flex-col items-center justify-center rounded-lg bg-white p-6 px-10 shadow-lg md:mx-0 md:h-172 md:w-145">
+          <form className="w-full space-y-8">
+            <div>
+              <h1 className="text-charcoal-header mb-4 text-2xl font-bold md:text-3xl">
+                Login
+              </h1>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-green-button w-full rounded-md border border-transparent px-4 py-2 text-white shadow-sm hover:bg-green-500 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
+            >
+              Sign in
+            </button>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-2 text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <button className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+              <img
+                className="mr-2 h-5 w-5"
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google logo"
+              />
+              Sign in with Google
+            </button>
+
+            <div className="mt-4 text-center">
+              <span className="text-gray-600">
+                Don&apos;t have an account yet?{' '}
+              </span>
+              <Link
+                to="/signup"
+                className="font-medium text-green-600 hover:text-green-700"
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
-export default Login;
+export default Login

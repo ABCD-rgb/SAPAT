@@ -1,14 +1,13 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import Ingredients from './pages/Ingredients';
-import Nutrients from './pages/Nutrients';
-import Formulations from './pages/Formulations';
-import ViewFormulation from './pages/ViewFormulation';
-import Error from './pages/Error';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Dashboard from './pages/Dashboard'
+import Ingredients from './pages/Ingredients'
+import Nutrients from './pages/Nutrients'
+import Formulations from './pages/Formulations'
+import ViewFormulation from './pages/ViewFormulation'
+import Error from './pages/Error'
 function App() {
-
   return (
     <>
       <Router>
