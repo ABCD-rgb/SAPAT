@@ -4,6 +4,8 @@ import {
   RiAddLine,
   RiCalculatorLine,
   RiFileChartLine,
+  RiFileUploadLine,
+  RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 
@@ -35,6 +37,51 @@ function ViewFormulation() {
   const userColor = useUserColor()
   const [focusedInput, setFocusedInput] = useState(null)
 
+  // Sample data arrays - these would typically come from your API/database
+  const ingredients = [
+    {
+      name: 'Maize',
+      minimum: 1.2,
+      maximum: 4.0,
+      value: null,
+    },
+    {
+      name: 'Barley',
+      minimum: null,
+      maximum: null,
+      value: null,
+    },
+    {
+      name: 'Barley',
+      minimum: null,
+      maximum: null,
+      value: null,
+    },
+    {
+      name: 'Barley',
+      minimum: null,
+      maximum: null,
+      value: null,
+    },
+    // Add more ingredients as needed
+  ]
+
+  const nutrients = [
+    {
+      name: 'DM',
+      minimum: 12.8,
+      maximum: null,
+      value: null,
+    },
+    {
+      name: 'CP',
+      minimum: 10.5,
+      maximum: 15.0,
+      value: null,
+    },
+    // Add more nutrients as needed
+  ]
+
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
   }
@@ -54,10 +101,19 @@ function ViewFormulation() {
       <div className="flex-1 p-4">
         <div className="space-y-4">
           {/* Header - Adjusted for mobile */}
+          <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+            View Formulation
+          </h1>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
-              <button className="btn btn-sm btn-outline text-xs">Import</button>
-              <button className="btn btn-sm btn-outline text-xs">Export</button>
+              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
+                <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
+                <span>Import</span>
+              </button>
+              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
+                <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
+                <span>Export</span>
+              </button>
             </div>
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
@@ -65,7 +121,7 @@ function ViewFormulation() {
                 <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
                 <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
-              <button className="btn btn-sm gap-1 text-xs">
+              <button className="btn btn-sm gap-1 rounded-lg text-xs">
                 <RiShareLine /> Share ▼
               </button>
             </div>
@@ -142,45 +198,22 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Maize</td>
-                      <td>1.2</td>
-                      <td>4.0</td>
-                      <td></td>
-                      <td>
-                        <button className="btn btn-ghost btn-xs">×</button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Barley</td>
-                      <td>
-                        <input
-                          type="number"
-                          className="input input-bordered input-sm w-20"
-                          style={getInputStyle('barley-min')}
-                          onFocus={() => handleFocus('barley-min')}
-                          onBlur={handleBlur}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          className="input input-bordered input-sm w-20"
-                          style={getInputStyle('barley-max')}
-                          onFocus={() => handleFocus('barley-max')}
-                          onBlur={handleBlur}
-                        />
-                      </td>
-                      <td></td>
-                      <td>
-                        <button className="btn btn-ghost btn-xs">×</button>
-                      </td>
-                    </tr>
+                    {ingredients.map((ingredient, index) => (
+                      <tr key={index}>
+                        <td>{ingredient.name}</td>
+                        <td>{ingredient.minimum}</td>
+                        <td>{ingredient.maximum}</td>
+                        <td>{ingredient.value}</td>
+                        <td>
+                          <button className="btn btn-ghost btn-xs">×</button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
               <div className="p-4">
-                <button className="btn btn-sm gap-2 bg-green-600 text-white">
+                <button className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700">
                   <RiAddLine /> Add ingredient
                 </button>
               </div>
@@ -204,44 +237,44 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>DM</td>
-                      <td>12.8</td>
-                      <td></td>
-                      <td></td>
-                      <td>
-                        <button className="btn btn-ghost btn-xs">×</button>
-                      </td>
-                    </tr>
+                    {nutrients.map((nutrient, index) => (
+                      <tr key={index}>
+                        <td>{nutrient.name}</td>
+                        <td>{nutrient.minimum}</td>
+                        <td>{nutrient.maximum}</td>
+                        <td>{nutrient.value}</td>
+                        <td>
+                          <button className="btn btn-ghost btn-xs">×</button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-              <div className="space-y-4 p-4">
-                <button className="btn btn-sm gap-2 bg-green-600 text-white">
+              <div className="p-4">
+                <button className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700">
                   <RiAddLine /> Add nutrient
                 </button>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    Total cost (per kg)
-                  </span>
-                  <input
-                    type="number"
-                    className="input input-bordered input-sm w-24 rounded-lg"
-                    style={getInputStyle('total-cost')}
-                    onFocus={() => handleFocus('total-cost')}
-                    onBlur={handleBlur}
-                  />
-                </div>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
-            <button className="btn btn-primary gap-2">
+            <div className="flex items-center justify-end">
+              <span className="text-sm text-gray-500">Total cost (per kg)</span>
+              <input
+                type="number"
+                className="input input-bordered input-sm w-24 rounded-lg"
+                style={getInputStyle('total-cost')}
+                onFocus={() => handleFocus('total-cost')}
+                onBlur={handleBlur}
+              />
+            </div>
+            <button className="btn btn-primary gap-2 rounded-lg">
               <RiCalculatorLine /> Optimize
             </button>
-            <button className="btn btn-warning gap-2">
+            <button className="btn btn-warning gap-2 rounded-lg">
               <RiFileChartLine /> Generate report
             </button>
           </div>

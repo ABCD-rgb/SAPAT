@@ -1,11 +1,13 @@
 function Header() {
   return (
     //  header containing date (month, day, year) and time on the  leftmost side and a default profile icon on the rightmost side
-    <header className="bg-white p-4 shadow-sm">
+    <header className="bg-white p-2 shadow-sm">
       <div className="text-darkbrown flex items-center justify-between">
-        <div className="items-left border-darkbrown ml-6 flex flex-col border-b pb-2">
-          <p className="text-xl font-bold">{new Date().toLocaleTimeString()}</p>
-          <p className="text-lg">
+        <div className="items-left border-darkbrown ml-6 flex flex-col border-b pb-1">
+          <p className="text-base font-bold">
+            {new Date().toLocaleTimeString()}
+          </p>
+          <p className="text-sm">
             {' '}
             {new Date().toLocaleDateString('en-US', {
               month: 'long',
@@ -15,11 +17,11 @@ function Header() {
           </p>
         </div>
         <div className="mr-6 flex items-center">
-          <p className="hidden md:mr-10 md:block md:text-2xl md:font-bold">
+          <p className="hidden md:mr-6 md:block md:text-lg md:font-bold">
             John Doe
           </p>
           <img
-            className="h-14 w-14 rounded-2xl"
+            className="h-10 w-10 rounded-2xl"
             alt="Tailwind CSS Navbar component"
             src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
           />
