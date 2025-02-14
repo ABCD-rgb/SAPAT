@@ -1,9 +1,6 @@
-import Header from '../components/Header'
-
 function Dashboard() {
   return (
-    <div>
-      <Header />
+    <div className="p-6">
       <h1>Dashboard</h1>
     </div>
   )
