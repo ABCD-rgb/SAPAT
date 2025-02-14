@@ -1,15 +1,35 @@
 import { RiAddLine, RiFileDownloadLine, RiFileUploadLine, RiFilterLine, RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
 import { useState } from 'react'
 import AddIngredientModal from '../components/ingredients/AddIngredientModal'
+import EditIngredientModal from '../components/ingredients/EditIngredientModal'
+import ConfirmationModal from '../components/ConfirmationModal'
 
 function Ingredients() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedIngredient, setSelectedIngredient] = useState(null)
   
   const ingredients = [
     { name: 'Barley', price: '6.50', available: 'Yes', group: 'Cereals' },
     { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
     { name: 'Wheat, Starch', price: '5.15', available: 'Yes', group: 'Wheat by-products' },
   ]
+
+  const handleEditClick = (ingredient) => {
+    setSelectedIngredient(ingredient)
+    setIsEditModalOpen(true)
+  }
+
+  const handleDeleteClick = (ingredient) => {
+    setSelectedIngredient(ingredient)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    // TODO: Implement delete functionality
+    console.log('Deleting ingredient:', selectedIngredient)
+  }
 
   return (
     <div className="p-3 md:p-6 space-y-6 max-w-full">
@@ -19,7 +39,7 @@ function Ingredients() {
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsAddModalOpen(true)}
             className="bg-green-button hover:bg-green-600 active:bg-green-700 transition-colors text-white px-2 md:px-4 py-1 md:py-2 text-sm md:text-base rounded-lg flex items-center gap-1 md:gap-2"
           >
             <RiAddLine className="w-4 h-4 md:w-5 md:h-5" />
@@ -68,10 +88,16 @@ function Ingredients() {
                   <td>{ingredient.available}</td>
                   <td>{ingredient.group}</td>
                   <td className="flex justify-end gap-2">
-                    <button className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10">
+                    <button 
+                      className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
+                      onClick={() => handleEditClick(ingredient)}
+                    >
                       <RiPencilLine className="w-4 h-4" />
                     </button>
-                    <button className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50">
+                    <button 
+                      className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                      onClick={() => handleDeleteClick(ingredient)}
+                    >
                       <RiDeleteBinLine className="w-4 h-4" />
                     </button>
                   </td>
@@ -83,8 +109,20 @@ function Ingredients() {
       </div>
 
       <AddIngredientModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+      />
+      <EditIngredientModal 
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        ingredient={selectedIngredient}
+      />
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Ingredient"
+        description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
       />
     </div>
   )
