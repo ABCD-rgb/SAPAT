@@ -1,8 +1,9 @@
-import { RiAddLine, RiFileDownloadLine, RiFileUploadLine, RiFilterLine, RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import { RiAddLine, RiFileDownloadLine, RiFileUploadLine, RiFilterLine } from 'react-icons/ri'
 import { useState } from 'react'
-import AddIngredientModal from '../components/ingredients/AddIngredientModal'
-import EditIngredientModal from '../components/ingredients/EditIngredientModal'
-import ConfirmationModal from '../components/ConfirmationModal'
+import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
+import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
+import ConfirmationModal from '../components/modals/ConfirmationModal'
+import Table from '../components/Table'
 
 function Ingredients() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -30,6 +31,8 @@ function Ingredients() {
     // TODO: Implement delete functionality
     console.log('Deleting ingredient:', selectedIngredient)
   }
+
+  const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
 
   return (
     <div className="p-3 md:p-6 space-y-6 max-w-full">
@@ -68,45 +71,12 @@ function Ingredients() {
       </div>
 
       {/* Ingredients table */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="text-deepbrown">Name</th>
-                <th className="text-deepbrown">Price (PHP/kg)</th>
-                <th className="text-deepbrown">Available</th>
-                <th className="text-deepbrown">Group</th>
-                <th className="text-right text-deepbrown">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ingredients.map((ingredient, index) => (
-                <tr key={index} className="hover">
-                  <td>{ingredient.name}</td>
-                  <td>{ingredient.price}</td>
-                  <td>{ingredient.available}</td>
-                  <td>{ingredient.group}</td>
-                  <td className="flex justify-end gap-2">
-                    <button 
-                      className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
-                      onClick={() => handleEditClick(ingredient)}
-                    >
-                      <RiPencilLine className="w-4 h-4" />
-                    </button>
-                    <button 
-                      className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
-                      onClick={() => handleDeleteClick(ingredient)}
-                    >
-                      <RiDeleteBinLine className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Table 
+        headers={headers}
+        data={ingredients}
+        onEdit={handleEditClick}
+        onDelete={handleDeleteClick}
+      />
 
       <AddIngredientModal 
         isOpen={isAddModalOpen} 
