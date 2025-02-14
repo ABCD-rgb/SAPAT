@@ -27,7 +27,7 @@ function AppLayout() {
             <Route path="/ingredients" element={<Ingredients />} />
             <Route path="/nutrients" element={<Nutrients />} />
             <Route path="/formulations" element={<Formulations />} />
-            <Route path="/view-formulation" element={<ViewFormulation />} />
+            <Route path="/formulations/:code" element={<ViewFormulation />} />
             <Route path="/error" element={<Error />} />
           </Routes>
         </div>

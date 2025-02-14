@@ -1,6 +1,6 @@
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
 
-function Table({ headers, data, onEdit, onDelete, actions = true }) {
+function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -17,7 +17,11 @@ function Table({ headers, data, onEdit, onDelete, actions = true }) {
           </thead>
           <tbody>
             {data.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover">
+              <tr 
+                key={rowIndex} 
+                className="hover cursor-pointer"
+                onClick={() => onRowClick && onRowClick(row)}
+              >
                 {Object.values(row).map((cell, cellIndex) => (
                   <td key={cellIndex}>{cell}</td>
                 ))}
@@ -25,13 +29,19 @@ function Table({ headers, data, onEdit, onDelete, actions = true }) {
                   <td className="flex justify-end gap-2">
                     <button
                       className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
-                      onClick={() => onEdit(row)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onEdit(row)
+                      }}
                     >
                       <RiPencilLine className="w-4 h-4" />
                     </button>
                     <button
                       className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
-                      onClick={() => onDelete(row)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onDelete(row)
+                      }}
                     >
                       <RiDeleteBinLine className="w-4 h-4" />
                     </button>
