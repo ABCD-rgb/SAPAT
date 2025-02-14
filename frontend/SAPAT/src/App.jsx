@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
@@ -12,10 +17,11 @@ import Header from './components/Header'
 
 function AppLayout() {
   const location = useLocation()
-  const isAuthPage = location.pathname === '/' || location.pathname === '/signup'
+  const isAuthPage =
+    location.pathname === '/' || location.pathname === '/signup'
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex h-screen flex-col">
       {!isAuthPage && <Header />}
       <div className="flex flex-1 overflow-hidden">
         {!isAuthPage && <Sidebar />}

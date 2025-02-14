@@ -1,11 +1,16 @@
 import { useParams } from 'react-router-dom'
-import { RiShareLine, RiAddLine, RiCalculatorLine, RiFileChartLine } from 'react-icons/ri'
+import {
+  RiShareLine,
+  RiAddLine,
+  RiCalculatorLine,
+  RiFileChartLine,
+} from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 
 // Define the hook directly in the same file
 function useUserColor() {
   const [userColor, setUserColor] = useState('')
-  
+
   const colors = [
     '#FF6B6B', // red
     '#4ECDC4', // teal
@@ -44,47 +49,49 @@ function ViewFormulation() {
   })
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
       <div className="flex-1 p-4">
         <div className="space-y-4">
           {/* Header - Adjusted for mobile */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:justify-between sm:items-center">
-            <div className="flex gap-2 flex-wrap">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-2">
               <button className="btn btn-sm btn-outline text-xs">Import</button>
               <button className="btn btn-sm btn-outline text-xs">Export</button>
             </div>
-            <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-blue-400"></div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-400"></div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-yellow-400"></div>
+                <div className="h-6 w-6 rounded-full bg-blue-400 sm:h-8 sm:w-8"></div>
+                <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
+                <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
-              <button className="btn btn-sm text-xs gap-1">
+              <button className="btn btn-sm gap-1 text-xs">
                 <RiShareLine /> Share ▼
               </button>
             </div>
           </div>
 
           {/* Form Fields - Grid on desktop, Stack on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div>
               <label className="label text-sm font-medium">Code</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={code}
                 readOnly
-                className="input input-bordered w-full rounded-xl" 
+                className="input input-bordered w-full rounded-xl"
                 style={getInputStyle('code')}
                 onFocus={() => handleFocus('code')}
                 onBlur={handleBlur}
               />
             </div>
             <div>
-              <label className="label text-sm font-medium">Formulation name</label>
-              <input 
+              <label className="label text-sm font-medium">
+                Formulation name
+              </label>
+              <input
                 type="text"
-                className="input input-bordered w-full rounded-xl" 
+                className="input input-bordered w-full rounded-xl"
                 style={getInputStyle('name')}
                 onFocus={() => handleFocus('name')}
                 onBlur={handleBlur}
@@ -92,9 +99,9 @@ function ViewFormulation() {
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Description</label>
-              <input 
+              <input
                 type="text"
-                className="input input-bordered w-full rounded-xl" 
+                className="input input-bordered w-full rounded-xl"
                 style={getInputStyle('description')}
                 onFocus={() => handleFocus('description')}
                 onBlur={handleBlur}
@@ -102,7 +109,7 @@ function ViewFormulation() {
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Animal group</label>
-              <select 
+              <select
                 className="select select-bordered w-full rounded-xl"
                 style={getInputStyle('animalGroup')}
                 onFocus={() => handleFocus('animalGroup')}
@@ -116,15 +123,15 @@ function ViewFormulation() {
           </div>
 
           {/* Tables - Grid on desktop, Stack on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Ingredients Table */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
               <div className="p-4">
-                <h3 className="font-semibold text-sm mb-2">Ingredients</h3>
+                <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
               <div className="overflow-x-auto">
-                <table className="table table-sm w-full">
+                <table className="table-sm table w-full">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -147,7 +154,7 @@ function ViewFormulation() {
                     <tr>
                       <td>Barley</td>
                       <td>
-                        <input 
+                        <input
                           type="number"
                           className="input input-bordered input-sm w-20"
                           style={getInputStyle('barley-min')}
@@ -156,7 +163,7 @@ function ViewFormulation() {
                         />
                       </td>
                       <td>
-                        <input 
+                        <input
                           type="number"
                           className="input input-bordered input-sm w-20"
                           style={getInputStyle('barley-max')}
@@ -180,13 +187,13 @@ function ViewFormulation() {
             </div>
 
             {/* Nutrients Table */}
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
               <div className="p-4">
-                <h3 className="font-semibold text-sm mb-2">Nutrients</h3>
+                <h3 className="mb-2 text-sm font-semibold">Nutrients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
               <div className="overflow-x-auto">
-                <table className="table table-sm w-full">
+                <table className="table-sm table w-full">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -209,13 +216,15 @@ function ViewFormulation() {
                   </tbody>
                 </table>
               </div>
-              <div className="p-4 space-y-4">
+              <div className="space-y-4 p-4">
                 <button className="btn btn-sm gap-2 bg-green-600 text-white">
                   <RiAddLine /> Add nutrient
                 </button>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Total cost (per kg)</span>
-                  <input 
+                  <span className="text-sm text-gray-500">
+                    Total cost (per kg)
+                  </span>
+                  <input
                     type="number"
                     className="input input-bordered input-sm w-24 rounded-lg"
                     style={getInputStyle('total-cost')}
@@ -228,7 +237,7 @@ function ViewFormulation() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 justify-end">
+          <div className="flex justify-end gap-2">
             <button className="btn btn-primary gap-2">
               <RiCalculatorLine /> Optimize
             </button>

@@ -2,28 +2,33 @@ import { RiCloseLine } from 'react-icons/ri'
 
 function EditFormulationModal({ isOpen, onClose, formulation }) {
   return (
-    <dialog id="edit_formulation_modal" className={`modal ${isOpen ? 'modal-open' : ''}`}>
-      <div className="modal-box w-11/12 max-w-2xl bg-white rounded-3xl relative mt-[64px] md:mt-0">
+    <dialog
+      id="edit_formulation_modal"
+      className={`modal ${isOpen ? 'modal-open' : ''}`}
+    >
+      <div className="modal-box relative mt-[64px] w-11/12 max-w-2xl rounded-3xl bg-white md:mt-0">
         {/* Close button */}
-        <button 
-          className="btn btn-sm btn-circle absolute right-4 top-4"
+        <button
+          className="btn btn-sm btn-circle absolute top-4 right-4"
           onClick={onClose}
         >
-          <RiCloseLine className="w-5 h-5" />
+          <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="font-bold text-lg text-deepbrown mb-4">Edit Formulation</h3>
-        
+        <h3 className="text-deepbrown mb-4 text-lg font-bold">
+          Edit Formulation
+        </h3>
+
         {/* Form fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="form-control w-full">
             <label className="label">
               <span className="label-text">Code</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="Enter code" 
-              className="input input-bordered w-full rounded-xl" 
+            <input
+              type="text"
+              placeholder="Enter code"
+              className="input input-bordered w-full rounded-xl"
               defaultValue={formulation?.code}
             />
           </div>
@@ -32,10 +37,10 @@ function EditFormulationModal({ isOpen, onClose, formulation }) {
             <label className="label">
               <span className="label-text">Name</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="Enter name" 
-              className="input input-bordered w-full rounded-xl" 
+            <input
+              type="text"
+              placeholder="Enter name"
+              className="input input-bordered w-full rounded-xl"
               defaultValue={formulation?.name}
             />
           </div>
@@ -44,7 +49,7 @@ function EditFormulationModal({ isOpen, onClose, formulation }) {
             <label className="label">
               <span className="label-text">Animal Group</span>
             </label>
-            <select 
+            <select
               className="select select-bordered w-full rounded-xl"
               defaultValue={formulation?.animalGroup}
             >
@@ -59,8 +64,8 @@ function EditFormulationModal({ isOpen, onClose, formulation }) {
             <label className="label">
               <span className="label-text">Description</span>
             </label>
-            <textarea 
-              placeholder="Enter description" 
+            <textarea
+              placeholder="Enter description"
               className="textarea textarea-bordered w-full rounded-xl"
               rows="3"
               defaultValue={formulation?.description}
@@ -70,13 +75,10 @@ function EditFormulationModal({ isOpen, onClose, formulation }) {
 
         {/* Modal actions */}
         <div className="modal-action">
-          <button 
-            className="btn rounded-xl px-8" 
-            onClick={onClose}
-          >
+          <button className="btn rounded-xl px-8" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-8">
+          <button className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600">
             Update
           </button>
         </div>

@@ -1,8 +1,15 @@
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
 
-function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) {
+function Table({
+  headers,
+  data,
+  onEdit,
+  onDelete,
+  onRowClick,
+  actions = true,
+}) {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="table">
           <thead>
@@ -12,13 +19,15 @@ function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) 
                   {header}
                 </th>
               ))}
-              {actions && <th className="text-right text-deepbrown">Actions</th>}
+              {actions && (
+                <th className="text-deepbrown text-right">Actions</th>
+              )}
             </tr>
           </thead>
           <tbody>
             {data.map((row, rowIndex) => (
-              <tr 
-                key={rowIndex} 
+              <tr
+                key={rowIndex}
                 className="hover cursor-pointer"
                 onClick={() => onRowClick && onRowClick(row)}
               >
@@ -34,7 +43,7 @@ function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) 
                         onEdit(row)
                       }}
                     >
-                      <RiPencilLine className="w-4 h-4" />
+                      <RiPencilLine className="h-4 w-4" />
                     </button>
                     <button
                       className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
@@ -43,7 +52,7 @@ function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) 
                         onDelete(row)
                       }}
                     >
-                      <RiDeleteBinLine className="w-4 h-4" />
+                      <RiDeleteBinLine className="h-4 w-4" />
                     </button>
                   </td>
                 )}
@@ -57,4 +66,3 @@ function Table({ headers, data, onEdit, onDelete, onRowClick, actions = true }) 
 }
 
 export default Table
-

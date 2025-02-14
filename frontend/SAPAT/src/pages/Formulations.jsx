@@ -14,7 +14,7 @@ function Formulations() {
   const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
   const navigate = useNavigate()
-  
+
   const formulations = [
     { code: 'F1', name: 'Feed 1', description: '', animalGroup: 'Swine' },
     { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
@@ -48,35 +48,37 @@ function Formulations() {
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
 
   return (
-    <div className="p-3 md:p-6 space-y-6 max-w-full">
-      <h1 className="text-xl md:text-2xl font-bold text-deepbrown mb-6">Formulations</h1>
+    <div className="max-w-full space-y-6 p-3 md:p-6">
+      <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+        Formulations
+      </h1>
 
       {/* Action buttons and search */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          <button 
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex w-full flex-wrap gap-2 md:w-auto">
+          <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-green-button hover:bg-green-600 active:bg-green-700 transition-colors text-white px-2 md:px-4 py-1 md:py-2 text-sm md:text-base rounded-lg flex items-center gap-1 md:gap-2"
+            className="bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
           >
-            <RiAddLine className="w-4 h-4 md:w-5 md:h-5" />
+            <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
             <span>Add New</span>
           </button>
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex w-full gap-2 md:w-auto">
           <input
             type="text"
             placeholder="Search"
-            className="px-3 md:px-4 py-1 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+            className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
           />
-          <button className="px-3 md:px-4 py-1 md:py-2 text-sm md:text-base border border-gray-300 rounded-lg text-darkbrown whitespace-nowrap hover:border-deepbrown hover:bg-gray-50 active:bg-gray-100 transition-colors flex items-center gap-1 md:gap-2">
-            <RiFilterLine className="w-4 h-4 md:w-5 md:h-5" />
+          <button className="text-darkbrown hover:border-deepbrown flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-gray-50 active:bg-gray-100 md:gap-2 md:px-4 md:py-2 md:text-base">
+            <RiFilterLine className="h-4 w-4 md:h-5 md:w-5" />
             <span>Filter</span>
           </button>
         </div>
       </div>
 
       {/* Formulations table */}
-      <Table 
+      <Table
         headers={headers}
         data={formulations}
         onEdit={handleEditClick}
@@ -84,12 +86,12 @@ function Formulations() {
         onRowClick={handleRowClick}
       />
 
-      <CreateFormulationModal 
-        isOpen={isCreateModalOpen} 
+      <CreateFormulationModal
+        isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleCreateSuccess}
       />
-      <EditFormulationModal 
+      <EditFormulationModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}

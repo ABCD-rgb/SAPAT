@@ -9,40 +9,55 @@ function AddIngredientModal({ isOpen, onClose }) {
   ]
 
   return (
-    <dialog id="add_ingredient_modal" className={`modal ${isOpen ? 'modal-open' : ''}`}>
-      <div className="modal-box w-11/12 max-w-3xl bg-white rounded-3xl relative mt-[64px] md:mt-0">
+    <dialog
+      id="add_ingredient_modal"
+      className={`modal ${isOpen ? 'modal-open' : ''}`}
+    >
+      <div className="modal-box relative mt-[64px] w-11/12 max-w-3xl rounded-3xl bg-white md:mt-0">
         {/* Close button */}
-        <button 
-          className="btn btn-sm btn-circle absolute right-4 top-4"
+        <button
+          className="btn btn-sm btn-circle absolute top-4 right-4"
           onClick={onClose}
         >
-          <RiCloseLine className="w-5 h-5" />
+          <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="font-bold text-lg text-deepbrown mb-4">Add Ingredient</h3>
-        <p className="text-sm text-gray-500 mb-4">Description</p>
-        
+        <h3 className="text-deepbrown mb-4 text-lg font-bold">
+          Add Ingredient
+        </h3>
+        <p className="mb-4 text-sm text-gray-500">Description</p>
+
         {/* Description section */}
         <div className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Name</span>
               </label>
-              <input type="text" placeholder="Value" className="input input-bordered w-full rounded-2xl" />
+              <input
+                type="text"
+                placeholder="Value"
+                className="input input-bordered w-full rounded-2xl"
+              />
             </div>
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Price (PHP/kg)</span>
               </label>
-              <input type="text" placeholder="Value" className="input input-bordered w-full rounded-2xl" />
+              <input
+                type="text"
+                placeholder="Value"
+                className="input input-bordered w-full rounded-2xl"
+              />
             </div>
             <div className="form-control w-full">
               <label className="label">
                 <span className="label-text">Group</span>
               </label>
               <select className="select select-bordered w-full rounded-2xl">
-                <option disabled selected>Value</option>
+                <option disabled selected>
+                  Value
+                </option>
                 <option>Cereals</option>
                 <option>Wheat by-products</option>
               </select>
@@ -51,8 +66,8 @@ function AddIngredientModal({ isOpen, onClose }) {
         </div>
 
         {/* Nutrients table */}
-        <div className="rounded-2xl border border-gray-200 overflow-hidden">
-          <table className="table table-zebra">
+        <div className="overflow-hidden rounded-2xl border border-gray-200">
+          <table className="table-zebra table">
             <thead className="bg-gray-50">
               <tr>
                 <th className="font-semibold">Name</th>
@@ -66,10 +81,10 @@ function AddIngredientModal({ isOpen, onClose }) {
                   <td>{nutrient.name}</td>
                   <td>{nutrient.unit}</td>
                   <td>
-                    <input 
-                      type="text" 
-                      placeholder="Value" 
-                      className="input input-bordered input-sm w-full max-w-xs rounded-xl" 
+                    <input
+                      type="text"
+                      placeholder="Value"
+                      className="input input-bordered input-sm w-full max-w-xs rounded-xl"
                     />
                   </td>
                 </tr>
@@ -80,13 +95,10 @@ function AddIngredientModal({ isOpen, onClose }) {
 
         {/* Modal actions */}
         <div className="modal-action">
-          <button 
-            className="btn rounded-xl px-8" 
-            onClick={onClose}
-          >
+          <button className="btn rounded-xl px-8" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn bg-green-button hover:bg-green-600 text-white rounded-xl px-8">
+          <button className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600">
             Add
           </button>
         </div>
