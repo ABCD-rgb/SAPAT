@@ -1,6 +1,10 @@
 import { RiAddLine, RiFileDownloadLine, RiFileUploadLine, RiFilterLine, RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import { useState } from 'react'
+import AddIngredientModal from '../components/ingredients/AddIngredientModal'
 
 function Ingredients() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  
   const ingredients = [
     { name: 'Barley', price: '6.50', available: 'Yes', group: 'Cereals' },
     { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
@@ -14,7 +18,10 @@ function Ingredients() {
       {/* Action buttons and search */}
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
-          <button className="bg-green-button hover:bg-green-600 active:bg-green-700 transition-colors text-white px-2 md:px-4 py-1 md:py-2 text-sm md:text-base rounded-lg flex items-center gap-1 md:gap-2">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-green-button hover:bg-green-600 active:bg-green-700 transition-colors text-white px-2 md:px-4 py-1 md:py-2 text-sm md:text-base rounded-lg flex items-center gap-1 md:gap-2"
+          >
             <RiAddLine className="w-4 h-4 md:w-5 md:h-5" />
             <span>Add New</span>
           </button>
@@ -74,6 +81,11 @@ function Ingredients() {
           </table>
         </div>
       </div>
+
+      <AddIngredientModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   )
 }
