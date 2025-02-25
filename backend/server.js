@@ -28,9 +28,6 @@ const io = new Server(httpServer, {
 handleMongoDB();
 
 // auth
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
