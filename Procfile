@@ -1,1 +1,1 @@
-web: cd backend && npm run dev
+web: cd backend && node server.js
