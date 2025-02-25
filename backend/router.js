@@ -35,6 +35,10 @@ const handleRoutes = (app) => {
       message: req.session?.messages?.[0] || "Authentication failed"
     });
   });
+
+  app.get('/', (req, res) => {
+    res.send('Hello World');
+  });
 };
 
 export default handleRoutes;
