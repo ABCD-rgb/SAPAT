@@ -14,6 +14,8 @@ function Dashboard() {
     return <div>Loading...</div>
   }
 
+  console.log(user);
+  
   if (!user) {
     return <Navigate to="/" />
   }
