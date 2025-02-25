@@ -2,7 +2,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import { RiFileList2Line, RiLeafLine } from 'react-icons/ri'
 import StatCard from '../components/StatCard'
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hook/useAuth'
 import { Navigate } from 'react-router-dom'
 
 ChartJS.register(ArcElement, Tooltip, Legend)

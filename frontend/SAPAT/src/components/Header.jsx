@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hook/useAuth'
 
 function Header() {
   const { user } = useAuth()
@@ -25,7 +25,7 @@ function Header() {
           <p className="hidden md:mr-6 md:block md:text-lg md:font-bold">
             {user?.displayName || 'Guest'}
           </p>
-          <img
+          <img  
             className="h-10 w-10 rounded-2xl"
             alt="Profile"
             src={user?.profilePicture || "https://ui-avatars.com/api/?name=" }

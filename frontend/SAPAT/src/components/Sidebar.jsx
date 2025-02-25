@@ -6,7 +6,7 @@ import {
   RiFlaskLine,
   RiLogoutBoxLine,
 } from 'react-icons/ri'
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hook/useAuth'
 
 function Sidebar() {
   const location = useLocation()
