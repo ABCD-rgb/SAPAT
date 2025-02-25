@@ -1,15 +1,21 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth2';
 import dotenv from 'dotenv';
+import User from '../models/user-model.js';
 
 dotenv.config();
 
 passport.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user.id);
 });
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
 });
 
 passport.use(new GoogleStrategy({
@@ -17,10 +23,28 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:3000/auth/google/callback",
     passReqToCallback: true,
-    scope: ['profile', 'email']
   },
-  function(request, accessToken, refreshToken, profile, done) {
-    return done(null, profile);
+  async function(request, accessToken, refreshToken, profile, done) {
+    try {
+      // Find or create user
+      let user = await User.findOne({ googleId: profile.id });
+      
+      if (!user) {
+        // Create new user if doesn't exist
+        user = await User.create({
+          googleId: profile.id,
+          email: profile.email,
+          displayName: profile.displayName,
+          firstName: profile.name.givenName,
+          lastName: profile.name.familyName,
+          profilePicture: profile.photos[0].value
+        });
+      }
+      
+      return done(null, user);
+    } catch (err) {
+      return done(err, null);
+    }
   }
 ));
 

@@ -5,7 +5,6 @@ import {
   useLocation,
 } from 'react-router-dom'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Ingredients from './pages/Ingredients'
 import Nutrients from './pages/Nutrients'
@@ -18,7 +17,7 @@ import Header from './components/Header'
 function AppLayout() {
   const location = useLocation()
   const isAuthPage =
-    location.pathname === '/' || location.pathname === '/signup'
+    location.pathname === '/'
 
   return (
     <div className="flex h-screen flex-col">
@@ -40,10 +39,6 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <Login />,
-      },
-      {
-        path: '/signup',
-        element: <Signup />,
       },
       {
         path: '/dashboard',

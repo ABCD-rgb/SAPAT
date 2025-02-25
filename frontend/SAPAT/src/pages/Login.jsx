@@ -1,9 +1,26 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 function Login() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Check if user is already authenticated
+    fetch('http://localhost:3000/api/user', {
+      credentials: 'include'
+    })
+      .then(res => {
+        if (res.ok) {
+          navigate('/dashboard')
+        }
+      })
+      .catch(err => {
+        console.error('Auth check failed:', err)
+      })
+  }, [navigate])
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = 'http://localhost:3000/auth/google'
   }
 
   return (
@@ -32,86 +49,27 @@ function Login() {
         </div>
 
         {/* Login modal */}
-        <div className="mx-auto flex h-115 w-7/8 flex-col items-center justify-center rounded-lg bg-white p-6 px-10 shadow-lg md:mx-0 md:h-172 md:w-145">
-          <form className="w-full space-y-8">
-            <div>
-              <h1 className="text-charcoal-header mb-4 text-2xl font-bold md:text-3xl">
-                Login
-              </h1>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
-                placeholder="Enter your email"
-              />
-            </div>
+        <div className="mx-auto flex h-auto w-7/8 flex-col items-center justify-center rounded-lg bg-white p-8 shadow-lg md:mx-0 md:w-96">
+          <h1 className="text-charcoal-header mb-6 text-2xl font-bold md:text-3xl">
+            Welcome to SAPAT
+          </h1>
+          
+          <p className="text-gray-600 mb-8 text-center">
+            Sign in or sign up with your Google account to continue
+          </p>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 focus:outline-none"
-                placeholder="Enter your password"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-green-button w-full rounded-md border border-transparent px-4 py-2 text-white shadow-sm hover:bg-green-500 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
-            >
-              Sign in
-            </button>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <button 
-              onClick={handleGoogleLogin}
-              type="button"
-              className="mt-4 flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-            >
-              <img
-                className="mr-2 h-5 w-5"
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt="Google logo"
-              />
-              Sign in with Google
-            </button>
-
-            <div className="mt-4 text-center">
-              <span className="text-gray-600">
-                Don&apos;t have an account yet?{' '}
-              </span>
-              <Link
-                to="/signup"
-                className="font-medium text-green-600 hover:text-green-700"
-              >
-                Sign up
-              </Link>
-            </div>
-          </div>
+          <button 
+            onClick={handleGoogleLogin}
+            type="button"
+            className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+          >
+            <img
+              className="mr-2 h-5 w-5"
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google logo"
+            />
+            Continue with Google
+          </button>
         </div>
       </div>
     </div>

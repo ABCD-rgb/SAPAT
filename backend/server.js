@@ -51,14 +51,38 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/login/failed',
-    successRedirect: 'http://localhost:5173/dashboard'
+    successRedirect: 'http://localhost:5173/dashboard',
+    failureMessage: true
   })
 );
 
 app.get('/login/failed', (req, res) => {
   res.status(401).json({
     success: false,
-    message: "failure",
+    message: req.session?.messages?.[0] || "Authentication failed"
+  });
+});
+
+// Check if user is authenticated middleware
+const isAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ error: 'Not authenticated' });
+};
+
+// Get current user route
+app.get('/api/user', isAuthenticated, (req, res) => {
+  res.json(req.user);
+});
+
+// Logout route
+app.get('/api/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error logging out' });
+    }
+    res.redirect(process.env.CLIENT_URL);
   });
 });
 

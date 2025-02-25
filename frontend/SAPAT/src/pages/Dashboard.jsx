@@ -2,10 +2,23 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { Pie } from 'react-chartjs-2'
 import { RiFileList2Line, RiLeafLine } from 'react-icons/ri'
 import StatCard from '../components/StatCard'
+import { useAuth } from '../context/AuthContext'
+import { Navigate } from 'react-router-dom'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Dashboard() {
+  const { user, loading, logout } = useAuth()
+  console.log(user)
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+
+  if (!user) {
+    return <Navigate to="/" />
+  }
+
   const pieData = {
     labels: ['Starter', 'Grower', 'Finisher', 'Layer'],
     datasets: [
@@ -35,7 +48,8 @@ function Dashboard() {
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="text-deepbrown mb-6 text-2xl font-bold">Dashboard</h1>
+      <h1 className="text-deepbrown mb-6 text-2xl font-bold">Welcome, {user.displayName}!</h1>
+      <button onClick={logout}>Logout</button>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <StatCard
