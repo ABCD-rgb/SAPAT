@@ -5,6 +5,7 @@ import useAuth from '../hook/useAuth'
 function Login() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const API_URL = import.meta.env.VITE_API_URL
 
   useEffect(() => {
     if (user) {
@@ -13,7 +14,7 @@ function Login() {
   }, [user, navigate])
 
   const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google'
+    window.location.href = `${API_URL}/auth/google`
   }
 
   return (
