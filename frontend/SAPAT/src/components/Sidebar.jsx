@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import {
   RiDashboardLine,
   RiLeafLine,
@@ -6,9 +6,12 @@ import {
   RiFlaskLine,
   RiLogoutBoxLine,
 } from 'react-icons/ri'
+import useAuth from '../hook/useAuth'
 
 function Sidebar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { logout } = useAuth()
 
   const menuItems = [
     { path: '/dashboard', icon: RiDashboardLine, label: 'Dashboard' },
@@ -16,6 +19,11 @@ function Sidebar() {
     { path: '/nutrients', icon: RiStackLine, label: 'Nutrients' },
     { path: '/formulations', icon: RiFlaskLine, label: 'Formulate' },
   ]
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/')
+  }
 
   return (
     <div className="bg-green-accent flex h-full w-16 flex-col p-3 md:w-48">
@@ -44,13 +52,13 @@ function Sidebar() {
         ))}
       </nav>
 
-      <Link
-        to="/"
+      <button
+        onClick={handleLogout}
         className="text-red-button flex items-center rounded-lg p-2 transition-colors hover:bg-white/50"
       >
         <RiLogoutBoxLine className="h-6 w-6" />
         <span className="ml-3 hidden md:block">Logout</span>
-      </Link>
+      </button>
     </div>
   )
 }

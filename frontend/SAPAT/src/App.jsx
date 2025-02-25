@@ -1,11 +1,10 @@
 import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
   useLocation,
 } from 'react-router-dom'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Ingredients from './pages/Ingredients'
 import Nutrients from './pages/Nutrients'
@@ -18,7 +17,7 @@ import Header from './components/Header'
 function AppLayout() {
   const location = useLocation()
   const isAuthPage =
-    location.pathname === '/' || location.pathname === '/signup'
+    location.pathname === '/'
 
   return (
     <div className="flex h-screen flex-col">
@@ -26,28 +25,51 @@ function AppLayout() {
       <div className="flex flex-1 overflow-hidden">
         {!isAuthPage && <Sidebar />}
         <div className="flex-1 overflow-auto">
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/ingredients" element={<Ingredients />} />
-            <Route path="/nutrients" element={<Nutrients />} />
-            <Route path="/formulations" element={<Formulations />} />
-            <Route path="/formulations/:code" element={<ViewFormulation />} />
-            <Route path="/error" element={<Error />} />
-          </Routes>
+          <Outlet />
         </div>
       </div>
     </div>
   )
 }
 
+const router = createBrowserRouter([
+  {
+    element: <AppLayout />,
+    children: [
+      {
+        path: '/',
+        element: <Login />,
+      },
+      {
+        path: '/dashboard',
+        element: <Dashboard />,
+      },
+      {
+        path: '/ingredients',
+        element: <Ingredients />,
+      },
+      {
+        path: '/nutrients',
+        element: <Nutrients />,
+      },
+      {
+        path: '/formulations',
+        element: <Formulations />,
+      },
+      {
+        path: '/formulations/:code',
+        element: <ViewFormulation />,
+      },
+      {
+        path: '/error',
+        element: <Error />,
+      },
+    ],
+  },
+])
+
 function App() {
-  return (
-    <Router>
-      <AppLayout />
-    </Router>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App

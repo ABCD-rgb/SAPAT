@@ -56,14 +56,15 @@ function AddNutrientModal({ isOpen, onClose }) {
             <label className="label">
               <span className="label-text">Group</span>
             </label>
-            <select className="select select-bordered w-full rounded-xl">
-              <option disabled selected>
-                Select group
-              </option>
-              <option>Composition</option>
-              <option>Amino acids</option>
-              <option>Minerals</option>
-              <option>Vitamins</option>
+            <select 
+              className="select select-bordered w-full rounded-xl"
+              defaultValue=""
+            >
+              <option value="" disabled>Select group</option>
+              <option value="composition">Composition</option>
+              <option value="amino">Amino acids</option>
+              <option value="minerals">Minerals</option>
+              <option value="vitamins">Vitamins</option>
             </select>
           </div>
 

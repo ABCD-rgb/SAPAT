@@ -1,4 +1,8 @@
+import useAuth from '../hook/useAuth'
+
 function Header() {
+  const { user } = useAuth()
+
   return (
     //  header containing date (month, day, year) and time on the  leftmost side and a default profile icon on the rightmost side
     <header className="bg-white p-2 shadow-sm">
@@ -18,12 +22,12 @@ function Header() {
         </div>
         <div className="mr-6 flex items-center">
           <p className="hidden md:mr-6 md:block md:text-lg md:font-bold">
-            John Doe
+            {user?.displayName || 'Guest'}
           </p>
-          <img
+          <img  
             className="h-10 w-10 rounded-2xl"
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            alt="Profile"
+            src={user?.profilePicture || "https://ui-avatars.com/api/?name=" }
           />
         </div>
       </div>
