@@ -9,7 +9,6 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Dashboard() {
   const { user, loading, logout } = useAuth()
-  console.log(user)
 
   if (loading) {
     return <div>Loading...</div>

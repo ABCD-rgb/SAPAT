@@ -2,7 +2,6 @@ import useAuth from '../hook/useAuth'
 
 function Header() {
   const { user } = useAuth()
-  console.log('User in header:', user)
 
   return (
     //  header containing date (month, day, year) and time on the  leftmost side and a default profile icon on the rightmost side

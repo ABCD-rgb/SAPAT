@@ -27,10 +27,16 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:3000/api/logout', {
-        credentials: 'include'
+      const res = await fetch('http://localhost:3000/api/logout', {
+        credentials: 'include',
+        method: 'GET'
       });
-      setUser(null);
+      if (res.ok) {
+        setUser(null);
+        window.location.href = '/';  // Force a full page reload
+      } else {
+        throw new Error('Logout failed');
+      }
     } catch (err) {
       console.error('Logout failed:', err);
     }

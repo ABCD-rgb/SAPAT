@@ -54,12 +54,13 @@ function AddIngredientModal({ isOpen, onClose }) {
               <label className="label">
                 <span className="label-text">Group</span>
               </label>
-              <select className="select select-bordered w-full rounded-2xl">
-                <option disabled selected>
-                  Value
-                </option>
-                <option>Cereals</option>
-                <option>Wheat by-products</option>
+              <select 
+                className="select select-bordered w-full rounded-2xl"
+                defaultValue=""
+              >
+                <option value="" disabled>Value</option>
+                <option value="cereals">Cereals</option>
+                <option value="wheat">Wheat by-products</option>
               </select>
             </div>
           </div>

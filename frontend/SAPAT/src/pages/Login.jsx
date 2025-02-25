@@ -1,23 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import useAuth from '../hook/useAuth'
 
 function Login() {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   useEffect(() => {
-    // Check if user is already authenticated
-    fetch('http://localhost:3000/api/user', {
-      credentials: 'include'
-    })
-      .then(res => {
-        if (res.ok) {
-          navigate('/dashboard')
-        }
-      })
-      .catch(err => {
-        console.error('Auth check failed:', err)
-      })
-  }, [navigate])
+    if (user) {
+      navigate('/dashboard')
+    }
+  }, [user, navigate])
 
   const handleGoogleLogin = () => {
     window.location.href = 'http://localhost:3000/auth/google'
