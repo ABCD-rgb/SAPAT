@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 
 const handleRoutes = (app) => {
   // Check if user is authenticated middleware
@@ -38,6 +39,7 @@ const handleRoutes = (app) => {
 
   app.get('/', (req, res) => {
     res.send('Hello World');
+    console.log('MongoDB Connection State:', mongoose.connection.readyState);
   });
 };
 
