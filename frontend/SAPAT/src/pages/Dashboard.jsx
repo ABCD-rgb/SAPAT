@@ -8,11 +8,12 @@ import { Navigate } from 'react-router-dom'
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Dashboard() {
-  const { user, loading, logout } = useAuth()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return <div>Loading...</div>
   }
+
 
   if (!user) {
     return <Navigate to="/" />
@@ -48,8 +49,6 @@ function Dashboard() {
   return (
     <div className="space-y-6 p-6">
       <h1 className="text-deepbrown mb-6 text-2xl font-bold">Welcome, {user.displayName}!</h1>
-      <button onClick={logout}>Logout</button>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <StatCard
           icon={RiFileList2Line}

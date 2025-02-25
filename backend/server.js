@@ -28,13 +28,17 @@ const io = new Server(httpServer, {
 handleMongoDB();
 
 // auth
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { 
-    secure: false, // set to true if using https
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    secure: process.env.NODE_ENV === 'production', // set to true if using https
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   }
 }));
 app.use(passport.initialize());
@@ -48,7 +52,7 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: '/login/failed', // TODO: create a login failed page
+    failureRedirect: `${process.env.CLIENT_URL}`, // TODO: create a login failed page
     successRedirect: `${process.env.CLIENT_URL}/dashboard`,
     failureMessage: true
   })
