@@ -24,14 +24,12 @@ const io = new Server(httpServer, {
   cors: corsOptions
 });
 
-handleMongoDB();
-handleRoutes(app);
-io.on("connection", handleSocket);
 
+handleMongoDB();
 
 // auth
 app.use(session({
-  secret: 'your_session_secret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { 
@@ -50,47 +48,15 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: '/login/failed',
-    successRedirect: 'http://localhost:5173/dashboard',
+    failureRedirect: '/login/failed', // TODO: create a login failed page
+    successRedirect: `${process.env.CLIENT_URL}/dashboard`,
     failureMessage: true
   })
 );
 
-app.get('/login/failed', (req, res) => {
-  res.status(401).json({
-    success: false,
-    message: req.session?.messages?.[0] || "Authentication failed"
-  });
-});
 
-// Check if user is authenticated middleware
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ error: 'Not authenticated' });
-};
-
-// Get current user route
-app.get('/api/user', isAuthenticated, (req, res) => {
-  res.json(req.user);
-});
-
-// Logout route
-app.get('/api/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error logging out' });
-    }
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error destroying session' });
-      }
-      res.clearCookie('connect.sid');  // Clear the session cookie
-      res.status(200).json({ message: 'Logged out successfully' });
-    });
-  });
-});
+handleRoutes(app);
+io.on("connection", handleSocket);
 
 httpServer.listen(3000, () => {
   console.log(`Server is running on port 3000`);
