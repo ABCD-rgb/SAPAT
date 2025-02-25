@@ -29,7 +29,7 @@ function Sidebar() {
     <div className="bg-green-accent flex h-full w-16 flex-col p-3 md:w-48">
       <div className="mb-8 flex justify-center">
         <img
-          src="/src/assets/logo.png"
+          src="/assets/logo.png"
           alt="SAPAT Logo"
           className="h-10 w-10 md:h-16 md:w-16"
         />
