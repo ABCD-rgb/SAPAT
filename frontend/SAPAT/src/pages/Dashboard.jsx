@@ -14,9 +14,9 @@ function Dashboard() {
     return <div>Loading...</div>
   }
 
-  console.log(user);
-  
+
   if (!user) {
+    alert('You are not logged in', user)
     return <Navigate to="/" />
   }
 
