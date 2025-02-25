@@ -22,13 +22,13 @@ function Login() {
       {/* Mobile background - hidden on desktop */}
       <div
         className="fixed min-h-screen w-full bg-left-top bg-no-repeat md:hidden"
-        style={{ backgroundImage: "url('/src/assets/mobile_bg.svg')" }}
+        style={{ backgroundImage: "url('/assets/mobile_bg.svg')" }}
       ></div>
 
       {/* Desktop background - hidden on mobile */}
       <div
         className="fixed hidden min-h-screen w-full bg-left-top bg-no-repeat md:block"
-        style={{ backgroundImage: "url('/src/assets/desktop_bg.svg')" }}
+        style={{ backgroundImage: "url('/assets/desktop_bg.svg')" }}
       ></div>
 
       {/* Content wrapper - positioned above backgrounds */}
@@ -36,7 +36,7 @@ function Login() {
         {/* Logo */}
         <div className="mb-10 flex items-center justify-center md:mb-0">
           <img
-            src="/src/assets/logo_word.png"
+            src="/assets/logo_word.png"
             alt="logo"
             className="h-1/2 w-1/2 md:h-full md:w-full"
           />
