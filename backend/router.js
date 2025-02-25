@@ -4,13 +4,16 @@ const handleRoutes = (app) => {
   // Check if user is authenticated middleware
   const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
+      console.log('isAuthenticated: User is authenticated');
       return next();
     }
+    console.log('isAuthenticated: User is not authenticated');
     res.status(401).json({ error: 'Not authenticated' });
   };
 
   // Get current user route
   app.get('/api/user', isAuthenticated, (req, res) => {
+    console.log('User:', req.user);
     res.json(req.user);
   });
 
