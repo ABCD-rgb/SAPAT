@@ -14,6 +14,7 @@ passport.deserializeUser(async (id, done) => {
         const user = await User.findById(id);
         done(null, user);
     } catch (err) {
+        console.error('Deserialize User Error:', err);
         done(err, null);
     }
 });
@@ -41,9 +42,10 @@ passport.use(new GoogleStrategy({
           profilePicture: profile.photos[0].value
         });
       }
-      
+      console.log('Google Strategy: User created or found');
       return done(null, user);
     } catch (err) {
+      console.error('Google Strategy: Error creating or finding user', err);
       return done(err, null);
     }
   }
