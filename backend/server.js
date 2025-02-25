@@ -49,7 +49,7 @@ app.get('/auth/google',
 
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    failureRedirect: '/login/failed', // TODO: create a login failed page
+    failureRedirect: `${process.env.CLIENT_URL}`, // TODO: create a login failed page
     successRedirect: `${process.env.CLIENT_URL}/dashboard`,
     failureMessage: true
   })
