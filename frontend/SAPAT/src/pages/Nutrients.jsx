@@ -9,12 +9,22 @@ import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import useAuth from "../hook/useAuth.js";
+import {Navigate} from "react-router-dom";
 
 function Nutrients() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedNutrient, setSelectedNutrient] = useState(null)
+
+  const { user, loading } = useAuth()
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   const nutrients = [
     {

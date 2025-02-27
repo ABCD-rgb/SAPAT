@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import {Navigate, useParams} from 'react-router-dom'
 import {
   RiShareLine,
   RiAddLine,
@@ -8,6 +8,7 @@ import {
   RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
+import useAuth from "../hook/useAuth.js";
 
 // Define the hook directly in the same file
 function useUserColor() {
@@ -36,6 +37,14 @@ function ViewFormulation() {
   const { code } = useParams()
   const userColor = useUserColor()
   const [focusedInput, setFocusedInput] = useState(null)
+
+  const { user, loading } = useAuth()
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   // Sample data arrays - these would typically come from your API/database
   const ingredients = [
