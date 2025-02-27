@@ -18,7 +18,7 @@ const createFormulation = async (req, res) => {
 
 const getAllFormulations = async (req, res) => {
     try {
-        const formulations = await Formulation.find();
+        const formulations = await Formulation.find().select('code name description animal_group');
         res.status(200).json({ message: 'success', formulations: formulations });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'Failed to get all formulations' })

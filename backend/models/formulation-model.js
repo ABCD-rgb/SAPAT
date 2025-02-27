@@ -20,10 +20,10 @@ const userAccessSchema = new Schema({
 });
 
 const formulationSchema = new Schema({
-    code: { type: String },
+    code: { type: String, default: '' },
     name: { type: String, required: true },
-    description: { type: String },
-    animal_group: { type: String },
+    description: { type: String, default: '' },
+    animal_group: { type: String, default: '' },
     ingredients: {
         type: [ingredientConstraintSchema],
         default: []
