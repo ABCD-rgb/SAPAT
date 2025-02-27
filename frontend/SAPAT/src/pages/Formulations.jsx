@@ -5,7 +5,8 @@ import EditFormulationModal from '../components/modals/formulations/EditFormulat
 import FormulationCreatedModal from '../components/modals/formulations/FormulationCreatedModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
-import { useNavigate } from 'react-router-dom'
+import {Navigate, useNavigate} from 'react-router-dom'
+import useAuth from "../hook/useAuth.js";
 
 function Formulations() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -13,7 +14,15 @@ function Formulations() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
-  const navigate = useNavigate()
+  const navigateURL = useNavigate()
+
+  const { user, loading } = useAuth()
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   const formulations = [
     { code: 'F1', name: 'Feed 1', description: '', animalGroup: 'Swine' },
@@ -53,7 +62,7 @@ function Formulations() {
   }
 
   const handleRowClick = (formulation) => {
-    navigate(`/formulations/${formulation.code}`)
+    navigateURL(`/formulations/${formulation.code}`)
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group']

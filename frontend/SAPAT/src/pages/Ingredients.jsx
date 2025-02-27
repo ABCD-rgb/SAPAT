@@ -9,12 +9,22 @@ import AddIngredientModal from '../components/modals/ingredients/AddIngredientMo
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import useAuth from "../hook/useAuth.js";
+import {Navigate} from "react-router-dom";
 
 function Ingredients() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedIngredient, setSelectedIngredient] = useState(null)
+
+  const { user, loading } = useAuth()
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   const ingredients = [
     { name: 'Barley', price: '6.50', available: 'Yes', group: 'Cereals' },
