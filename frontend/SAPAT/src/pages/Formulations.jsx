@@ -18,17 +18,6 @@ function Formulations() {
   const formulations = [
     { code: 'F1', name: 'Feed 1', description: '', animalGroup: 'Swine' },
     { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
   ]
 
   const handleEditClick = (formulation) => {
