@@ -9,7 +9,14 @@ const createFormulation = async (req, res) => {
         const newFormulation = await Formulation.create({
             code, name, description, animal_group, collaborators: [{ userId: ownerId, access: 'owner' }],
         });
-        res.status(200).json({ message: 'success', formulations: newFormulation });
+        const filteredFormulation = {
+            "_id": ownerId,
+            "code": code,
+            "name": name,
+            "description": description ?"description" : "",
+            "animal_group": animal_group ?"animal_group" : "",
+        }
+        res.status(200).json({ message: 'success', formulations: filteredFormulation });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'Failed to create new formulation' })
     }

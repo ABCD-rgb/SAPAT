@@ -55,7 +55,7 @@ function Formulations() {
   const handleCreateSuccess = (newFormulation) => {
     setIsCreateModalOpen(false)
     setSelectedFormulation(newFormulation)
-    setIsCreatedModalOpen(true)
+    setFormulations([...formulations, newFormulation])
   }
 
   const handleRowClick = (formulation) => {
@@ -117,6 +117,7 @@ function Formulations() {
 
       {/* Modals */}
       <CreateFormulationModal
+        owner={user._id}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleCreateSuccess}
