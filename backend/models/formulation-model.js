@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 
 const ingredientConstraintSchema = new Schema({
     ingredientId: { type: Schema.Types.ObjectId, ref: 'Ingredient' },
+    name: { type: String },
     min: { type: Number },
     max: { type: Number },
     value: { type: Number },
@@ -9,6 +10,7 @@ const ingredientConstraintSchema = new Schema({
 
 const nutrientConstraintSchema = new Schema({
     nutrientId: { type: Schema.Types.ObjectId, ref: 'Nutrient' },
+    name: { type: String },
     min: { type: Number },
     max: { type: Number },
     value: { type: Number },

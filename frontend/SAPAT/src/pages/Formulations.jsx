@@ -64,7 +64,7 @@ function Formulations() {
   }
 
   const handleRowClick = (formulation) => {
-    navigateURL(`/formulations/${formulation.code}`)
+    navigateURL(`/formulations/${formulation._id}`)
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
