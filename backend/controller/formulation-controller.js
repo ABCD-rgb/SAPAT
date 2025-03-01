@@ -10,7 +10,7 @@ const createFormulation = async (req, res) => {
             code, name, description, animal_group, collaborators: [{ userId: ownerId, access: 'owner' }],
         });
         const filteredFormulation = {
-            "_id": ownerId,
+            "_id": newFormulation._id,
             "code": code,
             "name": name,
             "description": description ? description : "",
@@ -18,7 +18,7 @@ const createFormulation = async (req, res) => {
         }
         res.status(200).json({ message: 'success', formulations: filteredFormulation });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to create new formulation' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -28,7 +28,7 @@ const getAllFormulations = async (req, res) => {
         const formulations = await Formulation.find().select('code name description animal_group');
         res.status(200).json({ message: 'success', formulations: formulations });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to get all formulations' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -42,7 +42,7 @@ const getFormulation = async (req, res) => {
         }
         res.status(200).json({ message: 'success', formulations: formulation });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to get formulation' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -62,11 +62,18 @@ const updateFormulation = async (req, res) => {
           { new: true },
         );
         if (!formulation) {
-            return res.status(404).json({ message: 'Formulation not found' });
+            return res.status(404).json({ message: 'error' });
         }
-        res.status(200).json({ message: 'success', formulations: formulation });
+        const filteredFormulation = {
+            "_id": formulation._id,
+            "code": code,
+            "name": name,
+            "description": description ? description : "",
+            "animal_group": animal_group ? animal_group : "",
+        }
+        res.status(200).json({ message: 'success', formulations: filteredFormulation });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to update formulation' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -76,11 +83,11 @@ const deleteFormulation = async (req, res) => {
     try {
         const formulation = await Formulation.findByIdAndDelete(id);
         if (!formulation) {
-            return res.status(404).json({ message: 'Formulation not found' });
+            return res.status(404).json({ message: 'error' });
         }
         res.status(200).json({ message: 'success' });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to delete formulation' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -90,7 +97,7 @@ const validateCollaborator = async (req, res) => {
     try {
         const formulation = await Formulation.findById(formulationId);
         if (!formulation) {
-            return res.status(404).json({ message: 'Formulation not found' });
+            return res.status(404).json({ message: 'error' });
         }
         // check the list of collaborators under the Formulation and see the user's access level
         const collaborator = formulation.collaborators.find(c => c.userId.toString() === collaboratorId);
@@ -99,7 +106,7 @@ const validateCollaborator = async (req, res) => {
         }
         res.status(200).json({ message: 'success', access: collaborator.access });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to validate collaborator' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 
@@ -108,16 +115,16 @@ const updateCollaborator = async (req,res) => {
     const { id } = req.params;
     const { updaterId, collaboratorId, access } = req.body;
     // there should only be one owner
-    if (access === 'owner') return res.status(400).json({ message: 'Unauthorized' })
+    if (access === 'owner') return res.status(400).json({ message: 'error' })
     try {
         const formulation = await Formulation.findById(id);
         if (!formulation) {
-            return res.status(404).json({ message: 'Formulation not found' });
+            return res.status(404).json({ message: 'error' });
         };
         // owner is the only one who can update
         const updater = formulation.collaborators.find(c => c.userId.toString() === updaterId);
         if (updater.access !== 'owner') {
-            return res.status(401).json({ message: 'Unauthorized' });
+            return res.status(401).json({ message: 'error' });
         }
         const collaborator = formulation.collaborators.find(c => c.userId.toString() === collaboratorId);
         if (!collaborator) {
@@ -132,7 +139,7 @@ const updateCollaborator = async (req,res) => {
         await formulation.save();
         res.status(200).json({ message: 'success' });
     } catch (err) {
-        res.status(500).json({ error: err.message, message: 'Failed to update collaborator' })
+        res.status(500).json({ error: err.message, message: 'error' })
     }
 };
 

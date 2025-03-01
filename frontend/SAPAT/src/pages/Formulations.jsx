@@ -66,6 +66,20 @@ function Formulations() {
     setToastAction(action)
   }
 
+  const handleEditResult = (updatedFormulation, action, message) => {
+    setIsEditModalOpen(false)
+    setFormulations((prevFormulations) => {
+      const index = prevFormulations.findIndex((formulation) => formulation._id === updatedFormulation._id)
+      const updated = [...prevFormulations];
+      updated[index] = updatedFormulation;
+      return updated;
+    })
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
   const handleRowClick = (formulation) => {
     navigateURL(`/formulations/${formulation._id}`)
   }
@@ -140,6 +154,7 @@ function Formulations() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}
+        onResult={handleEditResult}
       />
       <FormulationCreatedModal
         isOpen={isCreatedModalOpen}
