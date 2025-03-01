@@ -2,30 +2,32 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 import axios from 'axios'
 
-function CreateFormulationModal({ owner, isOpen, onClose, onSuccess }) {
+function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     description: '',
-    animalGroup: '',
+    animal_group: '',
   })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const body = { ...formData, owner }
+    console.log("body:",body)
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/formulation`, body)
       console.log("res:",res)
-      onSuccess(res.data.formulations)
+      onResult(res.data.formulations, "success", "Successfully created formulation.")
       // Reset form
       setFormData({
         code: '',
         name: '',
         description: '',
-        animalGroup: '',
+        animal_group: '',
       })
     } catch (err) {
       console.log(err)
+      onResult(null, "error", "Failed to create formulation.")
     }
 
   }
@@ -104,7 +106,7 @@ function CreateFormulationModal({ owner, isOpen, onClose, onSuccess }) {
                 <span className="label-text">Animal Group</span>
               </label>
               <select
-                name="animalGroup"
+                name="animal_group"
                 value={formData.animalGroup}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"

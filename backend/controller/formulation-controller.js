@@ -13,8 +13,8 @@ const createFormulation = async (req, res) => {
             "_id": ownerId,
             "code": code,
             "name": name,
-            "description": description ?"description" : "",
-            "animal_group": animal_group ?"animal_group" : "",
+            "description": description ? description : "",
+            "animal_group": animal_group ? animal_group : "",
         }
         res.status(200).json({ message: 'success', formulations: filteredFormulation });
     } catch (err) {

@@ -10,11 +10,12 @@ function Table({
 }) {
   // Function to filter out the _id when rendering rows
   const getRowData = (row) => {
+    if (!row) return []
     // Get the keys of the row excluding _id
-    const rowKeys = Object.keys(row).filter(key => key !== '_id');
-    return rowKeys.map(key => row[key]);
+    const orderedFields = ['code', 'name', 'description', 'animal_group']
+    const rowData = orderedFields.map((field) => row[field] || '')
+    return rowData
   };
-
 
   return (
     <div className="h-full overflow-auto rounded-lg bg-white shadow-sm">

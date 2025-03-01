@@ -6,6 +6,7 @@ import FormulationCreatedModal from '../components/modals/formulations/Formulati
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
+import Toast from '../components/Toast'
 import {Navigate, useNavigate} from 'react-router-dom'
 import useAuth from "../hook/useAuth.js";
 import axios from "axios";
@@ -19,6 +20,10 @@ function Formulations() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
   const navigateURL = useNavigate()
 
   useEffect(() => {
@@ -52,14 +57,23 @@ function Formulations() {
     console.log('Deleting formulation:', selectedFormulation)
   }
 
-  const handleCreateSuccess = (newFormulation) => {
+  const handleCreateResult = (newFormulation, action, message) => {
     setIsCreateModalOpen(false)
-    setSelectedFormulation(newFormulation)
     setFormulations([...formulations, newFormulation])
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
   }
 
   const handleRowClick = (formulation) => {
     navigateURL(`/formulations/${formulation._id}`)
+  }
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
@@ -120,7 +134,7 @@ function Formulations() {
         owner={user._id}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={handleCreateSuccess}
+        onResult={handleCreateResult}
       />
       <EditFormulationModal
         isOpen={isEditModalOpen}
@@ -139,6 +153,16 @@ function Formulations() {
         title="Delete Formulation"
         description={`Are you sure you want to delete ${selectedFormulation?.name}? This action cannot be undone.`}
       />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
+
     </div>
   )
 }
