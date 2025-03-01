@@ -8,6 +8,14 @@ function Table({
   onRowClick,
   actions = true,
 }) {
+  // Function to filter out the _id when rendering rows
+  const getRowData = (row) => {
+    // Get the keys of the row excluding _id
+    const rowKeys = Object.keys(row).filter(key => key !== '_id');
+    return rowKeys.map(key => row[key]);
+  };
+
+
   return (
     <div className="h-full overflow-auto rounded-lg bg-white shadow-sm">
       <table className="table w-full">
@@ -30,7 +38,7 @@ function Table({
               className="hover cursor-pointer"
               onClick={() => onRowClick && onRowClick(row)}
             >
-              {Object.values(row).map((cell, cellIndex) => (
+              {getRowData(row).map((cell, cellIndex) => (
                 <td key={cellIndex}>{cell}</td>
               ))}
               {actions && (

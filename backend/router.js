@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import {
+  createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator
+} from './controller/formulation-controller.js';
 
 const handleRoutes = (app) => {
   // Check if user is authenticated middleware
@@ -44,6 +47,17 @@ const handleRoutes = (app) => {
     res.send('Hello World');
     console.log('MongoDB Connection State:', mongoose.connection.readyState);
   });
+
+
+
+  // CONTROLLER API CALLS
+  app.post('/formulation', createFormulation);
+  app.get('/formulation', getAllFormulations);
+  app.get('/formulation/:id', getFormulation);
+  app.put('/formulation/:id', updateFormulation);
+  app.delete('/formulation/:id', deleteFormulation);
+  app.get('/formulation/collaborator/:formulationId/:collaboratorId', validateCollaborator);
+  app.put('/formulation/collaborator/:id', updateCollaborator);
 };
 
 export default handleRoutes;

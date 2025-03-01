@@ -1,5 +1,5 @@
 import { RiAddLine, RiFilterLine } from 'react-icons/ri'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CreateFormulationModal from '../components/modals/formulations/CreateFormulationModal'
 import EditFormulationModal from '../components/modals/formulations/EditFormulationModal'
 import FormulationCreatedModal from '../components/modals/formulations/FormulationCreatedModal'
@@ -7,8 +7,12 @@ import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import {Navigate, useNavigate} from 'react-router-dom'
 import useAuth from "../hook/useAuth.js";
+import axios from "axios";
 
 function Formulations() {
+  const { user, loading } = useAuth()
+
+  const [formulations, setFormulations] = useState([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -16,23 +20,21 @@ function Formulations() {
   const [selectedFormulation, setSelectedFormulation] = useState(null)
   const navigateURL = useNavigate()
 
-  const { user, loading } = useAuth()
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const formulations = [
-    { code: 'F1', name: 'Feed 1', description: '', animalGroup: 'Swine' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-    { code: 'F2', name: 'My Feed 1', description: '', animalGroup: 'Pig' },
-  ]
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation`);
+      const fetchedData = res.data.formulations;
+      setFormulations(fetchedData);
+    } catch (err) {
+      console.log(err)
+    } finally {
+      // TODO: add Loading screen
+    }
+  }
 
   const handleEditClick = (formulation) => {
     setSelectedFormulation(formulation)
@@ -56,7 +58,7 @@ function Formulations() {
   }
 
   const handleRowClick = (formulation) => {
-    navigateURL(`/formulations/${formulation.code}`)
+    navigateURL(`/formulations/${formulation._id}`)
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
