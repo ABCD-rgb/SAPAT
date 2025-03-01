@@ -57,7 +57,7 @@ const router = createBrowserRouter([
         element: <Formulations />,
       },
       {
-        path: '/formulations/:code',
+        path: '/formulations/:id',
         element: <ViewFormulation />,
       },
       {

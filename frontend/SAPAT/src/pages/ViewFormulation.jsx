@@ -9,87 +9,45 @@ import {
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import useAuth from "../hook/useAuth.js";
-
-// Define the hook directly in the same file
-function useUserColor() {
-  const [userColor, setUserColor] = useState('')
-
-  const colors = [
-    '#FF6B6B', // red
-    '#4ECDC4', // teal
-    '#45B7D1', // blue
-    '#96CEB4', // green
-    '#FFEEAD', // yellow
-    '#D4A5A5', // pink
-    '#9B59B6', // purple
-    '#E67E22', // orange
-  ]
-
-  useEffect(() => {
-    const randomColor = colors[Math.floor(Math.random() * colors.length)]
-    setUserColor(randomColor)
-  }, [])
-
-  return userColor
-}
+import axios from 'axios';
 
 function ViewFormulation() {
-  const { code } = useParams()
-  const userColor = useUserColor()
+  const { id } = useParams()
+  const { user, loading } = useAuth()
+
+
+  const [formulation, setFormulation] = useState({
+    code: '',
+    name: '',
+    description: '',
+    animal_group: '',
+    ingredients: [],
+    nutrients: [],
+  });
   const [focusedInput, setFocusedInput] = useState(null)
 
-  const { user, loading } = useAuth()
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  if (!user) {
-    return <Navigate to="/" />
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/${id}`);
+      setFormulation(res.data.formulations);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      // TODO: add loading screen
+    }
   }
 
-  // Sample data arrays - these would typically come from your API/database
-  const ingredients = [
-    {
-      name: 'Maize',
-      minimum: 1.2,
-      maximum: 4.0,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    // Add more ingredients as needed
-  ]
-
-  const nutrients = [
-    {
-      name: 'DM',
-      minimum: 12.8,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'CP',
-      minimum: 10.5,
-      maximum: 15.0,
-      value: null,
-    },
-    // Add more nutrients as needed
-  ]
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormulation({
+      ...formulation,
+      [name]: value,
+    });
+  }
 
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
@@ -99,10 +57,12 @@ function ViewFormulation() {
     setFocusedInput(null)
   }
 
-  const getInputStyle = (inputId) => ({
-    borderColor: focusedInput === inputId ? userColor : '',
-    boxShadow: focusedInput === inputId ? `0 0 0 1px ${userColor}` : '',
-  })
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
@@ -142,10 +102,10 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Code</label>
               <input
                 type="text"
-                value={code}
-                readOnly
+                name="code"
+                value={formulation.code}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('code')}
+                onChange={handleChange}
                 onFocus={() => handleFocus('code')}
                 onBlur={handleBlur}
               />
@@ -156,8 +116,10 @@ function ViewFormulation() {
               </label>
               <input
                 type="text"
+                name="name"
+                value={formulation.name}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('name')}
+                onChange={handleChange}
                 onFocus={() => handleFocus('name')}
                 onBlur={handleBlur}
               />
@@ -166,9 +128,11 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Description</label>
               <input
                 type="text"
+                name="description"
+                value={formulation.description}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('description')}
                 onFocus={() => handleFocus('description')}
+                onChange={handleChange}
                 onBlur={handleBlur}
               />
             </div>
@@ -176,13 +140,16 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Animal group</label>
               <select
                 className="select select-bordered w-full rounded-xl"
-                style={getInputStyle('animalGroup')}
+                name="animal_group"
+                value={formulation.animal_group}
+                onChange={handleChange}
                 onFocus={() => handleFocus('animalGroup')}
                 onBlur={handleBlur}
               >
                 <option>Broiler</option>
                 <option>Layer</option>
                 <option>Swine</option>
+                <option>Poultry</option>
               </select>
             </div>
           </div>
@@ -207,7 +174,7 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ingredients.map((ingredient, index) => (
+                    {formulation.ingredients.map((ingredient, index) => (
                       <tr key={index}>
                         <td>{ingredient.name}</td>
                         <td>{ingredient.minimum}</td>
@@ -246,7 +213,7 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    {nutrients.map((nutrient, index) => (
+                    {formulation.nutrients.map((nutrient, index) => (
                       <tr key={index}>
                         <td>{nutrient.name}</td>
                         <td>{nutrient.minimum}</td>
@@ -275,7 +242,6 @@ function ViewFormulation() {
               <input
                 type="number"
                 className="input input-bordered input-sm w-24 rounded-lg"
-                style={getInputStyle('total-cost')}
                 onFocus={() => handleFocus('total-cost')}
                 onBlur={handleBlur}
               />
