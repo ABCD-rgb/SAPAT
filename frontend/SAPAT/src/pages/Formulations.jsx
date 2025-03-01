@@ -52,8 +52,24 @@ function Formulations() {
     setIsDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
-    // TODO: Implement delete functionality
+  const handleDeleteConfirm = async () => {
+    try {
+      const selectedId = selectedFormulation._id;
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/formulation/${selectedFormulation._id}`);
+      const messageData = res.data.message;
+      if (messageData === 'success') {
+        setFormulations(formulations.filter((formulation) => formulation._id !== selectedId))
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage(messageData === 'success' ? 'Formulation deleted successfully' : 'Failed to delete formulation.')
+      setToastAction(messageData)
+    } catch (err) {
+      console.log(err)
+      setShowToast(true)
+      setMessage('Failed to delete formulation.')
+      setToastAction('error')
+    }
     console.log('Deleting formulation:', selectedFormulation)
   }
 
