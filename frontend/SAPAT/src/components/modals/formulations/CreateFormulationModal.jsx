@@ -46,7 +46,7 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
       code: '',
       name: '',
       description: '',
-      animalGroup: '',
+      animal_group: '',
     })
   }
 
@@ -107,7 +107,7 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
               </label>
               <select
                 name="animal_group"
-                value={formData.animalGroup}
+                value={formData.animal_group}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
