@@ -4,6 +4,7 @@ import { RiFileList2Line, RiLeafLine } from 'react-icons/ri'
 import StatCard from '../components/StatCard'
 import useAuth from '../hook/useAuth'
 import { Navigate } from 'react-router-dom'
+import Loading from '../components/Loading'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -38,7 +39,7 @@ function Dashboard() {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loading />
   }
   if (!user) {
     return <Navigate to="/" />

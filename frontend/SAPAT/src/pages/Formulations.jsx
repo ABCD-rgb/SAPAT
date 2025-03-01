@@ -5,6 +5,7 @@ import EditFormulationModal from '../components/modals/formulations/EditFormulat
 import FormulationCreatedModal from '../components/modals/formulations/FormulationCreatedModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import Loading from '../components/Loading'
 import {Navigate, useNavigate} from 'react-router-dom'
 import useAuth from "../hook/useAuth.js";
 import axios from "axios";
@@ -64,7 +65,7 @@ function Formulations() {
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loading />
   }
   if (!user) {
     return <Navigate to="/" />

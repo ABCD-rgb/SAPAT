@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from 'react'
 import useAuth from "../hook/useAuth.js";
 import axios from 'axios';
+import Loading from "../components/Loading.jsx";
 
 function ViewFormulation() {
   const { id } = useParams()
@@ -58,7 +59,7 @@ function ViewFormulation() {
   }
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loading />
   }
   if (!user) {
     return <Navigate to="/" />

@@ -9,6 +9,7 @@ import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import Loading from "../components/Loading.jsx";
 import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
 
@@ -139,7 +140,7 @@ function Nutrients() {
   const headers = ['Abbreviation', 'Name', 'Unit', 'Description', 'Group']
 
   if (loading) {
-    return <div>Loading...</div>
+    return <Loading />
   }
   if (!user) {
     return <Navigate to="/" />
