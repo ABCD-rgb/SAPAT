@@ -13,18 +13,12 @@ import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
 
 function Nutrients() {
+  const { user, loading } = useAuth()
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedNutrient, setSelectedNutrient] = useState(null)
 
-  const { user, loading } = useAuth()
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  if (!user) {
-    return <Navigate to="/" />
-  }
 
   const nutrients = [
     {
@@ -143,6 +137,13 @@ function Nutrients() {
   }
 
   const headers = ['Abbreviation', 'Name', 'Unit', 'Description', 'Group']
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">

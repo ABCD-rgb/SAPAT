@@ -17,12 +17,6 @@ function Formulations() {
   const navigateURL = useNavigate()
 
   const { user, loading } = useAuth()
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  if (!user) {
-    return <Navigate to="/" />
-  }
 
   const formulations = [
     { code: 'F1', name: 'Feed 1', description: '', animalGroup: 'Swine' },
@@ -66,6 +60,13 @@ function Formulations() {
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group']
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
