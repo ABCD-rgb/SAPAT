@@ -117,6 +117,17 @@ function ViewFormulation() {
     setToastAction('')
   }
 
+  const handleOpenShareFormulationModal = () => {
+    const currentUserAccess = collaborators.find(collaborator => collaborator._id === user._id)?.access
+    if (currentUserAccess === 'owner') {
+      setIsShareFormulationModalOpen(true)
+    } else {
+      setShowToast(true)
+      setMessage('Only the owner can share the formulation.')
+      setToastAction('error')
+    }
+  }
+
   const goToConfirmationModal = (type, collaborator) => {
     if (type === 'error') {
       // toast instructions
@@ -194,7 +205,7 @@ function ViewFormulation() {
                 <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
               <button
-                onClick={() => setIsShareFormulationModalOpen(true)}
+                onClick={handleOpenShareFormulationModal}
                 className="btn btn-sm gap-1 rounded-lg text-xs"
               >
                 <RiShareLine /> Share ▼
