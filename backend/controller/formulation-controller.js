@@ -27,8 +27,20 @@ const getAllFormulations = async (req, res) => {
     const { collaboratorId } = req.params;
     try {
         // only show formulations where the user is part of the collaborators
-        const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group');
-        res.status(200).json({ message: 'success', formulations: formulations });
+        const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group collaborators');
+        // aside from the basic details, return the access level of the user
+        const filteredFormulations = formulations.map(formulation => {
+            const access = formulation.collaborators.find(c => c.userId.toString() === collaboratorId)?.access;
+            return {
+                "_id": formulation._id,
+                "code": formulation.code,
+                "name": formulation.name,
+                "description": formulation.description ? formulation.description : "",
+                "animal_group": formulation.animal_group ? formulation.animal_group : "",
+                "access": access
+            }
+        })
+        res.status(200).json({ message: 'success', formulations: filteredFormulations });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'error' })
     }

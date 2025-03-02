@@ -27,12 +27,14 @@ function Formulations() {
   const navigateURL = useNavigate()
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`);
       const fetchedData = res.data.formulations;
       setFormulations(fetchedData);
     } catch (err) {
@@ -41,6 +43,12 @@ function Formulations() {
       // TODO: add Loading screen
     }
   }
+
+  // const checkAccess = async () => {
+  //   try {
+  //     const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${}/${user._id}`);
+  //   }
+  // }
 
   const handleEditClick = (formulation) => {
     setSelectedFormulation(formulation)
@@ -106,7 +114,7 @@ function Formulations() {
     setToastAction('')
   }
 
-  const headers = ['Code', 'Name', 'Description', 'Animal Group']
+  const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Access']
 
   if (loading) {
     return <Loading />
@@ -153,6 +161,7 @@ function Formulations() {
         <Table
           headers={headers}
           data={formulations}
+          page="formulations"
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           onRowClick={handleRowClick}

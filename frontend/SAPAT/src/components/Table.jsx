@@ -3,6 +3,7 @@ import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
 function Table({
   headers,
   data,
+  page,
   onEdit,
   onDelete,
   onRowClick,
@@ -11,10 +12,12 @@ function Table({
   // Function to filter out the _id when rendering rows
   const getRowData = (row) => {
     if (!row) return []
-    // Get the keys of the row excluding _id
-    const orderedFields = ['code', 'name', 'description', 'animal_group']
-    const rowData = orderedFields.map((field) => row[field] || '')
-    return rowData
+    if (page === 'formulations') {
+      // Get the keys of the row excluding _id
+      const orderedFields = ['code', 'name', 'description', 'animal_group', 'access']
+      const rowData = orderedFields.map((field) => row[field] || '')
+      return rowData
+    }
   };
 
   return (
