@@ -3,11 +3,11 @@ import Formulation from '../models/formulation-model.js';
 
 const createFormulation = async (req, res) => {
     const {
-        ownerId, code, name, description, animal_group
+        code, name, description, animal_group, owner
     } = req.body;
     try {
         const newFormulation = await Formulation.create({
-            code, name, description, animal_group, collaborators: [{ userId: ownerId, access: 'owner' }],
+            code, name, description, animal_group, collaborators: [{ userId: owner, access: 'owner' }],
         });
         const filteredFormulation = {
             "_id": newFormulation._id,

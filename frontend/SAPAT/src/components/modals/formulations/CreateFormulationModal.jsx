@@ -17,7 +17,9 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/formulation`, body)
       console.log("res:",res)
-      onResult(res.data.formulations, "success", "Successfully created formulation.")
+      const newFormulation = res.data.formulations;
+      newFormulation.access = "owner"
+      onResult(newFormulation, "success", "Successfully created formulation.")
       // Reset form
       setFormData({
         code: '',
