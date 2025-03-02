@@ -1,10 +1,10 @@
-import { RiCloseLine } from 'react-icons/ri'
+import { RiCloseLine, RiDeleteBinLine } from 'react-icons/ri'
 import { MdLink } from "react-icons/md";
 import { useState } from "react";
 import axios from "axios";
 
 
-function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formulation, collaborators }) {
+function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, onDelete, userId, formulation, collaborators }) {
   const [newCollaborator, setNewCollaborator] = useState({
     newId: '',
     newDisplayName: '',
@@ -18,6 +18,17 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
   const handleNewCollaborator = async (e) => {
     e.preventDefault()
     try {
+      //first check if the email already exists in collaborators
+      const isExistingCollaborator = collaborators.some(
+        collaborator => collaborator.email === newCollaborator.newEmail
+      )
+      if (isExistingCollaborator) {
+        console.log("isExistingCollaborator:")
+        onAdd('error', newCollaborator, 'This user is already a collaborator.')
+        clearInput()
+        return
+      }
+
       // get collaborator details based on newCollaborator.newCollaboratorEmail
       const userData = await fetchNewCollaboratorDataByEmail();
       // only call this if success
@@ -30,7 +41,7 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
           newEmail: userData.email,
           newAccess: newCollaborator.newAccess
         }
-        onAdd('success', formattedCollaborator);
+        onAdd('success', formattedCollaborator, '');
       }
     } catch (err) {
       console.log(err)
@@ -101,7 +112,8 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
       return res.data.user[0];
     } catch (err) {
       if (err.response.status === 404) {
-        onAdd('error', newCollaborator);
+        onAdd('error', newCollaborator, 'User not found. Ask them to register.');
+        clearInput()
       }
     }
   }
@@ -109,11 +121,22 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      // note: does not really add; just want to use the toast functionality
+      onAdd('linkCopied', newCollaborator, 'Link copied to clipboard.')
     } catch (err) {
       console.error("Failed to copy link:", err);
     }
   };
 
+  const clearInput = () => {
+    setNewCollaborator({
+      newId: '',
+      newDisplayName: '',
+      newProfilePicture: '',
+      newEmail: '',
+      newAccess: 'edit',
+    })
+  }
   const handleClose = () => {
     setUpdatedCollaborators([])
     setNewCollaborator({
@@ -195,17 +218,25 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
                   {collaborator.access === 'owner' ? (
                     <span className="text-sm text-gray-500">Owner</span>
                   ) : (
-                    <select
-                      className="select select-xs rounded-xl text-sm w-18"
-                      value={
-                        updatedCollaborators.find(c => c.collaboratorId === collaborator._id)?.access
-                        || collaborator.access
-                      }
-                      onChange={(e) => handleAccessChange(collaborator._id, e.target.value)}
-                    >
-                      <option value="edit">edit</option>
-                      <option value="view">view</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="select select-xs rounded-xl text-sm w-18"
+                        value={
+                          updatedCollaborators.find(c => c.collaboratorId === collaborator._id)?.access
+                          || collaborator.access
+                        }
+                        onChange={(e) => handleAccessChange(collaborator._id, e.target.value)}
+                      >
+                        <option value="edit">edit</option>
+                        <option value="view">view</option>
+                      </select>
+                      <button
+                        onClick={() => onDelete(collaborator._id)}
+                        className="btn btn-ghost btn-xs hover:bg-deepbrown/10"
+                      >
+                        <RiDeleteBinLine className="h-4 w-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
