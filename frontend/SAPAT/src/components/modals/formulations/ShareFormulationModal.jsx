@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 
 
-function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborators }) {
+function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formulation, collaborators }) {
   const [newCollaborator, setNewCollaborator] = useState({
     newId: '',
     newDisplayName: '',
@@ -12,6 +12,7 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
     newEmail: '',
     newAccess: 'edit',
   })
+  const [updatedCollaborators, setUpdatedCollaborators] = useState([])
 
 
   const handleNewCollaborator = async (e) => {
@@ -28,6 +29,56 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
     }
   }
 
+  // handle change for existing collaborators
+  const handleAccessChange = (collaboratorId, newAccess) => {
+    setUpdatedCollaborators(prev => {
+      // Check if collaborator is already in updatedCollaborators
+      const existingIndex = prev.findIndex(c => c.collaboratorId === collaboratorId)
+
+      if (existingIndex >= 0) {
+        // Update existing entry
+        const updated = [...prev]
+        updated[existingIndex] = { collaboratorId, access: newAccess }
+        return updated
+      } else {
+        // Add new entry
+        return [...prev, { collaboratorId, access: newAccess }]
+      }
+    })
+  }
+
+  const handleDone = async () => {
+    if (updatedCollaborators.length > 0) {
+      try {
+        const updatedCollaboratorsPromises = updatedCollaborators.map(async (updatedCollaborator) => {
+          const res = await axios.put(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${formulation._id}`, {
+            'updaterId': userId,
+            'collaboratorId': updatedCollaborator.collaboratorId,
+            'access': updatedCollaborator.access,
+          })
+        })
+        await Promise.all(updatedCollaboratorsPromises)
+
+        const allUpdatedCollaborators = collaborators.map(collaborator => {
+          const update = updatedCollaborators.find(u => u.collaboratorId === collaborator._id)
+          if (update) {
+            return {
+              ...collaborator,
+              access: update.access
+            }
+          }
+          return collaborator
+        })
+
+        onEdit(allUpdatedCollaborators)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    handleClose();
+  }
+
+  // handle change for new collaborator
   const handleChange = (e) => {
     const { name, value } = e.target
     setNewCollaborator((prev) => ({
@@ -54,6 +105,18 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
     }
   }
 
+  const handleClose = () => {
+    setUpdatedCollaborators([])
+    setNewCollaborator({
+      newId: '',
+      newDisplayName: '',
+      newProfilePicture: '',
+      newEmail: '',
+      newAccess: 'edit',
+    })
+    onClose()
+  }
+
   return (
     <dialog
       id="formulation_created_modal"
@@ -63,7 +126,7 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
         {/* Close button */}
         <button
           className="btn btn-sm btn-circle absolute top-4 right-4"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <RiCloseLine className="h-5 w-5" />
         </button>
@@ -115,19 +178,30 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
                         <img src={collaborator.profilePicture} alt="" />
                       </div>
                     </div>
-                    <span className="text-xs md:text-sm">{collaborator.email}</span>
+                    <div>
+                      <p className="text-sm font-medium">{collaborator.displayName}</p>
+                      <p className="text-xs text-gray-500">{collaborator.email}</p>
+                    </div>
                   </div>
                   {collaborator.access === 'owner' ? (
-                    <span className="text-sm text-gray-500">owner</span>
-                  )
-                  : (<select className="select select-xs rounded-xl text-sm w-18" value={collaborator.access}>
+                    <span className="text-sm text-gray-500">Owner</span>
+                  ) : (
+                    <select
+                      className="select select-xs rounded-xl text-sm w-18"
+                      value={
+                        updatedCollaborators.find(c => c.collaboratorId === collaborator._id)?.access
+                        || collaborator.access
+                      }
+                      onChange={(e) => handleAccessChange(collaborator._id, e.target.value)}
+                    >
                       <option value="edit">edit</option>
                       <option value="view">view</option>
-                    </select>)
-                  }
+                    </select>
+                  )}
                 </div>
               ))}
             </div>
+
           </div>
         </div>
         {/* Actions */}
@@ -136,14 +210,14 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, formulation, collaborat
             Copy link
             <MdLink className="h-5 w-5" />
           </button>
-          <button className="btn rounded-xl px-4" onClick={onClose}>
+          <button className="btn rounded-xl px-4" onClick={handleDone}>
             Done
           </button>
         </div>
 
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={onClose}>close</button>
+        <button onClick={handleClose}>close</button>
       </form>
     </dialog>
   )

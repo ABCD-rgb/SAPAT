@@ -164,6 +164,13 @@ function ViewFormulation() {
     }
   }
 
+  const handleUpdateCollaborator = (updatedCollaborators) => {
+    setCollaborators(updatedCollaborators);
+    setShowToast(true)
+    setMessage('Collaborator updated successfully')
+    setToastAction('success')
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -378,6 +385,8 @@ function ViewFormulation() {
         isOpen={isShareFormulationModalOpen}
         onClose={() => setIsShareFormulationModalOpen(false)}
         onAdd={goToConfirmationModal}
+        onEdit={handleUpdateCollaborator}
+        userId={user._id}
         formulation={formulation}
         collaborators={collaborators}
       />
