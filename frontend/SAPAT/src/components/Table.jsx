@@ -1,5 +1,6 @@
 import {useState} from "react";
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import { FaEye } from "react-icons/fa";
 import Toast from '../components/Toast'
 
 function Table({
@@ -62,9 +63,10 @@ function Table({
                   {(onRowClick && cellIndex === 1) ? (
                     <span
                       onClick={() => onRowClick && onRowClick(row)}
-                      className="cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium"
+                      className="group cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium inline-flex items-center gap-2 px-2 py-1 rounded"
                     >
                       {cell}
+                      <FaEye className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                     </span>
                   ) : (
                     cell
