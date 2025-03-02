@@ -85,8 +85,9 @@ function Formulations() {
     setIsEditModalOpen(false)
     setFormulations((prevFormulations) => {
       const index = prevFormulations.findIndex((formulation) => formulation._id === updatedFormulation._id)
-      const updated = [...prevFormulations];
-      updated[index] = updatedFormulation;
+      const updated = [...prevFormulations]
+      const formulationAccess = updated[index].access
+      updated[index] = {...updatedFormulation, access: formulationAccess};
       return updated;
     })
     // toast instructions
