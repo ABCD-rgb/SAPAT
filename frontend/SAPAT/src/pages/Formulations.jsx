@@ -178,6 +178,7 @@ function Formulations() {
         onConfirm={handleDeleteConfirm}
         title="Delete Formulation"
         description={`Are you sure you want to delete ${selectedFormulation?.name}? This action cannot be undone.`}
+        type='delete'
       />
 
       {/*  Toasts */}

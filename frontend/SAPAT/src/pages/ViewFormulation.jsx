@@ -12,7 +12,8 @@ import useAuth from "../hook/useAuth.js";
 import axios from 'axios';
 import Loading from "../components/Loading.jsx";
 import ShareFormulationModal from "../components/modals/formulations/ShareFormulationModal.jsx";
-import formulations from "./Formulations.jsx";
+import ConfirmationModal from "../components/modals/ConfirmationModal.jsx";
+import Toast from "../components/Toast.jsx";
 
 function ViewFormulation() {
   const { id } = useParams()
@@ -29,9 +30,17 @@ function ViewFormulation() {
     nutrients: [],
   });
   const [collaborators, setCollaborators] = useState([])
+  const [newCollaborator, setNewCollaborator] = useState({})
+  const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
+  const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [shouldRedirect, setShouldRedirect] = useState(false)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
+
 
   useEffect(() => {
     if (user) {
@@ -72,7 +81,7 @@ function ViewFormulation() {
       if (!formulation.collaborators) return;
       // get details of collaborators
       const collaboratorPromises = formulation.collaborators.map(async (collaborator) => {
-        const res = await axios.get(`${VITE_API_URL}/user-check/${collaborator.userId}`);
+        const res = await axios.get(`${VITE_API_URL}/user-check/id/${collaborator.userId}`);
         return {
           ...res.data.user,
           access: collaborator.access,
@@ -102,6 +111,48 @@ function ViewFormulation() {
     setFocusedInput(null)
   }
 
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
+  }
+
+  const goToConfirmationModal = (type, collaborator) => {
+    if (type === 'error') {
+      // toast instructions
+      setShowToast(true)
+      setMessage('User not found. Ask them to register.')
+      setToastAction('error')
+    } else {
+      setNewCollaborator(collaborator);
+      setIsAddCollaboratorModalOpen(true);
+    }
+  }
+  const handleAddCollaborator = async () => {
+    try {
+      const res = await axios.put(`${VITE_API_URL}/formulation/collaborator/${id}`, {
+        'updaterId': user._id,
+        'collaboratorId': newCollaborator.newId,
+        'access': newCollaborator.newAccess,
+      })
+
+      const newCollaboratorData = {
+        _id: newCollaborator.newId,
+        email: newCollaborator.newEmail,
+        access: newCollaborator.newAccess,
+        profilePicture: newCollaborator.newProfilePicture,
+        displayName: newCollaborator.newDisplayName,
+      }
+      setCollaborators([...collaborators, newCollaboratorData])
+      setShowToast(true)
+      setMessage('Collaborator added successfully')
+      setToastAction('success')
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -119,11 +170,6 @@ function ViewFormulation() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
-      <ShareFormulationModal
-        isOpen={true}
-        formulation={formulation}
-        collaborators={collaborators}
-      />
       <div className="flex-1 p-4">
         <div className="space-y-4">
           {/* Header - Adjusted for mobile */}
@@ -147,7 +193,10 @@ function ViewFormulation() {
                 <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
                 <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
-              <button className="btn btn-sm gap-1 rounded-lg text-xs">
+              <button
+                onClick={() => setIsShareFormulationModalOpen(true)}
+                className="btn btn-sm gap-1 rounded-lg text-xs"
+              >
                 <RiShareLine /> Share ▼
               </button>
             </div>
@@ -312,6 +361,32 @@ function ViewFormulation() {
           </div>
         </div>
       </div>
+
+    {/*  Modals */}
+      <ShareFormulationModal
+        isOpen={isShareFormulationModalOpen}
+        onClose={() => setIsShareFormulationModalOpen(false)}
+        onAdd={goToConfirmationModal}
+        formulation={formulation}
+        collaborators={collaborators}
+      />
+      <ConfirmationModal
+        isOpen={isAddCollaboratorModalOpen}
+        onClose={() => setIsAddCollaboratorModalOpen(false)}
+        onConfirm={handleAddCollaborator}
+        title="Add collaborator"
+        description={<>Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to this formulation?</>}
+        type='add'
+      />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
     </div>
   )
 }
