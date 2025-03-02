@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { getUser } from './controller/user-controller.js';
 import {
   createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator
 } from './controller/formulation-controller.js';
@@ -51,6 +52,7 @@ const handleRoutes = (app) => {
 
 
   // CONTROLLER API CALLS
+  app.get('/user-check/:id', getUser);
   app.post('/formulation', createFormulation);
   app.get('/formulation/filtered/:collaboratorId', getAllFormulations);
   app.get('/formulation/:id', getFormulation);

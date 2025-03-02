@@ -11,10 +11,13 @@ import { useState, useEffect } from 'react'
 import useAuth from "../hook/useAuth.js";
 import axios from 'axios';
 import Loading from "../components/Loading.jsx";
+import ShareFormulationModal from "../components/modals/formulations/ShareFormulationModal.jsx";
+import formulations from "./Formulations.jsx";
 
 function ViewFormulation() {
   const { id } = useParams()
   const { user, loading } = useAuth()
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
   const [formulation, setFormulation] = useState({
@@ -25,7 +28,9 @@ function ViewFormulation() {
     ingredients: [],
     nutrients: [],
   });
+  const [collaborators, setCollaborators] = useState([])
   const [focusedInput, setFocusedInput] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
@@ -34,9 +39,16 @@ function ViewFormulation() {
       checkAccess();
     }
   }, [user]);
+
+  useEffect(() => {
+    fetchCollaboratorData();
+    setIsLoading(false);
+  }, [formulation.collaborators]);
+
+
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/${id}`);
+      const res = await axios.get(`${VITE_API_URL}/formulation/${id}`);
       setFormulation(res.data.formulations);
     } catch (err) {
       console.log(err);
@@ -45,11 +57,30 @@ function ViewFormulation() {
 
   const checkAccess = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
+      const res = await axios.get(`${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
       console.log(res.data.access);
       if (res.data.access === 'notFound') {
         setShouldRedirect(true);
       }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const fetchCollaboratorData = async () => {
+    try {
+      if (!formulation.collaborators) return;
+      // get details of collaborators
+      const collaboratorPromises = formulation.collaborators.map(async (collaborator) => {
+        const res = await axios.get(`${VITE_API_URL}/user-check/${collaborator.userId}`);
+        return {
+          ...res.data.user,
+          access: collaborator.access,
+        };
+      })
+      // wait for all requests to complete
+      const collaboratorsData = await Promise.all(collaboratorPromises);
+      setCollaborators(collaboratorsData);
     } catch (err) {
       console.log(err);
     }
@@ -80,9 +111,19 @@ function ViewFormulation() {
   if (shouldRedirect) {
     return <Navigate to="/formulations" />
   }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
+      <ShareFormulationModal
+        isOpen={true}
+        formulation={formulation}
+        collaborators={collaborators}
+      />
       <div className="flex-1 p-4">
         <div className="space-y-4">
           {/* Header - Adjusted for mobile */}

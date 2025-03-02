@@ -2,7 +2,6 @@ import { RiAddLine, RiFilterLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import CreateFormulationModal from '../components/modals/formulations/CreateFormulationModal'
 import EditFormulationModal from '../components/modals/formulations/EditFormulationModal'
-import FormulationCreatedModal from '../components/modals/formulations/FormulationCreatedModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
@@ -172,11 +171,6 @@ function Formulations() {
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}
         onResult={handleEditResult}
-      />
-      <FormulationCreatedModal
-        isOpen={isCreatedModalOpen}
-        onClose={() => setIsCreatedModalOpen(false)}
-        formulation={selectedFormulation}
       />
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
