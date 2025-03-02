@@ -128,13 +128,18 @@ function ViewFormulation() {
     }
   }
 
-  const goToConfirmationModal = (type, collaborator) => {
+  const goToConfirmationModal = (type, collaborator, message) => {
     if (type === 'error') {
       // toast instructions
       setShowToast(true)
-      setMessage('User not found. Ask them to register.')
+      setMessage(message)
       setToastAction('error')
-    } else {
+    } else if (type === 'linkCopied') {
+      setShowToast(true)
+      setMessage(message)
+      setToastAction('success')
+    }
+    else {
       setNewCollaborator(collaborator);
       setIsAddCollaboratorModalOpen(true);
     }
@@ -169,6 +174,18 @@ function ViewFormulation() {
     setShowToast(true)
     setMessage('Collaborator updated successfully')
     setToastAction('success')
+  }
+
+  const handleDeleteCollaborator = async (collaboratorId) => {
+    try {
+      const res = await axios.delete(`${VITE_API_URL}/formulation/collaborator/${id}/${collaboratorId}`)
+      setCollaborators(collaborators.filter(collaborator => collaborator._id !== collaboratorId))
+      setShowToast(true)
+      setMessage('Collaborator deleted successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   if (loading) {
@@ -386,6 +403,7 @@ function ViewFormulation() {
         onClose={() => setIsShareFormulationModalOpen(false)}
         onAdd={goToConfirmationModal}
         onEdit={handleUpdateCollaborator}
+        onDelete={handleDeleteCollaborator}
         userId={user._id}
         formulation={formulation}
         collaborators={collaborators}

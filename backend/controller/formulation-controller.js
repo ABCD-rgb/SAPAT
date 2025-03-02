@@ -157,6 +157,49 @@ const updateCollaborator = async (req,res) => {
     }
 };
 
+const removeCollaborator = async (req,res) => {
+    const { formulationId, collaboratorId } = req.params;
+    try {
+        const formulation = await Formulation.findById(formulationId);
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        // owner cannot be removed
+        const toRemoveisOwner = formulation.collaborators.find(
+          c => c.userId.toString() === collaboratorId && c.access === 'owner'
+        );
+        if (toRemoveisOwner) {
+            return res.status(403).json({
+                message: 'error',
+            });
+        }
+
+        // remove the collaborator
+        const updatedFormulation = await Formulation.findByIdAndUpdate(
+          formulationId,
+          {
+              $pull: {
+                  collaborators: { userId: collaboratorId }
+              }
+          },
+          { new: true }
+        );
+
+        if (!updatedFormulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+
+        res.status(200).json({
+            message: 'success',
+            formulation: updatedFormulation
+        });
+
+
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
 
 
 export {
@@ -166,5 +209,6 @@ export {
     updateFormulation,
     deleteFormulation,
     validateCollaborator,
-    updateCollaborator
+    updateCollaborator,
+    removeCollaborator
 };
