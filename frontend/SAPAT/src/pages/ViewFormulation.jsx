@@ -128,11 +128,11 @@ function ViewFormulation() {
     }
   }
 
-  const goToConfirmationModal = (type, collaborator) => {
+  const goToConfirmationModal = (type, collaborator, message) => {
     if (type === 'error') {
       // toast instructions
       setShowToast(true)
-      setMessage('User not found. Ask them to register.')
+      setMessage(message)
       setToastAction('error')
     } else {
       setNewCollaborator(collaborator);

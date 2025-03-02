@@ -18,6 +18,17 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
   const handleNewCollaborator = async (e) => {
     e.preventDefault()
     try {
+      //first check if the email already exists in collaborators
+      const isExistingCollaborator = collaborators.some(
+        collaborator => collaborator.email === newCollaborator.newEmail
+      )
+      if (isExistingCollaborator) {
+        console.log("isExistingCollaborator:")
+        onAdd('error', newCollaborator, 'This user is already a collaborator.')
+        clearInput()
+        return
+      }
+
       // get collaborator details based on newCollaborator.newCollaboratorEmail
       const userData = await fetchNewCollaboratorDataByEmail();
       // only call this if success
@@ -30,7 +41,7 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
           newEmail: userData.email,
           newAccess: newCollaborator.newAccess
         }
-        onAdd('success', formattedCollaborator);
+        onAdd('success', formattedCollaborator, '');
       }
     } catch (err) {
       console.log(err)
@@ -101,7 +112,8 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
       return res.data.user[0];
     } catch (err) {
       if (err.response.status === 404) {
-        onAdd('error', newCollaborator);
+        onAdd('error', newCollaborator, 'User not found. Ask them to register.');
+        clearInput()
       }
     }
   }
@@ -114,6 +126,15 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
     }
   };
 
+  const clearInput = () => {
+    setNewCollaborator({
+      newId: '',
+      newDisplayName: '',
+      newProfilePicture: '',
+      newEmail: '',
+      newAccess: 'edit',
+    })
+  }
   const handleClose = () => {
     setUpdatedCollaborators([])
     setNewCollaborator({
