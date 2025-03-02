@@ -106,7 +106,7 @@ function Formulations() {
     setToastAction('')
   }
 
-  const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Access']
+  const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Permission']
 
   if (loading) {
     return <Loading />
