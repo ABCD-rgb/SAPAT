@@ -71,7 +71,7 @@ function Ingredients() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-auto flex-col bg-gray-50">
       {/* Fixed Header Section */}
       <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
         <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
