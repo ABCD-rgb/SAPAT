@@ -31,6 +31,8 @@ function Table({
       const rowData = orderedFields.map((field) => row[field] || '')
       return rowData
     }
+    // for pages that are not Formulations
+    return Object.values(row)
   };
 
   return (
@@ -57,7 +59,7 @@ function Table({
               {getRowData(row).map((cell, cellIndex) => (
                 <td key={cellIndex}>
                   {/* only the name column (index 1) is clickable to go to ViewFormulation */}
-                  {cellIndex === 1 ? (
+                  {(onRowClick && cellIndex === 1) ? (
                     <span
                       onClick={() => onRowClick && onRowClick(row)}
                       className="cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium"
