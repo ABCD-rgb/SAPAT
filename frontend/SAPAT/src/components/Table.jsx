@@ -52,11 +52,22 @@ function Table({
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className="hover cursor-pointer"
-              onClick={() => onRowClick && onRowClick(row)}
+              className="hover"
             >
               {getRowData(row).map((cell, cellIndex) => (
-                <td key={cellIndex}>{cell}</td>
+                <td key={cellIndex}>
+                  {/* only the name column (index 1) is clickable to go to ViewFormulation */}
+                  {cellIndex === 1 ? (
+                    <span
+                      onClick={() => onRowClick && onRowClick(row)}
+                      className="cursor-pointer text-deepbrown hover:text-deepbrown/80 hover:underline font-medium"
+                    >
+                      {cell}
+                    </span>
+                  ) : (
+                    cell
+                  )}
+                </td>
               ))}
               {actions && (
                 <td className="flex justify-end gap-2">
