@@ -121,6 +121,8 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      // note: does not really add; just want to use the toast functionality
+      onAdd('linkCopied', newCollaborator, 'Link copied to clipboard.')
     } catch (err) {
       console.error("Failed to copy link:", err);
     }

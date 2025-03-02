@@ -134,7 +134,12 @@ function ViewFormulation() {
       setShowToast(true)
       setMessage(message)
       setToastAction('error')
-    } else {
+    } else if (type === 'linkCopied') {
+      setShowToast(true)
+      setMessage(message)
+      setToastAction('success')
+    }
+    else {
       setNewCollaborator(collaborator);
       setIsAddCollaboratorModalOpen(true);
     }
