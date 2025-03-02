@@ -60,7 +60,7 @@ function Table({
                   {cellIndex === 1 ? (
                     <span
                       onClick={() => onRowClick && onRowClick(row)}
-                      className="cursor-pointer text-deepbrown hover:text-deepbrown/80 hover:underline font-medium"
+                      className="cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium"
                     >
                       {cell}
                     </span>
@@ -72,7 +72,9 @@ function Table({
               {actions && (
                 <td className="flex justify-end gap-2">
                   <button
-                    className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
+                    className={`btn btn-ghost btn-sm ${
+                      (row?.access && row.access !== 'owner') ? 'cursor-not-allowed text-gray-500' : 'text-deepbrown hover:bg-deepbrown/10'
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation()
                       // non-owners should not be able to edit the basic data
@@ -90,7 +92,9 @@ function Table({
                     <RiPencilLine className="h-4 w-4" />
                   </button>
                   <button
-                    className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                    className={`btn btn-ghost btn-sm ${
+                      (row?.access && row.access !== 'owner') ? 'cursor-not-allowed text-gray-500' : 'text-red-600 hover:bg-deepbrown/10'
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation()
                       // non-owners should not be able to edit the basic data
