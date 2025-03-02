@@ -19,7 +19,6 @@ const AuthProvider = ({ children }) => {
         setUser(userData);
       })
       .catch(() => {
-        console.log('catch: Not authenticated');
         setUser(null);
       })
       .finally(() => {

@@ -4,20 +4,12 @@ import { RiFileList2Line, RiLeafLine } from 'react-icons/ri'
 import StatCard from '../components/StatCard'
 import useAuth from '../hook/useAuth'
 import { Navigate } from 'react-router-dom'
+import Loading from '../components/Loading'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Dashboard() {
   const { user, loading } = useAuth()
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-
-  if (!user) {
-    return <Navigate to="/" />
-  }
 
   const pieData = {
     labels: ['Starter', 'Grower', 'Finisher', 'Layer'],
@@ -44,6 +36,13 @@ function Dashboard() {
       },
     },
     maintainAspectRatio: false,
+  }
+
+  if (loading) {
+    return <Loading />
+  }
+  if (!user) {
+    return <Navigate to="/" />
   }
 
   return (

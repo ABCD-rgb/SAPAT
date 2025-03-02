@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import {Navigate, useParams} from 'react-router-dom'
 import {
   RiShareLine,
   RiAddLine,
@@ -8,79 +8,100 @@ import {
   RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
-
-// Define the hook directly in the same file
-function useUserColor() {
-  const [userColor, setUserColor] = useState('')
-
-  const colors = [
-    '#FF6B6B', // red
-    '#4ECDC4', // teal
-    '#45B7D1', // blue
-    '#96CEB4', // green
-    '#FFEEAD', // yellow
-    '#D4A5A5', // pink
-    '#9B59B6', // purple
-    '#E67E22', // orange
-  ]
-
-  useEffect(() => {
-    const randomColor = colors[Math.floor(Math.random() * colors.length)]
-    setUserColor(randomColor)
-  }, [])
-
-  return userColor
-}
+import useAuth from "../hook/useAuth.js";
+import axios from 'axios';
+import Loading from "../components/Loading.jsx";
+import ShareFormulationModal from "../components/modals/formulations/ShareFormulationModal.jsx";
+import ConfirmationModal from "../components/modals/ConfirmationModal.jsx";
+import Toast from "../components/Toast.jsx";
 
 function ViewFormulation() {
-  const { code } = useParams()
-  const userColor = useUserColor()
+  const { id } = useParams()
+  const { user, loading } = useAuth()
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
+
+
+  const [formulation, setFormulation] = useState({
+    code: '',
+    name: '',
+    description: '',
+    animal_group: '',
+    ingredients: [],
+    nutrients: [],
+  });
+  const [collaborators, setCollaborators] = useState([])
+  const [newCollaborator, setNewCollaborator] = useState({})
+  const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
+  const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [shouldRedirect, setShouldRedirect] = useState(false)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
 
-  // Sample data arrays - these would typically come from your API/database
-  const ingredients = [
-    {
-      name: 'Maize',
-      minimum: 1.2,
-      maximum: 4.0,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'Barley',
-      minimum: null,
-      maximum: null,
-      value: null,
-    },
-    // Add more ingredients as needed
-  ]
 
-  const nutrients = [
-    {
-      name: 'DM',
-      minimum: 12.8,
-      maximum: null,
-      value: null,
-    },
-    {
-      name: 'CP',
-      minimum: 10.5,
-      maximum: 15.0,
-      value: null,
-    },
-    // Add more nutrients as needed
-  ]
+  useEffect(() => {
+    if (user) {
+      fetchData();
+      checkAccess();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchCollaboratorData();
+    setIsLoading(false);
+  }, [formulation.collaborators]);
+
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${VITE_API_URL}/formulation/${id}`);
+      setFormulation(res.data.formulations);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const checkAccess = async () => {
+    try {
+      const res = await axios.get(`${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
+      console.log(res.data.access);
+      if (res.data.access === 'notFound') {
+        setShouldRedirect(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const fetchCollaboratorData = async () => {
+    try {
+      if (!formulation.collaborators) return;
+      // get details of collaborators
+      const collaboratorPromises = formulation.collaborators.map(async (collaborator) => {
+        const res = await axios.get(`${VITE_API_URL}/user-check/id/${collaborator.userId}`);
+        return {
+          ...res.data.user,
+          access: collaborator.access,
+        };
+      })
+      // wait for all requests to complete
+      const collaboratorsData = await Promise.all(collaboratorPromises);
+      setCollaborators(collaboratorsData);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormulation({
+      ...formulation,
+      [name]: value,
+    });
+  }
 
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
@@ -90,10 +111,79 @@ function ViewFormulation() {
     setFocusedInput(null)
   }
 
-  const getInputStyle = (inputId) => ({
-    borderColor: focusedInput === inputId ? userColor : '',
-    boxShadow: focusedInput === inputId ? `0 0 0 1px ${userColor}` : '',
-  })
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
+  }
+
+  const handleOpenShareFormulationModal = () => {
+    const currentUserAccess = collaborators.find(collaborator => collaborator._id === user._id)?.access
+    if (currentUserAccess === 'owner') {
+      setIsShareFormulationModalOpen(true)
+    } else {
+      setShowToast(true)
+      setMessage('Only the owner can share the formulation.')
+      setToastAction('error')
+    }
+  }
+
+  const goToConfirmationModal = (type, collaborator) => {
+    if (type === 'error') {
+      // toast instructions
+      setShowToast(true)
+      setMessage('User not found. Ask them to register.')
+      setToastAction('error')
+    } else {
+      setNewCollaborator(collaborator);
+      setIsAddCollaboratorModalOpen(true);
+    }
+  }
+  const handleAddCollaborator = async () => {
+    try {
+      const res = await axios.put(`${VITE_API_URL}/formulation/collaborator/${id}`, {
+        'updaterId': user._id,
+        'collaboratorId': newCollaborator.newId,
+        'access': newCollaborator.newAccess,
+      })
+
+      const newCollaboratorData = {
+        _id: newCollaborator.newId,
+        email: newCollaborator.newEmail,
+        access: newCollaborator.newAccess,
+        profilePicture: newCollaborator.newProfilePicture,
+        displayName: newCollaborator.newDisplayName,
+      }
+      setCollaborators([...collaborators, newCollaboratorData])
+      setShowToast(true)
+      setMessage('Collaborator added successfully')
+      setToastAction('success')
+
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const handleUpdateCollaborator = (updatedCollaborators) => {
+    setCollaborators(updatedCollaborators);
+    setShowToast(true)
+    setMessage('Collaborator updated successfully')
+    setToastAction('success')
+  }
+
+  if (loading) {
+    return <Loading />
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
+  if (shouldRedirect) {
+    return <Navigate to="/formulations" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
@@ -121,7 +211,10 @@ function ViewFormulation() {
                 <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
                 <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
-              <button className="btn btn-sm gap-1 rounded-lg text-xs">
+              <button
+                onClick={handleOpenShareFormulationModal}
+                className="btn btn-sm gap-1 rounded-lg text-xs"
+              >
                 <RiShareLine /> Share ▼
               </button>
             </div>
@@ -133,10 +226,10 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Code</label>
               <input
                 type="text"
-                value={code}
-                readOnly
+                name="code"
+                value={formulation.code}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('code')}
+                onChange={handleChange}
                 onFocus={() => handleFocus('code')}
                 onBlur={handleBlur}
               />
@@ -147,8 +240,10 @@ function ViewFormulation() {
               </label>
               <input
                 type="text"
+                name="name"
+                value={formulation.name}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('name')}
+                onChange={handleChange}
                 onFocus={() => handleFocus('name')}
                 onBlur={handleBlur}
               />
@@ -157,9 +252,11 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Description</label>
               <input
                 type="text"
+                name="description"
+                value={formulation.description}
                 className="input input-bordered w-full rounded-xl"
-                style={getInputStyle('description')}
                 onFocus={() => handleFocus('description')}
+                onChange={handleChange}
                 onBlur={handleBlur}
               />
             </div>
@@ -167,13 +264,16 @@ function ViewFormulation() {
               <label className="label text-sm font-medium">Animal group</label>
               <select
                 className="select select-bordered w-full rounded-xl"
-                style={getInputStyle('animalGroup')}
+                name="animal_group"
+                value={formulation.animal_group}
+                onChange={handleChange}
                 onFocus={() => handleFocus('animalGroup')}
                 onBlur={handleBlur}
               >
                 <option>Broiler</option>
                 <option>Layer</option>
                 <option>Swine</option>
+                <option>Poultry</option>
               </select>
             </div>
           </div>
@@ -198,7 +298,7 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ingredients.map((ingredient, index) => (
+                    {formulation.ingredients.map((ingredient, index) => (
                       <tr key={index}>
                         <td>{ingredient.name}</td>
                         <td>{ingredient.minimum}</td>
@@ -237,7 +337,7 @@ function ViewFormulation() {
                     </tr>
                   </thead>
                   <tbody>
-                    {nutrients.map((nutrient, index) => (
+                    {formulation.nutrients.map((nutrient, index) => (
                       <tr key={index}>
                         <td>{nutrient.name}</td>
                         <td>{nutrient.minimum}</td>
@@ -266,7 +366,6 @@ function ViewFormulation() {
               <input
                 type="number"
                 className="input input-bordered input-sm w-24 rounded-lg"
-                style={getInputStyle('total-cost')}
                 onFocus={() => handleFocus('total-cost')}
                 onBlur={handleBlur}
               />
@@ -280,6 +379,34 @@ function ViewFormulation() {
           </div>
         </div>
       </div>
+
+    {/*  Modals */}
+      <ShareFormulationModal
+        isOpen={isShareFormulationModalOpen}
+        onClose={() => setIsShareFormulationModalOpen(false)}
+        onAdd={goToConfirmationModal}
+        onEdit={handleUpdateCollaborator}
+        userId={user._id}
+        formulation={formulation}
+        collaborators={collaborators}
+      />
+      <ConfirmationModal
+        isOpen={isAddCollaboratorModalOpen}
+        onClose={() => setIsAddCollaboratorModalOpen(false)}
+        onConfirm={handleAddCollaborator}
+        title="Add collaborator"
+        description={<>Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to this formulation?</>}
+        type='add'
+      />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
     </div>
   )
 }

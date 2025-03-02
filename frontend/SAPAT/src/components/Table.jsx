@@ -1,13 +1,41 @@
+import {useState} from "react";
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import { FaEye } from "react-icons/fa";
+import Toast from '../components/Toast'
 
 function Table({
   headers,
   data,
+  page,
   onEdit,
   onDelete,
   onRowClick,
   actions = true,
 }) {
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
+  }
+
+  // Function to filter out the _id when rendering rows
+  const getRowData = (row) => {
+    if (!row) return []
+    if (page === 'formulations') {
+      // Get the keys of the row excluding _id
+      const orderedFields = ['code', 'name', 'description', 'animal_group', 'access']
+      const rowData = orderedFields.map((field) => row[field] || '')
+      return rowData
+    }
+    // for pages that are not Formulations
+    return Object.values(row)
+  };
+
   return (
     <div className="h-full overflow-auto rounded-lg bg-white shadow-sm">
       <table className="table w-full">
@@ -27,28 +55,62 @@ function Table({
           {data.map((row, rowIndex) => (
             <tr
               key={rowIndex}
-              className="hover cursor-pointer"
-              onClick={() => onRowClick && onRowClick(row)}
+              className="hover"
             >
-              {Object.values(row).map((cell, cellIndex) => (
-                <td key={cellIndex}>{cell}</td>
+              {getRowData(row).map((cell, cellIndex) => (
+                <td key={cellIndex}>
+                  {/* only the name column (index 1) is clickable to go to ViewFormulation */}
+                  {(onRowClick && cellIndex === 1) ? (
+                    <span
+                      onClick={() => onRowClick && onRowClick(row)}
+                      className="group cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium inline-flex items-center gap-2 px-2 py-1 rounded"
+                    >
+                      {cell}
+                      <FaEye className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    </span>
+                  ) : (
+                    cell
+                  )}
+                </td>
               ))}
               {actions && (
                 <td className="flex justify-end gap-2">
                   <button
-                    className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
+                    className={`btn btn-ghost btn-sm ${
+                      (row?.access && row.access !== 'owner') ? 'cursor-not-allowed text-gray-500' : 'text-deepbrown hover:bg-deepbrown/10'
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit(row)
+                      // non-owners should not be able to edit the basic data
+                      if (row?.access && row.access !== 'owner') {
+                        // toast instructions
+                        setShowToast(true)
+                        setMessage('Only the owner can edit the basic data.')
+                        setToastAction('error')
+                      }
+                      else {
+                        onEdit(row)
+                      }
                     }}
                   >
                     <RiPencilLine className="h-4 w-4" />
                   </button>
                   <button
-                    className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
+                    className={`btn btn-ghost btn-sm ${
+                      (row?.access && row.access !== 'owner') ? 'cursor-not-allowed text-gray-500' : 'text-red-600 hover:bg-deepbrown/10'
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation()
-                      onDelete(row)
+                      // non-owners should not be able to edit the basic data
+                      if (row?.access && row.access !== 'owner') {
+                        // toast instructions
+                        setShowToast(true)
+                        setMessage('Only the owner can delete this formulation.')
+                        setToastAction('error')
+                      }
+                      else {
+                        onDelete(row)
+                      }
                     }}
                   >
                     <RiDeleteBinLine className="h-4 w-4" />
@@ -59,6 +121,14 @@ function Table({
           ))}
         </tbody>
       </table>
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
     </div>
   )
 }

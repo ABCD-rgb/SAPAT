@@ -9,12 +9,17 @@ import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import Loading from "../components/Loading.jsx";
+import useAuth from "../hook/useAuth.js";
+import {Navigate} from "react-router-dom";
 
 function Nutrients() {
+  const { user, loading } = useAuth()
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedNutrient, setSelectedNutrient] = useState(null)
+
 
   const nutrients = [
     {
@@ -133,6 +138,13 @@ function Nutrients() {
   }
 
   const headers = ['Abbreviation', 'Name', 'Unit', 'Description', 'Group']
+
+  if (loading) {
+    return <Loading />
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
