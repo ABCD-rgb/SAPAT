@@ -1,6 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { MdLink } from "react-icons/md";
-import {useEffect, useState} from "react";
+import { useState } from "react";
 import axios from "axios";
 
 
@@ -106,6 +106,14 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
     }
   }
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+    }
+  };
+
   const handleClose = () => {
     setUpdatedCollaborators([])
     setNewCollaborator({
@@ -207,7 +215,10 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
         </div>
         {/* Actions */}
         <div className="modal-action">
-          <button className="btn btn-outline rounded-xl px-4">
+          <button
+            onClick={handleCopyLink}
+            className="btn btn-outline rounded-xl px-4"
+          >
             Copy link
             <MdLink className="h-5 w-5" />
           </button>
