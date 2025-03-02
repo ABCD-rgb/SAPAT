@@ -24,8 +24,10 @@ const createFormulation = async (req, res) => {
 
 
 const getAllFormulations = async (req, res) => {
+    const { collaboratorId } = req.params;
     try {
-        const formulations = await Formulation.find().select('code name description animal_group');
+        // only show formulations where the user is part of the collaborators
+        const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group');
         res.status(200).json({ message: 'success', formulations: formulations });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'error' })

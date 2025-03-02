@@ -52,7 +52,7 @@ const handleRoutes = (app) => {
 
   // CONTROLLER API CALLS
   app.post('/formulation', createFormulation);
-  app.get('/formulation', getAllFormulations);
+  app.get('/formulation/filtered/:collaboratorId', getAllFormulations);
   app.get('/formulation/:id', getFormulation);
   app.put('/formulation/:id', updateFormulation);
   app.delete('/formulation/:id', deleteFormulation);
