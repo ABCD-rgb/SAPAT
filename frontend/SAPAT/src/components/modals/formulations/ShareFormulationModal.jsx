@@ -1,10 +1,10 @@
-import { RiCloseLine } from 'react-icons/ri'
+import { RiCloseLine, RiDeleteBinLine } from 'react-icons/ri'
 import { MdLink } from "react-icons/md";
 import { useState } from "react";
 import axios from "axios";
 
 
-function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formulation, collaborators }) {
+function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, onDelete, userId, formulation, collaborators }) {
   const [newCollaborator, setNewCollaborator] = useState({
     newId: '',
     newDisplayName: '',
@@ -218,17 +218,25 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
                   {collaborator.access === 'owner' ? (
                     <span className="text-sm text-gray-500">Owner</span>
                   ) : (
-                    <select
-                      className="select select-xs rounded-xl text-sm w-18"
-                      value={
-                        updatedCollaborators.find(c => c.collaboratorId === collaborator._id)?.access
-                        || collaborator.access
-                      }
-                      onChange={(e) => handleAccessChange(collaborator._id, e.target.value)}
-                    >
-                      <option value="edit">edit</option>
-                      <option value="view">view</option>
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="select select-xs rounded-xl text-sm w-18"
+                        value={
+                          updatedCollaborators.find(c => c.collaboratorId === collaborator._id)?.access
+                          || collaborator.access
+                        }
+                        onChange={(e) => handleAccessChange(collaborator._id, e.target.value)}
+                      >
+                        <option value="edit">edit</option>
+                        <option value="view">view</option>
+                      </select>
+                      <button
+                        onClick={() => onDelete(collaborator._id)}
+                        className="btn btn-ghost btn-xs hover:bg-deepbrown/10"
+                      >
+                        <RiDeleteBinLine className="h-4 w-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

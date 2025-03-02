@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { getUserById, getUserByEmail } from './controller/user-controller.js';
 import {
-  createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator
+  createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator, removeCollaborator
 } from './controller/formulation-controller.js';
 
 const handleRoutes = (app) => {
@@ -61,6 +61,7 @@ const handleRoutes = (app) => {
   app.delete('/formulation/:id', deleteFormulation);
   app.get('/formulation/collaborator/:formulationId/:collaboratorId', validateCollaborator);
   app.put('/formulation/collaborator/:id', updateCollaborator);
+  app.delete('/formulation/collaborator/:formulationId/:collaboratorId', removeCollaborator);
 };
 
 export default handleRoutes;

@@ -176,6 +176,18 @@ function ViewFormulation() {
     setToastAction('success')
   }
 
+  const handleDeleteCollaborator = async (collaboratorId) => {
+    try {
+      const res = await axios.delete(`${VITE_API_URL}/formulation/collaborator/${id}/${collaboratorId}`)
+      setCollaborators(collaborators.filter(collaborator => collaborator._id !== collaboratorId))
+      setShowToast(true)
+      setMessage('Collaborator deleted successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   if (loading) {
     return <Loading />
   }
@@ -391,6 +403,7 @@ function ViewFormulation() {
         onClose={() => setIsShareFormulationModalOpen(false)}
         onAdd={goToConfirmationModal}
         onEdit={handleUpdateCollaborator}
+        onDelete={handleDeleteCollaborator}
         userId={user._id}
         formulation={formulation}
         collaborators={collaborators}
