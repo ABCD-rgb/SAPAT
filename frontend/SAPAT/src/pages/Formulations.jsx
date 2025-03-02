@@ -2,7 +2,6 @@ import { RiAddLine, RiFilterLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import CreateFormulationModal from '../components/modals/formulations/CreateFormulationModal'
 import EditFormulationModal from '../components/modals/formulations/EditFormulationModal'
-import FormulationCreatedModal from '../components/modals/formulations/FormulationCreatedModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
@@ -39,16 +38,8 @@ function Formulations() {
       setFormulations(fetchedData);
     } catch (err) {
       console.log(err)
-    } finally {
-      // TODO: add Loading screen
     }
   }
-
-  // const checkAccess = async () => {
-  //   try {
-  //     const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${}/${user._id}`);
-  //   }
-  // }
 
   const handleEditClick = (formulation) => {
     setSelectedFormulation(formulation)
@@ -181,17 +172,13 @@ function Formulations() {
         formulation={selectedFormulation}
         onResult={handleEditResult}
       />
-      <FormulationCreatedModal
-        isOpen={isCreatedModalOpen}
-        onClose={() => setIsCreatedModalOpen(false)}
-        formulation={selectedFormulation}
-      />
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
         title="Delete Formulation"
         description={`Are you sure you want to delete ${selectedFormulation?.name}? This action cannot be undone.`}
+        type='delete'
       />
 
       {/*  Toasts */}
