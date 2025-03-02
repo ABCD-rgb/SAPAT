@@ -22,7 +22,15 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
       const userData = await fetchNewCollaboratorDataByEmail();
       // only call this if success
       if (userData) {
-        onAdd('success', newCollaborator);
+        console.log("userData:",userData)
+        const formattedCollaborator = {
+          newId: userData._id,
+          newDisplayName: userData.displayName,
+          newProfilePicture: userData.profilePicture,
+          newEmail: userData.email,
+          newAccess: newCollaborator.newAccess
+        }
+        onAdd('success', formattedCollaborator);
       }
     } catch (err) {
       console.log(err)
@@ -90,14 +98,7 @@ function ShareFormulationModal({ isOpen, onClose, onAdd, onEdit, userId, formula
   const fetchNewCollaboratorDataByEmail = async() => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/user-check/email/${newCollaborator.newEmail}`)
-      const userData = res.data.user[0];
-      setNewCollaborator((prev) => ({
-        ...prev,
-        'newId': userData._id,
-        'newDisplayName': userData.displayName,
-        'newProfilePicture': userData.profilePicture,
-      }))
-      return userData;
+      return res.data.user[0];
     } catch (err) {
       if (err.response.status === 404) {
         onAdd('error', newCollaborator);
