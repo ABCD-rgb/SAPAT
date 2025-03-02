@@ -1,4 +1,6 @@
+import {useState} from "react";
 import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import Toast from '../components/Toast'
 
 function Table({
   headers,
@@ -9,6 +11,17 @@ function Table({
   onRowClick,
   actions = true,
 }) {
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
+  }
+
   // Function to filter out the _id when rendering rows
   const getRowData = (row) => {
     if (!row) return []
@@ -51,7 +64,16 @@ function Table({
                     className="btn btn-ghost btn-sm text-deepbrown hover:bg-deepbrown/10"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onEdit(row)
+                      // non-owners should not be able to edit the basic data
+                      if (row?.access && row.access !== 'owner') {
+                        // toast instructions
+                        setShowToast(true)
+                        setMessage('Only the owner can edit the basic data.')
+                        setToastAction('error')
+                      }
+                      else {
+                        onEdit(row)
+                      }
                     }}
                   >
                     <RiPencilLine className="h-4 w-4" />
@@ -60,7 +82,16 @@ function Table({
                     className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onDelete(row)
+                      // non-owners should not be able to edit the basic data
+                      if (row?.access && row.access !== 'owner') {
+                        // toast instructions
+                        setShowToast(true)
+                        setMessage('Only the owner can delete this formulation.')
+                        setToastAction('error')
+                      }
+                      else {
+                        onDelete(row)
+                      }
                     }}
                   >
                     <RiDeleteBinLine className="h-4 w-4" />
@@ -71,6 +102,14 @@ function Table({
           ))}
         </tbody>
       </table>
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
     </div>
   )
 }
