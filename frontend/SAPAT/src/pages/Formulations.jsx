@@ -39,16 +39,8 @@ function Formulations() {
       setFormulations(fetchedData);
     } catch (err) {
       console.log(err)
-    } finally {
-      // TODO: add Loading screen
     }
   }
-
-  // const checkAccess = async () => {
-  //   try {
-  //     const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${}/${user._id}`);
-  //   }
-  // }
 
   const handleEditClick = (formulation) => {
     setSelectedFormulation(formulation)

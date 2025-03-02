@@ -26,19 +26,32 @@ function ViewFormulation() {
     nutrients: [],
   });
   const [focusedInput, setFocusedInput] = useState(null)
+  const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
+    if (user) {
+      fetchData();
+      checkAccess();
+    }
+  }, [user]);
   const fetchData = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/${id}`);
       setFormulation(res.data.formulations);
     } catch (err) {
       console.log(err);
-    } finally {
-      // TODO: add loading screen
+    }
+  }
+
+  const checkAccess = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
+      console.log(res.data.access);
+      if (res.data.access === 'notFound') {
+        setShouldRedirect(true);
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -64,7 +77,9 @@ function ViewFormulation() {
   if (!user) {
     return <Navigate to="/" />
   }
-
+  if (shouldRedirect) {
+    return <Navigate to="/formulations" />
+  }
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
