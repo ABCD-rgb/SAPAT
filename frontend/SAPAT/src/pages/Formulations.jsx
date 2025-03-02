@@ -6,6 +6,7 @@ import FormulationCreatedModal from '../components/modals/formulations/Formulati
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
+import Toast from '../components/Toast'
 import {Navigate, useNavigate} from 'react-router-dom'
 import useAuth from "../hook/useAuth.js";
 import axios from "axios";
@@ -19,15 +20,21 @@ function Formulations() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
   const navigateURL = useNavigate()
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`);
       const fetchedData = res.data.formulations;
       setFormulations(fetchedData);
     } catch (err) {
@@ -36,6 +43,12 @@ function Formulations() {
       // TODO: add Loading screen
     }
   }
+
+  // const checkAccess = async () => {
+  //   try {
+  //     const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/collaborator/${}/${user._id}`);
+  //   }
+  // }
 
   const handleEditClick = (formulation) => {
     setSelectedFormulation(formulation)
@@ -47,22 +60,61 @@ function Formulations() {
     setIsDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
-    // TODO: Implement delete functionality
+  const handleDeleteConfirm = async () => {
+    try {
+      const selectedId = selectedFormulation._id;
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/formulation/${selectedFormulation._id}`);
+      const messageData = res.data.message;
+      if (messageData === 'success') {
+        setFormulations(formulations.filter((formulation) => formulation._id !== selectedId))
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage(messageData === 'success' ? 'Formulation deleted successfully' : 'Failed to delete formulation.')
+      setToastAction(messageData)
+    } catch (err) {
+      console.log(err)
+      setShowToast(true)
+      setMessage('Failed to delete formulation.')
+      setToastAction('error')
+    }
     console.log('Deleting formulation:', selectedFormulation)
   }
 
-  const handleCreateSuccess = (newFormulation) => {
+  const handleCreateResult = (newFormulation, action, message) => {
     setIsCreateModalOpen(false)
-    setSelectedFormulation(newFormulation)
-    setIsCreatedModalOpen(true)
+    setFormulations([...formulations, newFormulation])
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
+  const handleEditResult = (updatedFormulation, action, message) => {
+    setIsEditModalOpen(false)
+    setFormulations((prevFormulations) => {
+      const index = prevFormulations.findIndex((formulation) => formulation._id === updatedFormulation._id)
+      const updated = [...prevFormulations];
+      updated[index] = updatedFormulation;
+      return updated;
+    })
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
   }
 
   const handleRowClick = (formulation) => {
     navigateURL(`/formulations/${formulation._id}`)
   }
 
-  const headers = ['Code', 'Name', 'Description', 'Animal Group']
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
+  }
+
+  const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Access']
 
   if (loading) {
     return <Loading />
@@ -109,6 +161,7 @@ function Formulations() {
         <Table
           headers={headers}
           data={formulations}
+          page="formulations"
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           onRowClick={handleRowClick}
@@ -117,14 +170,16 @@ function Formulations() {
 
       {/* Modals */}
       <CreateFormulationModal
+        owner={user._id}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={handleCreateSuccess}
+        onResult={handleCreateResult}
       />
       <EditFormulationModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}
+        onResult={handleEditResult}
       />
       <FormulationCreatedModal
         isOpen={isCreatedModalOpen}
@@ -138,6 +193,16 @@ function Formulations() {
         title="Delete Formulation"
         description={`Are you sure you want to delete ${selectedFormulation?.name}? This action cannot be undone.`}
       />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
+      />
+
     </div>
   )
 }

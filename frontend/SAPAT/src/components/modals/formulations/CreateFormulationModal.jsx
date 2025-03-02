@@ -1,25 +1,37 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
+import axios from 'axios'
 
-function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
+function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     description: '',
-    animalGroup: '',
+    animal_group: '',
   })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Add validation
-    onSuccess(formData)
-    // Reset form
-    setFormData({
-      code: '',
-      name: '',
-      description: '',
-      animalGroup: '',
-    })
+    const body = { ...formData, owner }
+    console.log("body:",body)
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/formulation`, body)
+      console.log("res:",res)
+      const newFormulation = res.data.formulations;
+      newFormulation.access = "owner"
+      onResult(newFormulation, "success", "Successfully created formulation.")
+      // Reset form
+      setFormData({
+        code: '',
+        name: '',
+        description: '',
+        animal_group: '',
+      })
+    } catch (err) {
+      console.log(err)
+      onResult(null, "error", "Failed to create formulation.")
+    }
+
   }
 
   const handleChange = (e) => {
@@ -28,6 +40,16 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
       ...prev,
       [name]: value,
     }))
+  }
+
+  const handleClose = () => {
+    onClose()
+    setFormData({
+      code: '',
+      name: '',
+      description: '',
+      animal_group: '',
+    })
   }
 
   return (
@@ -39,7 +61,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
         {/* Close button */}
         <button
           className="btn btn-sm btn-circle absolute top-4 right-4"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <RiCloseLine className="h-5 w-5" />
         </button>
@@ -59,6 +81,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
                 type="text"
                 name="code"
                 value={formData.code}
+                required
                 onChange={handleChange}
                 placeholder="Enter code"
                 className="input input-bordered w-full rounded-xl"
@@ -73,6 +96,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
                 type="text"
                 name="name"
                 value={formData.name}
+                required
                 onChange={handleChange}
                 placeholder="Enter name"
                 className="input input-bordered w-full rounded-xl"
@@ -84,8 +108,8 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
                 <span className="label-text">Animal Group</span>
               </label>
               <select
-                name="animalGroup"
-                value={formData.animalGroup}
+                name="animal_group"
+                value={formData.animal_group}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
@@ -109,6 +133,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
                 placeholder="Enter description"
                 className="textarea textarea-bordered w-full rounded-xl"
                 rows="3"
+                maxLength="60"
               ></textarea>
             </div>
           </div>
@@ -118,7 +143,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
             <button
               type="button"
               className="btn rounded-xl px-8"
-              onClick={onClose}
+              onClick={handleClose}
             >
               Cancel
             </button>
@@ -132,7 +157,7 @@ function CreateFormulationModal({ isOpen, onClose, onSuccess }) {
         </form>
       </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={onClose}>close</button>
+        <button onClick={handleClose}>close</button>
       </form>
     </dialog>
   )
