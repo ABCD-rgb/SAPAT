@@ -19,6 +19,7 @@ function Formulations() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   // toast visibility
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
@@ -36,6 +37,7 @@ function Formulations() {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`);
       const fetchedData = res.data.formulations;
       setFormulations(fetchedData);
+      setIsLoading(false);
     } catch (err) {
       console.log(err)
     }
@@ -113,6 +115,10 @@ function Formulations() {
   }
   if (!user) {
     return <Navigate to="/" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
   }
 
   return (

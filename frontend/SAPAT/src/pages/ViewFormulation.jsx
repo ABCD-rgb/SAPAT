@@ -31,6 +31,7 @@ function ViewFormulation() {
   });
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
+  const [userAccess, setUserAccess] = useState('')
   const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
   const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
@@ -71,6 +72,7 @@ function ViewFormulation() {
       if (res.data.access === 'notFound') {
         setShouldRedirect(true);
       }
+      setUserAccess(res.data.access);
     } catch (err) {
       console.log(err);
     }
@@ -118,8 +120,7 @@ function ViewFormulation() {
   }
 
   const handleOpenShareFormulationModal = () => {
-    const currentUserAccess = collaborators.find(collaborator => collaborator._id === user._id)?.access
-    if (currentUserAccess === 'owner') {
+    if (userAccess === 'owner') {
       setIsShareFormulationModalOpen(true)
     } else {
       setShowToast(true)
@@ -228,12 +229,18 @@ function ViewFormulation() {
                 <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
                 <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
               </div>
-              <button
-                onClick={handleOpenShareFormulationModal}
-                className="btn btn-sm gap-1 rounded-lg text-xs"
+              <div
+                className={`${(userAccess !== 'owner') && 'tooltip md:tooltip-left'}`}
+                data-tip={`${(userAccess !== 'owner') && 'Only the owner can share this formulation.'}`}
               >
-                <RiShareLine /> Share ▼
-              </button>
+                <button
+                  disabled={userAccess !== 'owner'}
+                  onClick={handleOpenShareFormulationModal}
+                  className="btn btn-sm gap-1 rounded-lg text-xs"
+                >
+                  <RiShareLine /> Share ▼
+                </button>
+              </div>
             </div>
           </div>
 
