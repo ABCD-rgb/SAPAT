@@ -9,7 +9,7 @@ import Dashboard from './pages/Dashboard'
 import Ingredients from './pages/Ingredients'
 import Nutrients from './pages/Nutrients'
 import Formulations from './pages/Formulations'
-import ViewFormulation from './pages/ViewFormulation'
+import ViewFormulationEntry from './pages/ViewFormulation/ViewFormulationEntry.jsx'
 import Error from './pages/Error'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
@@ -58,7 +58,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/formulations/:id',
-        element: <ViewFormulation />,
+        element: <ViewFormulationEntry />,
       },
       {
         path: '/error',

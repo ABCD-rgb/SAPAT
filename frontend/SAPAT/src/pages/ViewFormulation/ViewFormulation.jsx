@@ -1,4 +1,4 @@
-import {Navigate, useParams} from 'react-router-dom'
+import {Navigate} from 'react-router-dom'
 import {
   RiShareLine,
   RiAddLine,
@@ -8,16 +8,13 @@ import {
   RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
-import useAuth from "../hook/useAuth.js";
 import axios from 'axios';
-import Loading from "../components/Loading.jsx";
-import ShareFormulationModal from "../components/modals/formulations/ShareFormulationModal.jsx";
-import ConfirmationModal from "../components/modals/ConfirmationModal.jsx";
-import Toast from "../components/Toast.jsx";
+import Loading from "../../components/Loading.jsx";
+import ShareFormulationModal from "../../components/modals/formulations/ShareFormulationModal.jsx";
+import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
+import Toast from "../../components/Toast.jsx";
 
-function ViewFormulation() {
-  const { id } = useParams()
-  const { user, loading } = useAuth()
+function ViewFormulation({ id, user }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -189,12 +186,7 @@ function ViewFormulation() {
     }
   }
 
-  if (loading) {
-    return <Loading />
-  }
-  if (!user) {
-    return <Navigate to="/" />
-  }
+
   if (shouldRedirect) {
     return <Navigate to="/formulations" />
   }
