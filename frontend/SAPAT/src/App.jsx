@@ -1,3 +1,10 @@
+"use client";
+
+import {
+  LiveblocksProvider, RoomProvider, ClientSideSuspense
+} from "@liveblocks/react/suspense";
+import { useParams } from 'react-router-dom'
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -13,6 +20,7 @@ import ViewFormulationEntry from './pages/ViewFormulation/ViewFormulationEntry.j
 import Error from './pages/Error'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import Loading from './components/Loading'
 
 function AppLayout() {
   const location = useLocation()
@@ -31,6 +39,18 @@ function AppLayout() {
     </div>
   )
 }
+
+function FormulationRoom() {
+  const { id } = useParams();
+  return (
+    <RoomProvider id={`formulation-${id}`}>
+      <ClientSideSuspense fallback={<Loading />}>
+        {() => <ViewFormulationEntry id={id} />}
+      </ClientSideSuspense>
+    </RoomProvider>
+  );
+}
+
 
 const router = createBrowserRouter([
   {
@@ -58,7 +78,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/formulations/:id',
-        element: <ViewFormulationEntry />,
+        element: <FormulationRoom />
+
       },
       {
         path: '/error',
@@ -69,7 +90,11 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <LiveblocksProvider publicApiKey={"pk_dev_sS1DrZYo_7IVLkqHWV-Ls0ibrTA-lyOQC6ZfBHPOwi8YTvIIqd8l-DSo4cyP3Qh4"}>
+      <RouterProvider router={router} />
+    </LiveblocksProvider>
+  )
 }
 
 export default App

@@ -1,13 +1,20 @@
-import {Navigate, useParams} from 'react-router-dom'
+"use client";
+
+import { useOthers, useSelf } from "@liveblocks/react/suspense";
+import { Navigate } from 'react-router-dom'
 import { useState } from 'react'
 import useAuth from "../../hook/useAuth.js";
 import Loading from "../../components/Loading.jsx";
 import ViewFormulation from "./ViewFormulation.jsx"
 
 
-function ViewFormulationEntry() {
-  const { id } = useParams()
+function ViewFormulationEntry({id}) {
   const { user, loading } = useAuth()
+  const others = useOthers();
+  const userCount = others.length;
+  const self = useSelf();
+  console.log("LB Others: ", others);
+  console.log("LB Self: ", self);
 
 
   // toast visibility
@@ -30,10 +37,14 @@ function ViewFormulationEntry() {
   }
 
   return (
-    <ViewFormulation
-      id={id}
-      user={user}
-    />
+        <>
+          <div>There are {userCount} other user(s) online</div>
+          <ViewFormulation
+            id={id}
+            user={user}
+          />
+        </>
+
   )
 }
 
