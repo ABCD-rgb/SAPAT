@@ -6,6 +6,7 @@ declare global {
       info: {
         // Example properties, for useSelf, useUser, useOthers, etc.
         name: string;
+        email: string;
         avatar: string;
       };
     };

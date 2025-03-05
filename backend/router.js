@@ -3,6 +3,7 @@ import { getUserById, getUserByEmail } from './controller/user-controller.js';
 import {
   createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator, removeCollaborator
 } from './controller/formulation-controller.js';
+import handleLiveblocksAuth from './config/liveblocks-auth.js';
 
 const handleRoutes = (app) => {
   // Check if user is authenticated middleware
@@ -49,6 +50,11 @@ const handleRoutes = (app) => {
     console.log('MongoDB Connection State:', mongoose.connection.readyState);
   });
 
+
+  // LIVEBLOCKS
+  app.post('/api/liveblocks-auth', (req, res, next) => {
+    return handleLiveblocksAuth(req, res, next);
+  });
 
 
   // CONTROLLER API CALLS

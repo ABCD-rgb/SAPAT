@@ -21,6 +21,7 @@ import Error from './pages/Error'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Loading from './components/Loading'
+import useAuth from "./hook/useAuth.js";
 
 function AppLayout() {
   const location = useLocation()
@@ -90,8 +91,10 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+  const {liveblocksAuth} = useAuth();
+
   return (
-    <LiveblocksProvider publicApiKey={"pk_dev_sS1DrZYo_7IVLkqHWV-Ls0ibrTA-lyOQC6ZfBHPOwi8YTvIIqd8l-DSo4cyP3Qh4"}>
+    <LiveblocksProvider authEndpoint={liveblocksAuth}>
       <RouterProvider router={router} />
     </LiveblocksProvider>
   )
