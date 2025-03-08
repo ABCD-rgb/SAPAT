@@ -13,8 +13,9 @@ import Loading from "../../components/Loading.jsx";
 import ShareFormulationModal from "../../components/modals/formulations/ShareFormulationModal.jsx";
 import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
 import Toast from "../../components/Toast.jsx";
+import Avatar from "../../components/Avatar.jsx";
 
-function ViewFormulation({ id, user }) {
+function ViewFormulation({ id, user, self, others }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -217,9 +218,10 @@ function ViewFormulation({ id, user }) {
             </div>
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
-                <div className="h-6 w-6 rounded-full bg-blue-400 sm:h-8 sm:w-8"></div>
-                <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
-                <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
+                {others.map(({ connectionId, info }) => (
+                  <Avatar key={connectionId} src={info.avatar} name={info.name} />
+                ))}
+                <Avatar src={self.info.avatar} name={self.info.name} />
               </div>
               <div
                 className={`${(userAccess !== 'owner') && 'tooltip md:tooltip-left'}`}

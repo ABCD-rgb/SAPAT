@@ -11,7 +11,6 @@ import ViewFormulation from "./ViewFormulation.jsx"
 function ViewFormulationEntry({id}) {
   const { user, loading } = useAuth()
   const others = useOthers();
-  const userCount = others.length;
   const self = useSelf();
   console.log("LB Others: ", others);
   console.log("LB Self: ", self);
@@ -38,10 +37,11 @@ function ViewFormulationEntry({id}) {
 
   return (
         <>
-          <div>There are {userCount} other user(s) online</div>
           <ViewFormulation
             id={id}
             user={user}
+            self={self}
+            others={others}
           />
         </>
 
