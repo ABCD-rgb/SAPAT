@@ -22,6 +22,7 @@ import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Loading from './components/Loading'
 import useAuth from "./hook/useAuth.js";
+import {LiveObject} from "@liveblocks/client";
 
 function AppLayout() {
   const location = useLocation()
@@ -44,7 +45,18 @@ function AppLayout() {
 function FormulationRoom() {
   const { id } = useParams();
   return (
-    <RoomProvider id={`formulation-${id}`}>
+    <RoomProvider
+      id={`formulation-${id}`}
+      initialPresence={{ focusedId: null }}
+      initialStorage={{
+        formulation: new LiveObject({
+          code: '',
+          name: '',
+          description: '',
+          animal_group: '',
+        })
+      }}
+    >
       <ClientSideSuspense fallback={<Loading />}>
         {() => <ViewFormulationEntry id={id} />}
       </ClientSideSuspense>

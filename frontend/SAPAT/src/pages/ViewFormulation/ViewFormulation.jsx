@@ -14,8 +14,21 @@ import ShareFormulationModal from "../../components/modals/formulations/ShareFor
 import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
 import Toast from "../../components/Toast.jsx";
 import Avatar from "../../components/Avatar.jsx";
+import Selection from "../../components/Selection.jsx";
+const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
 
-function ViewFormulation({ id, user, self, others }) {
+function ViewFormulation({
+  id,
+  user,
+  self,
+  others,
+  updateMyPresence,
+  formulationRealTime,
+  updateCode,
+  updateName,
+  updateDescription,
+  updateAnimalGroup,
+}) {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -195,7 +208,12 @@ function ViewFormulation({ id, user, self, others }) {
   if (isLoading) {
     return <Loading />
   }
+  // loading due to liveblocks storage
+  if (!formulationRealTime) {
+    return <Loading />
+  }
 
+  const { code, name, description, animal_group } = formulationRealTime;
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -219,13 +237,17 @@ function ViewFormulation({ id, user, self, others }) {
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
                 {others.map(({ connectionId, info }) => (
-                  <Avatar key={connectionId} src={info.avatar} name={info.name} />
+                  <Avatar
+                    key={connectionId}
+                    src={info.avatar}
+                    name={info.name}
+                  />
                 ))}
                 <Avatar src={self.info.avatar} name="You" />
               </div>
               <div
-                className={`${(userAccess !== 'owner') && 'tooltip md:tooltip-left'}`}
-                data-tip={`${(userAccess !== 'owner') && 'Only the owner can share this formulation.'}`}
+                className={`${userAccess !== 'owner' && 'tooltip md:tooltip-left'}`}
+                data-tip={`${userAccess !== 'owner' && 'Only the owner can share this formulation.'}`}
               >
                 <button
                   disabled={userAccess !== 'owner'}
@@ -243,56 +265,63 @@ function ViewFormulation({ id, user, self, others }) {
             <div>
               <label className="label text-sm font-medium">Code</label>
               <input
+                id="input-code"
                 type="text"
-                name="code"
-                value={formulation.code}
                 className="input input-bordered w-full rounded-xl"
-                onChange={handleChange}
-                onFocus={() => handleFocus('code')}
-                onBlur={handleBlur}
+                value={code}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateCode(e.target.value)}
+                maxLength={20}
               />
+              <Selections id="input-code" others={others} />
             </div>
             <div>
               <label className="label text-sm font-medium">
                 Formulation name
               </label>
               <input
+                id="input-name"
                 type="text"
-                name="name"
-                value={formulation.name}
                 className="input input-bordered w-full rounded-xl"
-                onChange={handleChange}
-                onFocus={() => handleFocus('name')}
-                onBlur={handleBlur}
+                value={name}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateName(e.target.value)}
+                maxLength={20}
               />
+              <Selections id="input-name" others={others} />
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Description</label>
               <input
+                id="input-description"
                 type="text"
-                name="description"
-                value={formulation.description}
                 className="input input-bordered w-full rounded-xl"
-                onFocus={() => handleFocus('description')}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                value={description}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateDescription(e.target.value)}
               />
+              <Selections id="input-description" others={others} />
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Animal group</label>
               <select
+                id="input-animal_group"
                 className="select select-bordered w-full rounded-xl"
-                name="animal_group"
-                value={formulation.animal_group}
-                onChange={handleChange}
-                onFocus={() => handleFocus('animalGroup')}
-                onBlur={handleBlur}
+                name="input-animal_group"
+                value={animal_group}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateAnimalGroup(e.target.value)}
               >
                 <option>Broiler</option>
                 <option>Layer</option>
                 <option>Swine</option>
                 <option>Poultry</option>
               </select>
+              <Selections id="input-animal_group" others={others} />
             </div>
           </div>
 
@@ -398,7 +427,7 @@ function ViewFormulation({ id, user, self, others }) {
         </div>
       </div>
 
-    {/*  Modals */}
+      {/*  Modals */}
       <ShareFormulationModal
         isOpen={isShareFormulationModalOpen}
         onClose={() => setIsShareFormulationModalOpen(false)}
@@ -414,13 +443,18 @@ function ViewFormulation({ id, user, self, others }) {
         onClose={() => setIsAddCollaboratorModalOpen(false)}
         onConfirm={handleAddCollaborator}
         title="Add collaborator"
-        description={<>Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to this formulation?</>}
-        type='add'
+        description={
+          <>
+            Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to
+            this formulation?
+          </>
+        }
+        type="add"
       />
 
       {/*  Toasts */}
       <Toast
-        className="transition ease-in-out delay-150"
+        className="transition delay-150 ease-in-out"
         show={showToast}
         action={toastAction}
         message={message}
@@ -428,6 +462,24 @@ function ViewFormulation({ id, user, self, others }) {
       />
     </div>
   )
+}
+
+function Selections({ id, others }) {
+  return (
+    <>
+      {others.map(({ connectionId, info, presence }) => {
+        if (presence.focusedId === id) {
+          return (
+            <Selection
+              key={connectionId}
+              name={info.name}
+              color={COLORS[connectionId % COLORS.length]}
+            />
+          );
+        }
+      })}
+    </>
+  );
 }
 
 export default ViewFormulation
