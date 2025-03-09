@@ -18,6 +18,8 @@ import Selection from "../../components/Selection.jsx";
 const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
 
 function ViewFormulation({
+  formulation,
+  userAccess,
   id,
   user,
   self,
@@ -32,22 +34,13 @@ function ViewFormulation({
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
-  const [formulation, setFormulation] = useState({
-    code: '',
-    name: '',
-    description: '',
-    animal_group: '',
-    ingredients: [],
-    nutrients: [],
-  });
+
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
-  const [userAccess, setUserAccess] = useState('')
   const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
   const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
   // toast visibility
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
@@ -55,39 +48,11 @@ function ViewFormulation({
 
 
   useEffect(() => {
-    if (user) {
-      fetchData();
-      checkAccess();
-    }
-  }, [user]);
-
-  useEffect(() => {
     fetchCollaboratorData();
     setIsLoading(false);
   }, [formulation.collaborators]);
 
 
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`${VITE_API_URL}/formulation/${id}`);
-      setFormulation(res.data.formulations);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const checkAccess = async () => {
-    try {
-      const res = await axios.get(`${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
-      console.log(res.data.access);
-      if (res.data.access === 'notFound') {
-        setShouldRedirect(true);
-      }
-      setUserAccess(res.data.access);
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   const fetchCollaboratorData = async () => {
     try {
@@ -108,13 +73,7 @@ function ViewFormulation({
     }
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormulation({
-      ...formulation,
-      [name]: value,
-    });
-  }
+
 
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
@@ -201,9 +160,6 @@ function ViewFormulation({
   }
 
 
-  if (shouldRedirect) {
-    return <Navigate to="/formulations" />
-  }
   // loading due to api calls
   if (isLoading) {
     return <Loading />
