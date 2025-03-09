@@ -221,7 +221,7 @@ function ViewFormulation({ id, user, self, others }) {
                 {others.map(({ connectionId, info }) => (
                   <Avatar key={connectionId} src={info.avatar} name={info.name} />
                 ))}
-                <Avatar src={self.info.avatar} name={self.info.name} />
+                <Avatar src={self.info.avatar} name="You" />
               </div>
               <div
                 className={`${(userAccess !== 'owner') && 'tooltip md:tooltip-left'}`}
