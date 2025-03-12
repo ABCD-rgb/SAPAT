@@ -9,7 +9,7 @@ import {
   useStorage
 } from "@liveblocks/react/suspense";
 import { Navigate, useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { debounce } from "lodash";
 import useAuth from "../../hook/useAuth.js";
@@ -25,8 +25,8 @@ function ViewFormulationEntry({id}) {
   const others = useOthers();
   const self = useSelf();
   const updateMyPresence = useUpdateMyPresence();
-  console.log("LB Others: ", others);
-  console.log("LB Self: ", self);
+  // console.log("LB Others: ", others);
+  // console.log("LB Self: ", self);
 
   const formulationRealTime = useStorage((root) => root.formulation);
 
@@ -59,11 +59,17 @@ function ViewFormulationEntry({id}) {
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
 
+  const formulationRef = useRef(formulationRealTime);
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
     setToastAction('')
   }
+
+  useEffect(() => {
+    formulationRef.current = formulationRealTime; // Always sync the ref with the latest formulation
+  }, [formulationRealTime]);
 
   useEffect(() => {
     if (user) {
@@ -118,7 +124,6 @@ function ViewFormulationEntry({id}) {
   const checkAccess = async () => {
     try {
       const res = await axios.get(`${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
-      console.log(res.data.access);
       if (res.data.access === 'notFound') {
         setShouldRedirect(true);
       }
@@ -130,12 +135,13 @@ function ViewFormulationEntry({id}) {
 
   const updateDatabase = async () => {
     try {
+      const currentFormulation = formulationRef.current;
       const VITE_API_URL = import.meta.env.VITE_API_URL;
       await axios.put(`${VITE_API_URL}/formulation/${id}`, {
-        code: formulationRealTime.code,
-        name: formulationRealTime.name,
-        description: formulationRealTime.description,
-        animal_group: formulationRealTime.animal_group,
+        code: currentFormulation.code,
+        name: currentFormulation.name,
+        description: currentFormulation.description,
+        animal_group: currentFormulation.animal_group,
       });
 
       console.log("Database updated successfully!");
