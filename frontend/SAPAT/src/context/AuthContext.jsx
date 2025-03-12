@@ -43,8 +43,26 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const liveblocksAuth = async (room) => {
+    try {
+      const res = await fetch(`${API_URL}/api/liveblocks-auth`, {
+        credentials: 'include',
+        method: 'POST',
+        body: JSON.stringify({ room })
+      });
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error('Lblocks auth failed');
+      }
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
+
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, logout, liveblocksAuth }}>
       {children}
     </AuthContext.Provider>
   );
