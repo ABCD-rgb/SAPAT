@@ -1,4 +1,4 @@
-import {Navigate, useParams} from 'react-router-dom'
+import {Navigate} from 'react-router-dom'
 import {
   RiShareLine,
   RiAddLine,
@@ -8,35 +8,39 @@ import {
   RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
-import useAuth from "../hook/useAuth.js";
 import axios from 'axios';
-import Loading from "../components/Loading.jsx";
-import ShareFormulationModal from "../components/modals/formulations/ShareFormulationModal.jsx";
-import ConfirmationModal from "../components/modals/ConfirmationModal.jsx";
-import Toast from "../components/Toast.jsx";
+import Loading from "../../components/Loading.jsx";
+import ShareFormulationModal from "../../components/modals/formulations/ShareFormulationModal.jsx";
+import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
+import Toast from "../../components/Toast.jsx";
+import Avatar from "../../components/Avatar.jsx";
+import Selection from "../../components/Selection.jsx";
+const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
 
-function ViewFormulation() {
-  const { id } = useParams()
-  const { user, loading } = useAuth()
+function ViewFormulation({
+  formulation,
+  userAccess,
+  id,
+  user,
+  self,
+  others,
+  updateMyPresence,
+  formulationRealTime,
+  updateCode,
+  updateName,
+  updateDescription,
+  updateAnimalGroup,
+}) {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 
-  const [formulation, setFormulation] = useState({
-    code: '',
-    name: '',
-    description: '',
-    animal_group: '',
-    ingredients: [],
-    nutrients: [],
-  });
+
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
-  const [userAccess, setUserAccess] = useState('')
   const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
   const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
   // toast visibility
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
@@ -44,39 +48,11 @@ function ViewFormulation() {
 
 
   useEffect(() => {
-    if (user) {
-      fetchData();
-      checkAccess();
-    }
-  }, [user]);
-
-  useEffect(() => {
     fetchCollaboratorData();
     setIsLoading(false);
   }, [formulation.collaborators]);
 
 
-  const fetchData = async () => {
-    try {
-      const res = await axios.get(`${VITE_API_URL}/formulation/${id}`);
-      setFormulation(res.data.formulations);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const checkAccess = async () => {
-    try {
-      const res = await axios.get(`${VITE_API_URL}/formulation/collaborator/${id}/${user._id}`);
-      console.log(res.data.access);
-      if (res.data.access === 'notFound') {
-        setShouldRedirect(true);
-      }
-      setUserAccess(res.data.access);
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   const fetchCollaboratorData = async () => {
     try {
@@ -97,13 +73,7 @@ function ViewFormulation() {
     }
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormulation({
-      ...formulation,
-      [name]: value,
-    });
-  }
+
 
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
@@ -189,20 +159,17 @@ function ViewFormulation() {
     }
   }
 
-  if (loading) {
-    return <Loading />
-  }
-  if (!user) {
-    return <Navigate to="/" />
-  }
-  if (shouldRedirect) {
-    return <Navigate to="/formulations" />
-  }
+
   // loading due to api calls
   if (isLoading) {
     return <Loading />
   }
+  // loading due to liveblocks storage
+  if (!formulationRealTime) {
+    return <Loading />
+  }
 
+  const { code, name, description, animal_group } = formulationRealTime;
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -225,13 +192,18 @@ function ViewFormulation() {
             </div>
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
-                <div className="h-6 w-6 rounded-full bg-blue-400 sm:h-8 sm:w-8"></div>
-                <div className="h-6 w-6 rounded-full bg-green-400 sm:h-8 sm:w-8"></div>
-                <div className="h-6 w-6 rounded-full bg-yellow-400 sm:h-8 sm:w-8"></div>
+                {others.map(({ connectionId, info }) => (
+                  <Avatar
+                    key={connectionId}
+                    src={info.avatar}
+                    name={info.name}
+                  />
+                ))}
+                <Avatar src={self.info.avatar} name="You" />
               </div>
               <div
-                className={`${(userAccess !== 'owner') && 'tooltip md:tooltip-left'}`}
-                data-tip={`${(userAccess !== 'owner') && 'Only the owner can share this formulation.'}`}
+                className={`${userAccess !== 'owner' && 'tooltip md:tooltip-left'}`}
+                data-tip={`${userAccess !== 'owner' && 'Only the owner can share this formulation.'}`}
               >
                 <button
                   disabled={userAccess !== 'owner'}
@@ -249,56 +221,63 @@ function ViewFormulation() {
             <div>
               <label className="label text-sm font-medium">Code</label>
               <input
+                id="input-code"
                 type="text"
-                name="code"
-                value={formulation.code}
                 className="input input-bordered w-full rounded-xl"
-                onChange={handleChange}
-                onFocus={() => handleFocus('code')}
-                onBlur={handleBlur}
+                value={code}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateCode(e.target.value)}
+                maxLength={20}
               />
+              <Selections id="input-code" others={others} />
             </div>
             <div>
               <label className="label text-sm font-medium">
                 Formulation name
               </label>
               <input
+                id="input-name"
                 type="text"
-                name="name"
-                value={formulation.name}
                 className="input input-bordered w-full rounded-xl"
-                onChange={handleChange}
-                onFocus={() => handleFocus('name')}
-                onBlur={handleBlur}
+                value={name}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateName(e.target.value)}
+                maxLength={20}
               />
+              <Selections id="input-name" others={others} />
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Description</label>
               <input
+                id="input-description"
                 type="text"
-                name="description"
-                value={formulation.description}
                 className="input input-bordered w-full rounded-xl"
-                onFocus={() => handleFocus('description')}
-                onChange={handleChange}
-                onBlur={handleBlur}
+                value={description}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateDescription(e.target.value)}
               />
+              <Selections id="input-description" others={others} />
             </div>
             <div className="md:col-span-2">
               <label className="label text-sm font-medium">Animal group</label>
               <select
+                id="input-animal_group"
                 className="select select-bordered w-full rounded-xl"
-                name="animal_group"
-                value={formulation.animal_group}
-                onChange={handleChange}
-                onFocus={() => handleFocus('animalGroup')}
-                onBlur={handleBlur}
+                name="input-animal_group"
+                value={animal_group}
+                onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                onBlur={() => updateMyPresence({ focusedId: null })}
+                onChange={(e) => updateAnimalGroup(e.target.value)}
               >
                 <option>Broiler</option>
                 <option>Layer</option>
                 <option>Swine</option>
                 <option>Poultry</option>
               </select>
+              <Selections id="input-animal_group" others={others} />
             </div>
           </div>
 
@@ -404,7 +383,7 @@ function ViewFormulation() {
         </div>
       </div>
 
-    {/*  Modals */}
+      {/*  Modals */}
       <ShareFormulationModal
         isOpen={isShareFormulationModalOpen}
         onClose={() => setIsShareFormulationModalOpen(false)}
@@ -420,13 +399,18 @@ function ViewFormulation() {
         onClose={() => setIsAddCollaboratorModalOpen(false)}
         onConfirm={handleAddCollaborator}
         title="Add collaborator"
-        description={<>Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to this formulation?</>}
-        type='add'
+        description={
+          <>
+            Add <strong>{newCollaborator.newEmail}</strong> as a collaborator to
+            this formulation?
+          </>
+        }
+        type="add"
       />
 
       {/*  Toasts */}
       <Toast
-        className="transition ease-in-out delay-150"
+        className="transition delay-150 ease-in-out"
         show={showToast}
         action={toastAction}
         message={message}
@@ -434,6 +418,24 @@ function ViewFormulation() {
       />
     </div>
   )
+}
+
+function Selections({ id, others }) {
+  return (
+    <>
+      {others.map(({ connectionId, info, presence }) => {
+        if (presence.focusedId === id) {
+          return (
+            <Selection
+              key={connectionId}
+              name={info.name}
+              color={COLORS[connectionId % COLORS.length]}
+            />
+          );
+        }
+      })}
+    </>
+  );
 }
 
 export default ViewFormulation

@@ -1,3 +1,10 @@
+"use client";
+
+import {
+  LiveblocksProvider, RoomProvider, ClientSideSuspense
+} from "@liveblocks/react/suspense";
+import { useParams } from 'react-router-dom'
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -9,10 +16,13 @@ import Dashboard from './pages/Dashboard'
 import Ingredients from './pages/Ingredients'
 import Nutrients from './pages/Nutrients'
 import Formulations from './pages/Formulations'
-import ViewFormulation from './pages/ViewFormulation'
+import ViewFormulationEntry from './pages/ViewFormulation/ViewFormulationEntry.jsx'
 import Error from './pages/Error'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
+import Loading from './components/Loading'
+import useAuth from "./hook/useAuth.js";
+import {LiveObject} from "@liveblocks/client";
 
 function AppLayout() {
   const location = useLocation()
@@ -31,6 +41,29 @@ function AppLayout() {
     </div>
   )
 }
+
+function FormulationRoom() {
+  const { id } = useParams();
+  return (
+    <RoomProvider
+      id={`formulation-${id}`}
+      initialPresence={{ focusedId: null }}
+      initialStorage={{
+        formulation: new LiveObject({
+          code: '',
+          name: '',
+          description: '',
+          animal_group: '',
+        })
+      }}
+    >
+      <ClientSideSuspense fallback={<Loading />}>
+        {() => <ViewFormulationEntry id={id} />}
+      </ClientSideSuspense>
+    </RoomProvider>
+  );
+}
+
 
 const router = createBrowserRouter([
   {
@@ -58,7 +91,8 @@ const router = createBrowserRouter([
       },
       {
         path: '/formulations/:id',
-        element: <ViewFormulation />,
+        element: <FormulationRoom />
+
       },
       {
         path: '/error',
@@ -69,7 +103,13 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-  return <RouterProvider router={router} />
+  const {liveblocksAuth} = useAuth();
+
+  return (
+    <LiveblocksProvider authEndpoint={liveblocksAuth}>
+      <RouterProvider router={router} />
+    </LiveblocksProvider>
+  )
 }
 
 export default App
