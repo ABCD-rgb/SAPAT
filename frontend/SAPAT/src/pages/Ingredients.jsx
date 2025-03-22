@@ -4,7 +4,7 @@ import {
   RiFileUploadLine,
   RiFilterLine,
 } from 'react-icons/ri'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
@@ -12,39 +12,37 @@ import Table from '../components/Table'
 import Loading from '../components/Loading'
 import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
+import axios from "axios";
 
 function Ingredients() {
   const { user, loading } = useAuth()
+  const [ingredients, setIngredients] = useState([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedIngredient, setSelectedIngredient] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
 
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
-  const ingredients = [
-    { name: 'Barley', price: '6.50', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    {
-      name: 'Wheat, Starch',
-      price: '5.15',
-      available: 'Yes',
-      group: 'Wheat by-products',
-    },
-  ]
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`);
+      const fetchedData = res.data.ingredients;
+      setIngredients(fetchedData);
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
 
   const handleEditClick = (ingredient) => {
     setSelectedIngredient(ingredient)
@@ -116,6 +114,7 @@ function Ingredients() {
         <Table
           headers={headers}
           data={ingredients}
+          page="ingredients"
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />

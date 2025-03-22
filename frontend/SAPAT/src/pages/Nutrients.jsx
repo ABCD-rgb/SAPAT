@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   RiAddLine,
   RiFileUploadLine,
@@ -12,115 +12,32 @@ import Table from '../components/Table'
 import Loading from "../components/Loading.jsx";
 import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
+import axios from "axios";
 
 function Nutrients() {
   const { user, loading } = useAuth()
+  const [nutrients, setNutrients] = useState([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedNutrient, setSelectedNutrient] = useState(null)
 
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
-  const nutrients = [
-    {
-      abbreviation: 'DM',
-      name: 'Dry Matter',
-      unit: '%',
-      description: '',
-      group: 'Composition',
-    },
-    {
-      abbreviation: 'CP',
-      name: 'Crude Protein',
-      unit: '%',
-      description: '',
-      group: 'Composition',
-    },
-    {
-      abbreviation: '',
-      name: 'Lysine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-    {
-      abbreviation: '',
-      name: 'Glycine',
-      unit: '%',
-      description: '',
-      group: 'Amino acids',
-    },
-  ]
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`);
+      const fetchedData = res.data.nutrients;
+      setNutrients(fetchedData);
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
 
   const handleEditClick = (nutrient) => {
     setSelectedNutrient(nutrient)
@@ -192,6 +109,7 @@ function Nutrients() {
         <Table
           headers={headers}
           data={nutrients}
+          page="nutrients"
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />

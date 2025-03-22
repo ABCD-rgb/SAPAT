@@ -23,7 +23,7 @@ function Table({
     setToastAction('')
   }
 
-  // Function to filter out the _id when rendering rows
+  // Function to filter data to be shown
   const getRowData = (row) => {
     if (!row) return []
     if (page === 'formulations') {
@@ -32,7 +32,18 @@ function Table({
       const rowData = orderedFields.map((field) => row[field] || '')
       return rowData
     }
-    // for pages that are not Formulations
+    else if (page === 'ingredients') {
+      const orderedFields = ['name', 'price', 'available', 'group']
+      const rowData = orderedFields.map((field) => row[field] || '')
+      rowData.available = (Number(rowData.available) === 1) ? "Yes" : "No"
+      return rowData
+    }
+    else if (page === 'nutrients') {
+      const orderedFields = ['abbreviation', 'name', 'unit', 'description', 'group']
+      const rowData = orderedFields.map((field) => row[field] || '')
+      return rowData
+    }
+    // for tables that shows all fields
     return Object.values(row)
   };
 
@@ -60,7 +71,7 @@ function Table({
               {getRowData(row).map((cell, cellIndex) => (
                 <td key={cellIndex}>
                   {/* only the name column (index 1) is clickable to go to ViewFormulation */}
-                  {(onRowClick && cellIndex === 1) ? (
+                    {(onRowClick && cellIndex === 1) ? (
                     <span
                       onClick={() => onRowClick && onRowClick(row)}
                       className="group cursor-pointer text-deepbrown hover:text-white/80 hover:underline hover:bg-deepbrown font-medium inline-flex items-center gap-2 px-2 py-1 rounded"
