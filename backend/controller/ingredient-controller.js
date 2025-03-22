@@ -1,6 +1,5 @@
 import Ingredient from '../models/ingredient-model.js';
 import UserIngredientOverride from '../models/user_ingredient_override-model.js';
-import mongoose from 'mongoose';
 
 const createIngredient = async (req, res) => {
   const {
@@ -144,7 +143,6 @@ const handleGetIngredientGlobalAndOverride = async (userId) => {
 
 const handleUpdateIngredientOverride = async (globalIngredient, name, price, available, group, nutrients, ingredient_id, user_id) => {
   try {
-
     const ingredient = await UserIngredientOverride.find({ 'ingredient_id': ingredient_id, "user": user_id });
     // there is no override yet
     if (ingredient.length === 0) {

@@ -5,7 +5,7 @@ const ingredientSchema = new Schema({
   price: { type: Number, required: true },
   available: {type: Number, default: 1},  // 1 -> true; 0 -> false
   group: {type: String, default: '' }, // Cereal grains, Protein, Fats and oils, Minerals and vitamins
-  source: { type: String, required: true }, // global or user
+  source: { type: String, required: true, default: 'user' }, // global or user
   nutrients: [{
     nutrient: { type: Schema.Types.ObjectId, ref: 'Nutrient' },
     value: { type: Number }

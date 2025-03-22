@@ -6,6 +6,9 @@ import {
 import {
   createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient, importIngredient
 } from './controller/ingredient-controller.js'
+import {
+  createNutrient, getAllNutrients, getNutrient, updateNutrient, deleteNutrient
+} from './controller/nutrient-controller.js'
 import handleLiveblocksAuth from './config/liveblocks-auth.js';
 
 const handleRoutes = (app) => {
@@ -79,6 +82,13 @@ const handleRoutes = (app) => {
   app.put('/ingredient/:id/:userId', updateIngredient);
   app.delete('/ingredient/:id/:userId', deleteIngredient);
   app.post('/ingredient/import/:id', importIngredient);
+
+  app.post('/nutrient', createNutrient);
+  app.get('/nutrient/filtered/:userId', getAllNutrients);
+  app.get('/nutrient/:id', getNutrient);
+  app.put('/nutrient/:id/:userId', updateNutrient);
+  app.delete('/nutrient/:id/:userId', deleteNutrient);
+
 };
 
 export default handleRoutes;
