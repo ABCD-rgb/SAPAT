@@ -61,10 +61,10 @@ function AddNutrientModal({ isOpen, onClose }) {
               defaultValue=""
             >
               <option value="" disabled>Select group</option>
-              <option value="composition">Composition</option>
-              <option value="amino">Amino acids</option>
-              <option value="minerals">Minerals</option>
-              <option value="vitamins">Vitamins</option>
+              <option value="Energy">Energy</option>
+              <option value="Composition">Composition</option>
+              <option value="Minerals">Minerals</option>
+              <option value="Amino acids">Amino acids</option>
             </select>
           </div>
 

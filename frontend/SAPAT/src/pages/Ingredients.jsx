@@ -46,6 +46,7 @@ function Ingredients() {
 
   const handleEditClick = (ingredient) => {
     setSelectedIngredient(ingredient)
+    console.log("selectedIngredient: ", ingredient)
     setIsEditModalOpen(true)
   }
 

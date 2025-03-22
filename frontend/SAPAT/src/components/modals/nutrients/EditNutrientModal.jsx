@@ -61,13 +61,12 @@ function EditNutrientModal({ isOpen, onClose, nutrient }) {
             </label>
             <select
               className="select select-bordered w-full rounded-xl"
-              defaultValue={nutrient?.group}
+              value={nutrient?.group}
             >
-              <option disabled>Select group</option>
-              <option>Composition</option>
-              <option>Amino acids</option>
-              <option>Minerals</option>
-              <option>Vitamins</option>
+              <option value="Energy">Energy</option>
+              <option value="Composition">Composition</option>
+              <option value="Minerals">Minerals</option>
+              <option value="Amino acids">Amino acids</option>
             </select>
           </div>
 

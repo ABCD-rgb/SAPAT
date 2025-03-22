@@ -59,8 +59,10 @@ function AddIngredientModal({ isOpen, onClose }) {
                 defaultValue=""
               >
                 <option value="" disabled>Value</option>
-                <option value="cereals">Cereals</option>
-                <option value="wheat">Wheat by-products</option>
+                <option value="Cereal grains">Cereal grains</option>
+                <option value="Protein">Protein</option>
+                <option value="Fats and oils">Fats and oils</option>
+                <option value="Minerals and vitamins">Minerals and vitamins</option>
               </select>
             </div>
           </div>
