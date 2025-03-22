@@ -3,6 +3,9 @@ import { getUserById, getUserByEmail } from './controller/user-controller.js';
 import {
   createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, validateCollaborator, updateCollaborator, removeCollaborator
 } from './controller/formulation-controller.js';
+import {
+  createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient, importIngredient
+} from './controller/ingredient-controller.js'
 import handleLiveblocksAuth from './config/liveblocks-auth.js';
 
 const handleRoutes = (app) => {
@@ -60,6 +63,7 @@ const handleRoutes = (app) => {
   // CONTROLLER API CALLS
   app.get('/user-check/id/:id', getUserById);
   app.get('/user-check/email/:email', getUserByEmail);
+
   app.post('/formulation', createFormulation);
   app.get('/formulation/filtered/:collaboratorId', getAllFormulations);
   app.get('/formulation/:id', getFormulation);
@@ -68,6 +72,13 @@ const handleRoutes = (app) => {
   app.get('/formulation/collaborator/:formulationId/:collaboratorId', validateCollaborator);
   app.put('/formulation/collaborator/:id', updateCollaborator);
   app.delete('/formulation/collaborator/:formulationId/:collaboratorId', removeCollaborator);
+
+  app.post('/ingredient', createIngredient);
+  app.get('/ingredient/filtered/:userId', getAllIngredients);
+  app.get('/ingredient/:id', getIngredient);
+  app.put('/ingredient/:id/:userId', updateIngredient);
+  app.delete('/ingredient/:id/:userId', deleteIngredient);
+  app.post('/ingredient/import/:id', importIngredient);
 };
 
 export default handleRoutes;
