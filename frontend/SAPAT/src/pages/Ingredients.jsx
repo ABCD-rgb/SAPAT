@@ -38,11 +38,11 @@ function Ingredients() {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`);
       const fetchedData = res.data.ingredients;
       setIngredients(fetchedData);
+      setIsLoading(false);
     } catch (err) {
       console.log(err)
     }
   }
-
 
   const handleEditClick = (ingredient) => {
     setSelectedIngredient(ingredient)
@@ -66,6 +66,10 @@ function Ingredients() {
   }
   if (!user) {
     return <Navigate to="/" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
   }
 
   return (

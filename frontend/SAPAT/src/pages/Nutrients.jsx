@@ -21,6 +21,11 @@ function Nutrients() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedNutrient, setSelectedNutrient] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -33,11 +38,11 @@ function Nutrients() {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`);
       const fetchedData = res.data.nutrients;
       setNutrients(fetchedData);
+      setIsLoading(false);
     } catch (err) {
       console.log(err)
     }
   }
-
 
   const handleEditClick = (nutrient) => {
     setSelectedNutrient(nutrient)
@@ -61,6 +66,10 @@ function Nutrients() {
   }
   if (!user) {
     return <Navigate to="/" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
   }
 
   return (
