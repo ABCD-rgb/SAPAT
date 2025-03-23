@@ -34,7 +34,31 @@ function ViewFormulation({
 }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL;
 
+  const sampleIngredients = [
+    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
+    { name: "Corn", maximum: 12 },
+    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
+    { name: "Corn", maximum: 12 },
+    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
+    { name: "Corn", maximum: 12 },
+    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
+    { name: "Corn", maximum: 12 },
+    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
+    { name: "Corn", maximum: 12 },
+  ]
 
+  const sampleNutrients = [
+    { name: "Dry Matter", minimum: 1, maximum: 3 },
+    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+    { name: "Dry Matter", minimum: 1, maximum: 3 },
+    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+    { name: "Dry Matter", minimum: 1, maximum: 3 },
+    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+    { name: "Dry Matter", minimum: 1, maximum: 3 },
+    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+    { name: "Dry Matter", minimum: 1, maximum: 3 },
+    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+  ]
 
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
@@ -264,7 +288,7 @@ function ViewFormulation({
           </div>
 
           {/* Form Fields - Grid on desktop, Stack on mobile */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
             <div>
               <label className="label text-sm font-medium">Code</label>
               <input
@@ -308,7 +332,7 @@ function ViewFormulation({
               />
               <Selections id="input-description" others={others} />
             </div>
-            <div className="md:col-span-2">
+            <div>
               <label className="label text-sm font-medium">Animal group</label>
               <select
                 id="input-animal_group"
@@ -335,8 +359,8 @@ function ViewFormulation({
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="table-sm table w-full">
+              <div className="max-h-64 overflow-y-auto overflow-x-auto">
+                <table className="table-sm table w-full table-pin-rows">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -347,7 +371,7 @@ function ViewFormulation({
                     </tr>
                   </thead>
                   <tbody>
-                    {formulation.ingredients.map((ingredient, index) => (
+                    {sampleIngredients.map((ingredient, index) => (
                       <tr key={index}>
                         <td>{ingredient.name}</td>
                         <td>{ingredient.minimum}</td>
@@ -377,8 +401,8 @@ function ViewFormulation({
                 <h3 className="mb-2 text-sm font-semibold">Nutrients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="table-sm table w-full">
+              <div className="max-h-64 overflow-y-auto overflow-x-auto">
+                <table className="table-sm table w-full table-pin-rows  ">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -389,7 +413,7 @@ function ViewFormulation({
                     </tr>
                   </thead>
                   <tbody>
-                    {formulation.nutrients.map((nutrient, index) => (
+                    {sampleNutrients.map((nutrient, index) => (
                       <tr key={index}>
                         <td>{nutrient.name}</td>
                         <td>{nutrient.minimum}</td>
