@@ -35,7 +35,7 @@ function Table({
     else if (page === 'ingredients') {
       const orderedFields = ['name', 'price', 'available', 'group']
       const rowData = orderedFields.map((field) => row[field] || '')
-      rowData.available = (Number(rowData.available) === 1) ? "Yes" : "No"
+      rowData[2] = (Number(rowData[2]) === 1) ? "Yes" : "No"  // for 'available' field
       return rowData
     }
     else if (page === 'nutrients') {

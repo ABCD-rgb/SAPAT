@@ -13,6 +13,7 @@ import Loading from '../components/Loading'
 import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
+import Toast from "../components/Toast.jsx";
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -46,7 +47,6 @@ function Ingredients() {
 
   const handleEditClick = (ingredient) => {
     setSelectedIngredient(ingredient)
-    console.log("selectedIngredient: ", ingredient)
     setIsEditModalOpen(true)
   }
 
@@ -58,6 +58,26 @@ function Ingredients() {
   const handleDeleteConfirm = () => {
     // TODO: Implement delete functionality
     console.log('Deleting ingredient:', selectedIngredient)
+  }
+
+  const handleEditResult = (updatedIngredient, action, message) => {
+    setIsEditModalOpen(false)
+    setIngredients((prevIngredient) => {
+      const index = prevIngredient.findIndex((formulation) => formulation._id === updatedIngredient._id)
+      const updated = [...prevIngredient]
+      updated[index] = {...updatedIngredient}
+      return updated;
+    })
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
   }
 
   const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
@@ -130,9 +150,11 @@ function Ingredients() {
         onClose={() => setIsAddModalOpen(false)}
       />
       <EditIngredientModal
+        user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         ingredient={selectedIngredient}
+        onResult={handleEditResult}
       />
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -140,6 +162,15 @@ function Ingredients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
+      />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
       />
     </div>
   )

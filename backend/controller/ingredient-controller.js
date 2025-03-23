@@ -48,7 +48,7 @@ const updateIngredient = async (req, res) => {
   const { name, price, available, group, nutrients } = req.body;
   try {
     const ingredient = await Ingredient.findById(id);
-    if (!ingredient && ingredient.user !== userId) {
+    if (!ingredient) {
       return res.status(404).json({ message: 'error' });
     }
 
