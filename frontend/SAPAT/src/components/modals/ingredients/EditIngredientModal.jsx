@@ -1,5 +1,5 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useMemo} from 'react'
 import Loading from "../../Loading.jsx";
 import axios from 'axios';
 
@@ -87,6 +87,25 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
     setFormData(prev => ({ ...prev, nutrients: updatedNutrients }));
   };
 
+  const nutrientRows = useMemo(() => {
+    return formData.nutrients.map((nutrient, index) => (
+      <tr key={index}>
+        <td>{nutrient.name}</td>
+        <td>{nutrient.unit}</td>
+        <td>
+          <input
+            type="number"
+            name="value"
+            placeholder="Value"
+            className="input input-bordered input-sm w-full max-w-xs rounded-xl"
+            value={nutrient.value}
+            pattern="[0-9]*"
+            onChange={(e) => handleNutrientChange(index, e)}
+          />
+        </td>
+      </tr>
+    ));
+  }, [formData.nutrients]);
 
   return (
     <dialog
@@ -186,23 +205,7 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
                 </tr>
               </thead>
               <tbody>
-                {formData.nutrients.map((nutrient, index) => (
-                  <tr key={index}>
-                    <td>{nutrient.name}</td>
-                    <td>{nutrient.unit}</td>
-                    <td>
-                      <input
-                        type="number"
-                        name="value"
-                        placeholder="Value"
-                        className="input input-bordered input-sm w-full max-w-xs rounded-xl"
-                        value={nutrient.value}
-                        pattern="[0-9]*"
-                        onChange={(e) => handleNutrientChange(index, e)}
-                      />
-                    </td>
-                  </tr>
-                ))}
+                {nutrientRows}
               </tbody>
             </table>
           </div>
