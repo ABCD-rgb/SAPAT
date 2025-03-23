@@ -1,6 +1,26 @@
 import { RiCloseLine } from 'react-icons/ri'
+import { useState } from 'react'
 
 function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
+  const [checkedIngredients, setCheckedIngredients] = useState([])
+
+  const handleRowClick = (ingredient) => {
+    const isChecked = checkedIngredients.includes(ingredient._id)
+    if (isChecked) {
+      setCheckedIngredients(checkedIngredients.filter(item => item !== ingredient._id))
+    } else {
+      setCheckedIngredients([...checkedIngredients, ingredient._id])
+    }
+  }
+
+  const handleCheckboxChange = (ingredient, e) => {
+    if (e.target.checked) {
+      setCheckedIngredients([...checkedIngredients, ingredient._id]);
+    } else {
+      setCheckedIngredients(checkedIngredients.filter(item => item !== ingredient._id));
+    }
+  }
+
   return (
     <dialog
       id="choose_ingredients_modal"
@@ -22,11 +42,21 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
 
         {/* Ingredients table */}
         <div className="max-h-64 overflow-y-auto overflow-hidden rounded-2xl border border-gray-200">
-          <table className="table-zebra table table-pin-rows">
+          <table className="table table-pin-rows">
             <thead className="bg-gray-50">
             <tr>
               <th>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    if (isChecked) {
+                      setCheckedIngredients(ingredients.map(ingredient => ingredient._id));
+                    } else {
+                      setCheckedIngredients([]);
+                    }
+                  }}
+                />
               </th>
               <th className="font-semibold">Name</th>
               <th className="font-semibold">Price</th>
@@ -36,9 +66,17 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
             </thead>
             <tbody>
             {ingredients.map((ingredient, index) => (
-              <tr key={index}>
+              <tr
+                key={index}
+                className={`hover ${checkedIngredients.includes(ingredient._id) ? 'bg-blue-100' : ''}`}
+                onClick={() => handleRowClick(ingredient)}
+              >
                 <td>
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    checked={checkedIngredients.includes(ingredient._id)}
+                    onChange={(e) => handleCheckboxChange(ingredient, e)}
+                  />
                 </td>
                 <td>{ingredient.name}</td>
                 <td>{ingredient.price}</td>

@@ -1,6 +1,26 @@
 import { RiCloseLine } from 'react-icons/ri'
+import {useState} from "react";
 
 function ChooseNutrientsModal({ isOpen, onClose, nutrients }) {
+  const [checkedNutrients, setCheckedNutrients] = useState([])
+
+  const handleRowClick = (nutrient) => {
+    const isChecked = checkedNutrients.includes(nutrient._id)
+    if (isChecked) {
+      setCheckedNutrients(checkedNutrients.filter(item => item !== nutrient._id))
+    } else {
+      setCheckedNutrients([...checkedNutrients, nutrient._id])
+    }
+  }
+
+  const handleCheckboxChange = (nutrient, e) => {
+    if (e.target.checked) {
+      setCheckedNutrients([...checkedNutrients, nutrient._id]);
+    } else {
+      setCheckedNutrients(checkedNutrients.filter(item => item !== nutrient._id));
+    }
+  }
+
   return (
     <dialog
       id="choose_nutrients_modal"
@@ -22,11 +42,21 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients }) {
 
         {/* Nutrients table */}
         <div className="max-h-64 overflow-y-auto rounded-2xl border border-gray-200">
-          <table className="table-zebra table table-pin-rows">
+          <table className="table table-pin-rows">
             <thead className="bg-gray-50">
             <tr>
               <th>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    if (isChecked) {
+                      setCheckedNutrients(nutrients.map(nutrient => nutrient._id));
+                    } else {
+                      setCheckedNutrients([]);
+                    }
+                  }}
+                />
               </th>
               <th className="font-semibold">Abbreviation</th>
               <th className="font-semibold">Name</th>
@@ -36,9 +66,17 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients }) {
             </thead>
             <tbody>
             {nutrients.map((nutrient, index) => (
-              <tr key={index}>
+              <tr
+                key={index}
+                className={`hover ${checkedNutrients.includes(nutrient._id) ? 'bg-blue-100' : ''}`}
+                onClick={() => handleRowClick(nutrient)}
+              >
                 <td>
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    checked={checkedNutrients.includes(nutrient._id)}
+                    onChange={(e) => handleCheckboxChange(nutrient, e)}
+                  />
                 </td>
                 <td>{nutrient.abbreviation}</td>
                 <td>{nutrient.name}</td>
