@@ -1,4 +1,3 @@
-import {Navigate} from 'react-router-dom'
 import {
   RiShareLine,
   RiAddLine,
@@ -15,6 +14,8 @@ import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
 import Toast from "../../components/Toast.jsx";
 import Avatar from "../../components/Avatar.jsx";
 import Selection from "../../components/Selection.jsx";
+import ChooseIngredientsModal from "../../components/modals/viewformulation/ChooseIngredientsModal.jsx";
+import ChooseNutrientsModal from "../../components/modals/viewformulation/ChooseNutrientsModal.jsx";
 const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
 
 function ViewFormulation({
@@ -46,6 +47,8 @@ function ViewFormulation({
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
 
+  const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] = useState(false)
+  const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] = useState(false)
 
   useEffect(() => {
     fetchCollaboratorData();
@@ -272,10 +275,9 @@ function ViewFormulation({
                 onBlur={() => updateMyPresence({ focusedId: null })}
                 onChange={(e) => updateAnimalGroup(e.target.value)}
               >
-                <option>Broiler</option>
-                <option>Layer</option>
-                <option>Swine</option>
-                <option>Poultry</option>
+                <option value="Swine">Swine</option>
+                <option value="Pig">Pig</option>
+                <option value="Poultry">Poultry</option>
               </select>
               <Selections id="input-animal_group" others={others} />
             </div>
@@ -316,7 +318,10 @@ function ViewFormulation({
                 </table>
               </div>
               <div className="p-4">
-                <button className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700">
+                <button
+                  onClick={() => setIsChooseIngredientsModalOpen(true)}
+                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                >
                   <RiAddLine /> Add ingredient
                 </button>
               </div>
@@ -355,7 +360,10 @@ function ViewFormulation({
                 </table>
               </div>
               <div className="p-4">
-                <button className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700">
+                <button
+                  onClick={() => setIsChooseNutrientsModalOpen(true)}
+                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                >
                   <RiAddLine /> Add nutrient
                 </button>
               </div>
@@ -406,6 +414,19 @@ function ViewFormulation({
           </>
         }
         type="add"
+      />
+
+      <ChooseIngredientsModal
+        user_id={user._id}
+        isOpen={isChooseIngredientsModalOpen}
+        onClose={() => setIsChooseIngredientsModalOpen(false)}
+        // onResult={handleCreateResult}
+      />
+      <ChooseNutrientsModal
+        user_id={user._id}
+        isOpen={isChooseNutrientsModalOpen}
+        onClose={() => setIsChooseNutrientsModalOpen(false)}
+        // onResult={handleCreateResult}
       />
 
       {/*  Toasts */}
