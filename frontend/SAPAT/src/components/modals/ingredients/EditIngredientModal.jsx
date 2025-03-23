@@ -20,7 +20,6 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
       value: 0,
     }],
   })
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (ingredient) {
@@ -49,7 +48,6 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
           nutrients: formattedNutrients,
         };
       })
-      setIsLoading(false)
     } catch (err) {
       console.log(err);
     }
@@ -89,10 +87,6 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
     setFormData(prev => ({ ...prev, nutrients: updatedNutrients }));
   };
 
-  // loading due to api calls
-  if (isLoading) {
-    return <Loading />
-  }
 
   return (
     <dialog

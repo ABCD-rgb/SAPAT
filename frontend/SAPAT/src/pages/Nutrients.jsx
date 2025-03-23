@@ -55,9 +55,24 @@ function Nutrients() {
     setIsDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
-    // TODO: Implement delete functionality
-    console.log('Deleting nutrient:', selectedNutrient)
+  const handleDeleteConfirm = async () => {
+    try {
+      const selectedId = selectedNutrient._id;
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/nutrient/${selectedNutrient._id}/${user._id}`);
+      const messageData = res.data.message;
+      if (messageData === 'success') {
+        setNutrients(nutrients.filter((nutrient) => nutrient._id !== selectedId))
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage(messageData === 'success' ? 'Nutrient deleted successfully' : 'Failed to delete nutrient.')
+      setToastAction(messageData)
+    } catch (err) {
+      console.log(err)
+      setShowToast(true)
+      setMessage('Failed to delete formulation.')
+      setToastAction('error')
+    }
   }
 
   const handleEditResult = (updatedNutrient, action, message) => {
@@ -163,6 +178,7 @@ function Nutrients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Nutrient"
         description={`Are you sure you want to delete ${selectedNutrient?.name}? This action cannot be undone.`}
+        type='delete'
       />
 
       {/*  Toasts */}

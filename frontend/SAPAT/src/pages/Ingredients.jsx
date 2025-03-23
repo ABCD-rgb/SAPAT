@@ -56,8 +56,6 @@ function Ingredients() {
   }
 
   const handleDeleteConfirm = async () => {
-    // TODO: Implement delete functionality
-    console.log('Deleting ingredient:', selectedIngredient)
     try {
       const selectedId = selectedIngredient._id;
       const res = await axios.delete(`${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`);
@@ -187,7 +185,7 @@ function Ingredients() {
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}g
+        onConfirm={handleDeleteConfirm}
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
         type='delete'
