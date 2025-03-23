@@ -9,7 +9,6 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
   //   { name: 'Lysine', unit: '%' },
   //   { name: 'Glycine', unit: '%' },
   // ]
-  console.log("ingredient on edit: ", ingredient)
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -130,9 +129,10 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
                   <span className="label-text">Price (PHP/kg)</span>
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   name="price"
                   value={formData.price}
+                  pattern="[0-9]*"
                   required
                   onChange={handleChange}
                   placeholder="Enter price"
@@ -191,11 +191,12 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
                     <td>{nutrient.unit}</td>
                     <td>
                       <input
-                        type="text"
+                        type="number"
                         name="value"
                         placeholder="Value"
                         className="input input-bordered input-sm w-full max-w-xs rounded-xl"
                         value={nutrient.value}
+                        pattern="[0-9]*"
                         onChange={(e) => handleNutrientChange(index, e)}
                       />
                     </td>
@@ -206,10 +207,16 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
           </div>
           {/* Modal actions */}
           <div className="modal-action">
-            <button className="btn rounded-xl px-8" onClick={onClose}>
+            <button
+              type="button"
+              className="btn rounded-xl px-8" onClick={onClose}
+            >
               Cancel
             </button>
-            <button className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600">
+            <button
+              type="submit"
+              className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
+            >
               Update
             </button>
           </div>

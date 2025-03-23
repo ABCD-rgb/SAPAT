@@ -77,6 +77,15 @@ function Ingredients() {
     }
   }
 
+  const handleCreateResult = (newIngredient, action, message) => {
+    setIsAddModalOpen(false)
+    setIngredients([...ingredients, newIngredient])
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
   const handleEditResult = (updatedIngredient, action, message) => {
     setIsEditModalOpen(false)
     setIngredients((prevIngredient) => {
@@ -163,8 +172,10 @@ function Ingredients() {
       </div>
 
       <AddIngredientModal
+        user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onResult={handleCreateResult}
       />
       <EditIngredientModal
         user_id={user._id}

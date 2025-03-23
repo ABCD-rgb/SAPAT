@@ -23,7 +23,7 @@ const getAllIngredients = async (req, res) => {
     const userIngredients = await Ingredient.find({'user': userId});
     //  global ingredients (and overrides)
     const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
-    const ingredients = [...userIngredients, ...globalIngredients];
+    const ingredients = [...globalIngredients, ...userIngredients];
     res.status(200).json({ message: 'success', ingredients: ingredients });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
