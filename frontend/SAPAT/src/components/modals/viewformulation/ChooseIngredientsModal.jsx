@@ -1,13 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
 
-function ChooseIngredientsModal({ isOpen, onClose }) {
-  const nutrientInputs = [
-    { name: 'Dry Matter', price: '32.11', available: 1, group: 'Composition' },
-    { name: 'Crude Protein', price: '12.21', available: 1, group: 'Composition' },
-    { name: 'Lysine', price: '13.26', available: 1, group: 'Energy' },
-    { name: 'Glycine', price: '10.22', available: 1, group: 'Composition' },
-  ]
-
+function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
   return (
     <dialog
       id="choose_ingredients_modal"
@@ -27,11 +20,9 @@ function ChooseIngredientsModal({ isOpen, onClose }) {
         </h3>
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
-        {/* Description section */}
-
-        {/* Nutrients table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200">
-          <table className="table-zebra table">
+        {/* Ingredients table */}
+        <div className="max-h-64 overflow-y-auto overflow-hidden rounded-2xl border border-gray-200">
+          <table className="table-zebra table table-pin-rows">
             <thead className="bg-gray-50">
             <tr>
               <th>
@@ -44,15 +35,15 @@ function ChooseIngredientsModal({ isOpen, onClose }) {
             </tr>
             </thead>
             <tbody>
-            {nutrientInputs.map((nutrient, index) => (
+            {ingredients.map((ingredient, index) => (
               <tr key={index}>
                 <td>
                   <input type="checkbox" />
                 </td>
-                <td>{nutrient.name}</td>
-                <td>{nutrient.price}</td>
-                <td>{nutrient.available}</td>
-                <td>{nutrient.group}</td>
+                <td>{ingredient.name}</td>
+                <td>{ingredient.price}</td>
+                <td>{ingredient.available}</td>
+                <td>{ingredient.group}</td>
               </tr>
             ))}
             </tbody>

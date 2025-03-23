@@ -1,13 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
 
-function ChooseNutrientsModal({ isOpen, onClose }) {
-  const nutrientInputs = [
-    { abbreviation: 'DM', name: 'Dry Matter', unit: '%', group: 'Composition' },
-    { abbreviation: 'CP', name: 'Crude Protein', unit: '%', group: 'Composition' },
-    { abbreviation: '', name: 'Lysine', unit: '%', group: 'Amino Acids' },
-    { abbreviation: '', name: 'Glycine', unit: '%', group: 'Amino Acids' },
-  ]
-
+function ChooseNutrientsModal({ isOpen, onClose, nutrients }) {
   return (
     <dialog
       id="choose_nutrients_modal"
@@ -27,11 +20,9 @@ function ChooseNutrientsModal({ isOpen, onClose }) {
         </h3>
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
-        {/* Description section */}
-
         {/* Nutrients table */}
-        <div className="overflow-hidden rounded-2xl border border-gray-200">
-          <table className="table-zebra table">
+        <div className="max-h-64 overflow-y-auto rounded-2xl border border-gray-200">
+          <table className="table-zebra table table-pin-rows">
             <thead className="bg-gray-50">
             <tr>
               <th>
@@ -44,7 +35,7 @@ function ChooseNutrientsModal({ isOpen, onClose }) {
             </tr>
             </thead>
             <tbody>
-            {nutrientInputs.map((nutrient, index) => (
+            {nutrients.map((nutrient, index) => (
               <tr key={index}>
                 <td>
                   <input type="checkbox" />

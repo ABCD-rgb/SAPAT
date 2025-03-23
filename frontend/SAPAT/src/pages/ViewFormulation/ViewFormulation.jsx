@@ -47,15 +47,59 @@ function ViewFormulation({
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
 
+  // choosing ingredients and nutrients to create feeds
+  const [owner, setOwner] = useState()
+  const [ingredients, setIngredients] = useState([])
+  const [nutrients, setNutrients] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] = useState(false)
   const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] = useState(false)
+
+  useEffect(() => {
+    fetchOwner()
+    // make sure owner has been fetched before getting the ingredients and nutrients
+    if (owner) {
+      fetchIngredients()
+      fetchNutrients()
+    }
+  }, [owner]);
 
   useEffect(() => {
     fetchCollaboratorData();
     setIsLoading(false);
   }, [formulation.collaborators]);
 
+  console.log("owner", owner)
+  console.log("ingredients", ingredients);
+  console.log("nutrients", nutrients);
 
+  const fetchOwner = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/owner/${id}`);
+      setOwner(res.data.owner);
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const fetchIngredients = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}`);
+      const fetchedData = res.data.ingredients;
+      setIngredients(fetchedData);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const fetchNutrients = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`);
+      const fetchedData = res.data.nutrients;
+      setNutrients(fetchedData);
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const fetchCollaboratorData = async () => {
     try {
@@ -417,15 +461,15 @@ function ViewFormulation({
       />
 
       <ChooseIngredientsModal
-        user_id={user._id}
         isOpen={isChooseIngredientsModalOpen}
         onClose={() => setIsChooseIngredientsModalOpen(false)}
+        ingredients={ingredients}
         // onResult={handleCreateResult}
       />
       <ChooseNutrientsModal
-        user_id={user._id}
         isOpen={isChooseNutrientsModalOpen}
         onClose={() => setIsChooseNutrientsModalOpen(false)}
+        nutrients={nutrients}
         // onResult={handleCreateResult}
       />
 
