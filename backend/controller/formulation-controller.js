@@ -105,6 +105,20 @@ const deleteFormulation = async (req, res) => {
     }
 };
 
+const getFormulationOwner = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const formulation = await Formulation.findById(id);
+        const owner = formulation.collaborators.filter(item => item.access === 'owner');
+        if (owner.length === 0) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', owner: owner[0].userId });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
 
 const validateCollaborator = async (req, res) => {
     const { formulationId, collaboratorId } = req.params;
@@ -208,6 +222,7 @@ export {
     getFormulation,
     updateFormulation,
     deleteFormulation,
+    getFormulationOwner,
     validateCollaborator,
     updateCollaborator,
     removeCollaborator
