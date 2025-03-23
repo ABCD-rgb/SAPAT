@@ -24,7 +24,7 @@ const getAllNutrients = async (req, res) => {
     const userNutrients = await Nutrient.find({'user': userId});
     // global nutrients and overrides
     const globalNutrients = await handleGetNutrientGlobalAndOverride(userId);
-    const nutrients = [...userNutrients, ...globalNutrients];
+    const nutrients = [...globalNutrients, ...userNutrients];
     res.status(200).json({ message: 'success', nutrients: nutrients });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' });
@@ -32,11 +32,18 @@ const getAllNutrients = async (req, res) => {
 }
 
 const getNutrient = async (req, res) => {
-  const { id } = req.params;
+  const { id, userId } = req.params;
   try {
     const nutrient = await Nutrient.findById(id);
     if (!nutrient) {
       return res.status(404).json({ message: 'nutrient not found' });
+    }
+    // check nutrient overrides
+    if (nutrient.source === 'global') {
+      const override = await UserNutrientOverride.find({nutrient_id: nutrient._id, user: userId});
+      if (override.length !== 0) {
+        return res.status(200).json({ message: 'success', nutrients: override[0] });
+      }
     }
     res.status(200).json({ message: 'success', nutrients: nutrient });
   } catch (err) {
@@ -49,7 +56,7 @@ const updateNutrient = async (req, res) => {
   const { abbreviation, name, unit, description, group } = req.body;
   try {
     const nutrient = await Nutrient.findById(id);
-    if (!nutrient && nutrient.user !== userId) {
+    if (!nutrient) {
       return res.status(404).json({ message: 'error' });
     }
 
@@ -142,6 +149,7 @@ const handleUpdateNutrientOverride = async (globalNutrient, abbreviation, name, 
     // there is an existing override
     else {
       if (nutrient_id) nutrient[0].nutrient_id = nutrient_id;
+      if (abbreviation) nutrient[0].abbreviation = abbreviation;
       if (name) nutrient[0].name = name;
       if (unit) nutrient[0].unit = unit;
       if (description) nutrient[0].description = description;

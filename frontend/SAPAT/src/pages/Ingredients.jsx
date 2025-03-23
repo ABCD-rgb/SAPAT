@@ -89,7 +89,7 @@ function Ingredients() {
   const handleEditResult = (updatedIngredient, action, message) => {
     setIsEditModalOpen(false)
     setIngredients((prevIngredient) => {
-      const index = prevIngredient.findIndex((formulation) => formulation._id === updatedIngredient._id)
+      const index = prevIngredient.findIndex((ingredient) => ingredient._id === updatedIngredient._id)
       const updated = [...prevIngredient]
       updated[index] = {...updatedIngredient}
       return updated;

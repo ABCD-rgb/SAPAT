@@ -13,6 +13,7 @@ import Loading from "../components/Loading.jsx";
 import useAuth from "../hook/useAuth.js";
 import {Navigate} from "react-router-dom";
 import axios from "axios";
+import Toast from "../components/Toast.jsx";
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -57,6 +58,26 @@ function Nutrients() {
   const handleDeleteConfirm = () => {
     // TODO: Implement delete functionality
     console.log('Deleting nutrient:', selectedNutrient)
+  }
+
+  const handleEditResult = (updatedNutrient, action, message) => {
+    setIsEditModalOpen(false)
+    setNutrients((prevNutrient) => {
+      const index = prevNutrient.findIndex((nutrient) => nutrient._id === updatedNutrient._id)
+      const updated = [...prevNutrient]
+      updated[index] = {...updatedNutrient}
+      return updated;
+    })
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
   }
 
   const headers = ['Abbreviation', 'Name', 'Unit', 'Description', 'Group']
@@ -130,9 +151,11 @@ function Nutrients() {
         onClose={() => setIsAddModalOpen(false)}
       />
       <EditNutrientModal
+        user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         nutrient={selectedNutrient}
+        onResult={handleEditResult}
       />
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -140,6 +163,15 @@ function Nutrients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Nutrient"
         description={`Are you sure you want to delete ${selectedNutrient?.name}? This action cannot be undone.`}
+      />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition ease-in-out delay-150"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
       />
     </div>
   )

@@ -31,11 +31,17 @@ const getAllIngredients = async (req, res) => {
 };
 
 const getIngredient = async (req, res) => {
-  const { id } = req.params;
+  const { id, userId } = req.params;
   try {
     const ingredient = await Ingredient.findById(id);
     if (!ingredient) {
       return res.status(404).json({ message: 'Ingredient not found' });
+    }
+    if (ingredient.source === 'global') {
+      const override = await UserIngredientOverride.find({ingredient_id: ingredient._id, user: userId});
+      if (override.length !== 0) {
+        return res.status(200).json({ message: 'success', ingredients: override[0] });
+      }
     }
     res.status(200).json({ message: 'success', ingredients: ingredient });
   } catch (err) {

@@ -78,14 +78,14 @@ const handleRoutes = (app) => {
 
   app.post('/ingredient', createIngredient);
   app.get('/ingredient/filtered/:userId', getAllIngredients);
-  app.get('/ingredient/:id', getIngredient);
+  app.get('/ingredient/:id/:userId', getIngredient);
   app.put('/ingredient/:id/:userId', updateIngredient);
   app.delete('/ingredient/:id/:userId', deleteIngredient);
   app.post('/ingredient/import/:id', importIngredient);
 
   app.post('/nutrient', createNutrient);
   app.get('/nutrient/filtered/:userId', getAllNutrients);
-  app.get('/nutrient/:id', getNutrient);
+  app.get('/nutrient/:id/:userId', getNutrient);
   app.put('/nutrient/:id/:userId', updateNutrient);
   app.delete('/nutrient/:id/:userId', deleteNutrient);
 

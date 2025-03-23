@@ -1,5 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
 import {useEffect, useState} from 'react'
+import Loading from "../../Loading.jsx";
 import axios from 'axios';
 
 function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult }) {
@@ -19,6 +20,7 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
       value: 0,
     }],
   })
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (ingredient) {
@@ -32,7 +34,7 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
   const fetchNutrientData = async (nutrients) => {
     try {
       const formattedNutrients = await Promise.all(nutrients.map(async nutrient => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/${nutrient.nutrient}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/${nutrient.nutrient}/${user_id}`);
         const fetchedData = res.data.nutrients;
         return {
           'nutrient': fetchedData._id,
@@ -47,6 +49,7 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
           nutrients: formattedNutrients,
         };
       })
+      setIsLoading(false)
     } catch (err) {
       console.log(err);
     }
@@ -86,6 +89,10 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
     setFormData(prev => ({ ...prev, nutrients: updatedNutrients }));
   };
 
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
+  }
 
   return (
     <dialog
