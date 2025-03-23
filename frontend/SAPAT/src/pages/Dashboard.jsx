@@ -22,8 +22,8 @@ function Dashboard() {
     labels: ['Swine', 'Pig', 'Poultry'],
     datasets: [
       {
-        data: `${formulationTypeCount}`,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+        data: formulationTypeCount,
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
         borderWidth: 0,
       },
     ],
@@ -60,7 +60,6 @@ function Dashboard() {
       const pig =  formulations.filter(item => item.animal_group === 'Pig')
       const poultry =  formulations.filter(item => item.animal_group === 'Poultry')
       const typeCount = [swine.length, pig.length, poultry.length]
-      console.log("typeCount", typeCount)
       setFormulationTypeCount(typeCount)
     } catch (err) {
       console.log(err)
