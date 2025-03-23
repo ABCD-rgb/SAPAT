@@ -1,7 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {isParenthesized} from "eslint-plugin-react/lib/util/ast.js";
 
 function AddIngredientModal({ user_id, isOpen, onClose, onResult }) {
   // const nutrientInputs = [

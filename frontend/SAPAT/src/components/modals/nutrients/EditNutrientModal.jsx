@@ -113,7 +113,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
               </label>
               <select
                 name="group"
-                value={nutrient?.group}
+                value={formData.group}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >

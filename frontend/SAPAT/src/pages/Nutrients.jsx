@@ -75,6 +75,15 @@ function Nutrients() {
     }
   }
 
+  const handleCreateResult = (newNutrient, action, message) => {
+    setIsAddModalOpen(false)
+    setNutrients([...nutrients, newNutrient])
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
   const handleEditResult = (updatedNutrient, action, message) => {
     setIsEditModalOpen(false)
     setNutrients((prevNutrient) => {
@@ -162,8 +171,10 @@ function Nutrients() {
 
       {/* Modals */}
       <AddNutrientModal
+        user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onResult={handleCreateResult}
       />
       <EditNutrientModal
         user_id={user._id}
