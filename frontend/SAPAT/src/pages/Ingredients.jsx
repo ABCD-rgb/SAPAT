@@ -55,9 +55,26 @@ function Ingredients() {
     setIsDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     // TODO: Implement delete functionality
     console.log('Deleting ingredient:', selectedIngredient)
+    try {
+      const selectedId = selectedIngredient._id;
+      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`);
+      const messageData = res.data.message;
+      if (messageData === 'success') {
+        setIngredients(ingredients.filter((ingredient) => ingredient._id !== selectedId))
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage(messageData === 'success' ? 'Ingredient deleted successfully' : 'Failed to delete ingredient.')
+      setToastAction(messageData)
+    } catch (err) {
+      console.log(err)
+      setShowToast(true)
+      setMessage('Failed to delete formulation.')
+      setToastAction('error')
+    }
   }
 
   const handleEditResult = (updatedIngredient, action, message) => {
@@ -159,9 +176,10 @@ function Ingredients() {
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={handleDeleteConfirm}g
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
+        type='delete'
       />
 
       {/*  Toasts */}

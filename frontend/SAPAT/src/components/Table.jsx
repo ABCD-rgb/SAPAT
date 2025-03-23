@@ -116,7 +116,7 @@ function Table({
                     data-tip={`${(row?.access && row.access !== 'owner') && 'Only the owner can delete this formulation.'}`}
                   >
                     <button
-                      disabled={row?.access !== 'owner'}
+                      disabled={row?.access && row?.access !== 'owner'}
                       className={`btn btn-ghost btn-sm ${
                         (row?.access && row.access !== 'owner') ? 'cursor-not-allowed text-gray-500' : 'text-red-600 hover:bg-deepbrown/10'
                       }`}
