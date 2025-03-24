@@ -10,10 +10,10 @@ import EditIngredientModal from '../components/modals/ingredients/EditIngredient
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
-import useAuth from "../hook/useAuth.js";
-import {Navigate} from "react-router-dom";
-import axios from "axios";
-import Toast from "../components/Toast.jsx";
+import useAuth from '../hook/useAuth.js'
+import { Navigate } from 'react-router-dom'
+import axios from 'axios'
+import Toast from '../components/Toast.jsx'
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -30,16 +30,18 @@ function Ingredients() {
 
   useEffect(() => {
     if (user) {
-      fetchData();
+      fetchData()
     }
-  }, [user]);
+  }, [user])
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`);
-      const fetchedData = res.data.ingredients;
-      setIngredients(fetchedData);
-      setIsLoading(false);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`
+      )
+      const fetchedData = res.data.ingredients
+      setIngredients(fetchedData)
+      setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
@@ -57,15 +59,23 @@ function Ingredients() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const selectedId = selectedIngredient._id;
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`);
-      const messageData = res.data.message;
+      const selectedId = selectedIngredient._id
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`
+      )
+      const messageData = res.data.message
       if (messageData === 'success') {
-        setIngredients(ingredients.filter((ingredient) => ingredient._id !== selectedId))
+        setIngredients(
+          ingredients.filter((ingredient) => ingredient._id !== selectedId)
+        )
       }
       // toast instructions
       setShowToast(true)
-      setMessage(messageData === 'success' ? 'Ingredient deleted successfully' : 'Failed to delete ingredient.')
+      setMessage(
+        messageData === 'success'
+          ? 'Ingredient deleted successfully'
+          : 'Failed to delete ingredient.'
+      )
       setToastAction(messageData)
     } catch (err) {
       console.log(err)
@@ -87,10 +97,12 @@ function Ingredients() {
   const handleEditResult = (updatedIngredient, action, message) => {
     setIsEditModalOpen(false)
     setIngredients((prevIngredient) => {
-      const index = prevIngredient.findIndex((ingredient) => ingredient._id === updatedIngredient._id)
+      const index = prevIngredient.findIndex(
+        (ingredient) => ingredient._id === updatedIngredient._id
+      )
       const updated = [...prevIngredient]
-      updated[index] = {...updatedIngredient}
-      return updated;
+      updated[index] = { ...updatedIngredient }
+      return updated
     })
     // toast instructions
     setShowToast(true)
@@ -188,12 +200,12 @@ function Ingredients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
-        type='delete'
+        type="delete"
       />
 
       {/*  Toasts */}
       <Toast
-        className="transition ease-in-out delay-150"
+        className="transition delay-150 ease-in-out"
         show={showToast}
         action={toastAction}
         message={message}

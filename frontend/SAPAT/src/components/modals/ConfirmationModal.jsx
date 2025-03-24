@@ -1,6 +1,13 @@
 import { RiCloseLine } from 'react-icons/ri'
 
-function ConfirmationModal({ isOpen, onClose, onConfirm, title, description, type }) {
+function ConfirmationModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  type,
+}) {
   return (
     <dialog
       id="confirmation_modal"
@@ -33,7 +40,7 @@ function ConfirmationModal({ isOpen, onClose, onConfirm, title, description, typ
             >
               Delete
             </button>
-          ): (
+          ) : (
             <button
               className="btn rounded-xl bg-green-500 px-8 text-white hover:bg-green-600"
               onClick={() => {

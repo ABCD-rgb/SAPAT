@@ -1,5 +1,5 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
@@ -14,14 +14,19 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const body = { ...formData, source: 'user', user: user_id };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/nutrient`, body)
-      const nutrientData = res.data.nutrients;
-      const messageData = res.data.message;
+      const body = { ...formData, source: 'user', user: user_id }
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/nutrient`,
+        body
+      )
+      const nutrientData = res.data.nutrients
+      const messageData = res.data.message
       onResult(
         nutrientData,
         messageData,
-        messageData === 'success' ? "Successfully updated nutrient" : "Failed to update nutrient"
+        messageData === 'success'
+          ? 'Successfully updated nutrient'
+          : 'Failed to update nutrient'
       )
       // reset form data
       setFormData({
@@ -32,13 +37,13 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
         description: '',
       })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
@@ -118,7 +123,9 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
-                <option value="" disabled>Select group</option>
+                <option value="" disabled>
+                  Select group
+                </option>
                 <option value="Energy">Energy</option>
                 <option value="Composition">Composition</option>
                 <option value="Minerals">Minerals</option>
@@ -142,7 +149,8 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
           <div className="modal-action">
             <button
               type="button"
-              className="btn rounded-xl px-8" onClick={onClose}
+              className="btn rounded-xl px-8"
+              onClick={onClose}
             >
               Cancel
             </button>

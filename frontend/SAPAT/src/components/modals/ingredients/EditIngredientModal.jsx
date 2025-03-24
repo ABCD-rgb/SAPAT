@@ -1,9 +1,15 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState, useMemo} from 'react'
-import Loading from "../../Loading.jsx";
-import axios from 'axios';
+import { useEffect, useState, useMemo } from 'react'
+import Loading from '../../Loading.jsx'
+import axios from 'axios'
 
-function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult }) {
+function EditIngredientModal({
+  user_id,
+  isOpen,
+  onClose,
+  ingredient,
+  onResult,
+}) {
   // const nutrientInputs = [
   //   { name: 'Dry Matter', unit: '%' },
   //   { name: 'Crude Protein', unit: '%' },
@@ -14,78 +20,88 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
     name: '',
     price: '',
     group: '',
-    nutrients: [{
-      name: '',
-      unit: '',
-      value: 0,
-    }],
+    nutrients: [
+      {
+        name: '',
+        unit: '',
+        value: 0,
+      },
+    ],
   })
 
   useEffect(() => {
     if (ingredient) {
       setFormData(ingredient)
       // update formData (get name and unit for each nutrient)
-      fetchNutrientData(ingredient.nutrients);
+      fetchNutrientData(ingredient.nutrients)
     }
-  }, [ingredient]);
-
+  }, [ingredient])
 
   const fetchNutrientData = async (nutrients) => {
     try {
-      const formattedNutrients = await Promise.all(nutrients.map(async nutrient => {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/${nutrient.nutrient}/${user_id}`);
-        const fetchedData = res.data.nutrients;
-        return {
-          'nutrient': fetchedData._id,
-          'name': fetchedData.name,
-          'unit': fetchedData.unit,
-          'value': nutrient.value,
-        }
-      }))
+      const formattedNutrients = await Promise.all(
+        nutrients.map(async (nutrient) => {
+          const res = await axios.get(
+            `${import.meta.env.VITE_API_URL}/nutrient/${nutrient.nutrient}/${user_id}`
+          )
+          const fetchedData = res.data.nutrients
+          return {
+            nutrient: fetchedData._id,
+            name: fetchedData.name,
+            unit: fetchedData.unit,
+            value: nutrient.value,
+          }
+        })
+      )
       setFormData((prevFormData) => {
         return {
           ...prevFormData,
           nutrients: formattedNutrients,
-        };
+        }
       })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const { _id, user, ...body } = formData;
-      const ingredient_id = ingredient.ingredient_id || ingredient._id;
-      const res = await axios.put(`${import.meta.env.VITE_API_URL}/ingredient/${ingredient_id}/${user_id}`, body)
-      const ingredientData = res.data.ingredients;
-      const messageData = res.data.message;
+      const { _id, user, ...body } = formData
+      const ingredient_id = ingredient.ingredient_id || ingredient._id
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/ingredient/${ingredient_id}/${user_id}`,
+        body
+      )
+      const ingredientData = res.data.ingredients
+      const messageData = res.data.message
       onResult(
         ingredientData,
         messageData,
-        messageData === 'success' ? "Successfully updated ingredient" : "Failed to update ingredient"
+        messageData === 'success'
+          ? 'Successfully updated ingredient'
+          : 'Failed to update ingredient'
       )
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
 
   const handleNutrientChange = (index, event) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
     const updatedNutrients = formData.nutrients.map((nutrient, i) =>
       i === index ? { ...nutrient, [name]: value } : nutrient
-    );
-    setFormData(prev => ({ ...prev, nutrients: updatedNutrients }));
-  };
+    )
+    setFormData((prev) => ({ ...prev, nutrients: updatedNutrients }))
+  }
 
   const nutrientRows = useMemo(() => {
     return formData.nutrients.map((nutrient, index) => (
@@ -104,8 +120,8 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
           />
         </td>
       </tr>
-    ));
-  }, [formData.nutrients]);
+    ))
+  }, [formData.nutrients])
 
   return (
     <dialog
@@ -188,7 +204,9 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
                   <option value="Cereal grains">Cereal grains</option>
                   <option value="Protein">Protein</option>
                   <option value="Fats and oils">Fats and oils</option>
-                  <option value="Minerals and vitamins">Minerals and vitamins</option>
+                  <option value="Minerals and vitamins">
+                    Minerals and vitamins
+                  </option>
                 </select>
               </div>
             </div>
@@ -196,7 +214,7 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
 
           {/* Nutrients table */}
           <div className="max-h-64 overflow-y-auto rounded-2xl border border-gray-200">
-            <table className="table-zebra table table-pin-rows">
+            <table className="table-zebra table-pin-rows table">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="font-semibold">Name</th>
@@ -204,16 +222,15 @@ function EditIngredientModal({ user_id, isOpen, onClose, ingredient, onResult })
                   <th className="font-semibold">Value</th>
                 </tr>
               </thead>
-              <tbody>
-                {nutrientRows}
-              </tbody>
+              <tbody>{nutrientRows}</tbody>
             </table>
           </div>
           {/* Modal actions */}
           <div className="modal-action">
             <button
               type="button"
-              className="btn rounded-xl px-8" onClick={onClose}
+              className="btn rounded-xl px-8"
+              onClick={onClose}
             >
               Cancel
             </button>

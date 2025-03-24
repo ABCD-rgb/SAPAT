@@ -1,6 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState} from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 function AddIngredientModal({ user_id, isOpen, onClose, onResult }) {
   // const nutrientInputs = [
@@ -14,86 +14,97 @@ function AddIngredientModal({ user_id, isOpen, onClose, onResult }) {
     name: '',
     price: '',
     group: '',
-    nutrients: [{
+    nutrients: [
+      {
+        name: '',
+        unit: '',
+        value: 0,
+      },
+    ],
+  })
+  const [localNutrients, setLocalNutrients] = useState([
+    {
       name: '',
       unit: '',
       value: 0,
-    }],
-  })
-  const [localNutrients, setLocalNutrients] = useState([{
-    name: '',
-    unit:  '',
-    value: 0,
-  }])
+    },
+  ])
 
   useEffect(() => {
     // update formData (get name and unit for each nutrient)
-    fetchNutrientData();
-  }, []);
+    fetchNutrientData()
+  }, [])
 
   const fetchNutrientData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${user_id}`);
-      const fetchedData = res.data.nutrients;
-      const formattedNutrients = fetchedData.map(nutrient => {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user_id}`
+      )
+      const fetchedData = res.data.nutrients
+      const formattedNutrients = fetchedData.map((nutrient) => {
         return {
           nutrient: nutrient._id,
           name: nutrient.name,
           unit: nutrient.unit,
           value: 0,
         }
-      });
+      })
       setFormData((prevFormData) => {
         return {
           ...prevFormData,
           nutrients: formattedNutrients,
-        };
+        }
       })
-      setLocalNutrients(formattedNutrients);
+      setLocalNutrients(formattedNutrients)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const body = { ...formData, source: 'user', user: user_id };
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/ingredient`, body)
-      const ingredientData = res.data.ingredients;
-      const messageData = res.data.message;
+      const body = { ...formData, source: 'user', user: user_id }
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/ingredient`,
+        body
+      )
+      const ingredientData = res.data.ingredients
+      const messageData = res.data.message
       onResult(
         ingredientData,
         messageData,
-        messageData === 'success' ? "Successfully updated ingredient" : "Failed to update ingredient"
+        messageData === 'success'
+          ? 'Successfully updated ingredient'
+          : 'Failed to update ingredient'
       )
       // reset form data
       setFormData({
         name: '',
         price: '',
         group: '',
-        nutrients: localNutrients
+        nutrients: localNutrients,
       })
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
 
   const handleNutrientChange = (index, event) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target
     const updatedNutrients = formData.nutrients.map((nutrient, i) =>
       i === index ? { ...nutrient, [name]: value } : nutrient
-    );
-    setFormData(prev => ({ ...prev, nutrients: updatedNutrients }));
-  };
+    )
+    setFormData((prev) => ({ ...prev, nutrients: updatedNutrients }))
+  }
 
   return (
     <dialog
@@ -171,11 +182,15 @@ function AddIngredientModal({ user_id, isOpen, onClose, onResult }) {
                   onChange={handleChange}
                   className="select select-bordered w-full rounded-2xl"
                 >
-                  <option value="" disabled>Value</option>
+                  <option value="" disabled>
+                    Value
+                  </option>
                   <option value="Cereal grains">Cereal grains</option>
                   <option value="Protein">Protein</option>
                   <option value="Fats and oils">Fats and oils</option>
-                  <option value="Minerals and vitamins">Minerals and vitamins</option>
+                  <option value="Minerals and vitamins">
+                    Minerals and vitamins
+                  </option>
                 </select>
               </div>
             </div>
@@ -183,7 +198,7 @@ function AddIngredientModal({ user_id, isOpen, onClose, onResult }) {
 
           {/* Nutrients table */}
           <div className="max-h-64 overflow-y-auto rounded-2xl border border-gray-200">
-            <table className="table-zebra table table-pin-rows">
+            <table className="table-zebra table-pin-rows table">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="font-semibold">Name</th>

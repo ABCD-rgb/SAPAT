@@ -1,34 +1,37 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState} from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 function EditFormulationModal({ isOpen, onClose, formulation, onResult }) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     animal_group: '',
-    description: ''
-  });
+    description: '',
+  })
 
   useEffect(() => {
     if (formulation) {
-      setFormData(formulation);
+      setFormData(formulation)
     }
-  }, [formulation]);
-
-
+  }, [formulation])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const { _id, ...body } = formData;
-      const res = await axios.put(`${import.meta.env.VITE_API_URL}/formulation/${_id}`, body)
-      const formulationData = res.data.formulations;
-      const messageData = res.data.message;
+      const { _id, ...body } = formData
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/formulation/${_id}`,
+        body
+      )
+      const formulationData = res.data.formulations
+      const messageData = res.data.message
       onResult(
         formulationData,
         messageData,
-        messageData === 'success' ? "Successfully updated formulation." : "Failed to update formulation."
+        messageData === 'success'
+          ? 'Successfully updated formulation.'
+          : 'Failed to update formulation.'
       )
     } catch (err) {
       console.log(err)
@@ -37,7 +40,7 @@ function EditFormulationModal({ isOpen, onClose, formulation, onResult }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
@@ -130,7 +133,11 @@ function EditFormulationModal({ isOpen, onClose, formulation, onResult }) {
           </div>
           {/* Modal actions */}
           <div className="modal-action">
-            <button type="button" className="btn rounded-xl px-8" onClick={onClose}>
+            <button
+              type="button"
+              className="btn rounded-xl px-8"
+              onClick={onClose}
+            >
               Cancel
             </button>
             <button

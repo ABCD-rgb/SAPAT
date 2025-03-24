@@ -9,11 +9,11 @@ import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
-import Loading from "../components/Loading.jsx";
-import useAuth from "../hook/useAuth.js";
-import {Navigate} from "react-router-dom";
-import axios from "axios";
-import Toast from "../components/Toast.jsx";
+import Loading from '../components/Loading.jsx'
+import useAuth from '../hook/useAuth.js'
+import { Navigate } from 'react-router-dom'
+import axios from 'axios'
+import Toast from '../components/Toast.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -30,16 +30,18 @@ function Nutrients() {
 
   useEffect(() => {
     if (user) {
-      fetchData();
+      fetchData()
     }
-  }, [user]);
+  }, [user])
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`);
-      const fetchedData = res.data.nutrients;
-      setNutrients(fetchedData);
-      setIsLoading(false);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`
+      )
+      const fetchedData = res.data.nutrients
+      setNutrients(fetchedData)
+      setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
@@ -57,15 +59,23 @@ function Nutrients() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const selectedId = selectedNutrient._id;
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/nutrient/${selectedNutrient._id}/${user._id}`);
-      const messageData = res.data.message;
+      const selectedId = selectedNutrient._id
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/nutrient/${selectedNutrient._id}/${user._id}`
+      )
+      const messageData = res.data.message
       if (messageData === 'success') {
-        setNutrients(nutrients.filter((nutrient) => nutrient._id !== selectedId))
+        setNutrients(
+          nutrients.filter((nutrient) => nutrient._id !== selectedId)
+        )
       }
       // toast instructions
       setShowToast(true)
-      setMessage(messageData === 'success' ? 'Nutrient deleted successfully' : 'Failed to delete nutrient.')
+      setMessage(
+        messageData === 'success'
+          ? 'Nutrient deleted successfully'
+          : 'Failed to delete nutrient.'
+      )
       setToastAction(messageData)
     } catch (err) {
       console.log(err)
@@ -87,10 +97,12 @@ function Nutrients() {
   const handleEditResult = (updatedNutrient, action, message) => {
     setIsEditModalOpen(false)
     setNutrients((prevNutrient) => {
-      const index = prevNutrient.findIndex((nutrient) => nutrient._id === updatedNutrient._id)
+      const index = prevNutrient.findIndex(
+        (nutrient) => nutrient._id === updatedNutrient._id
+      )
       const updated = [...prevNutrient]
-      updated[index] = {...updatedNutrient}
-      return updated;
+      updated[index] = { ...updatedNutrient }
+      return updated
     })
     // toast instructions
     setShowToast(true)
@@ -189,12 +201,12 @@ function Nutrients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Nutrient"
         description={`Are you sure you want to delete ${selectedNutrient?.name}? This action cannot be undone.`}
-        type='delete'
+        type="delete"
       />
 
       {/*  Toasts */}
       <Toast
-        className="transition ease-in-out delay-150"
+        className="transition delay-150 ease-in-out"
         show={showToast}
         action={toastAction}
         message={message}

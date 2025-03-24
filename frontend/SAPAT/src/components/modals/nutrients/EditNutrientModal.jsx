@@ -1,6 +1,6 @@
 import { RiCloseLine } from 'react-icons/ri'
-import {useEffect, useState} from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
   const [formData, setFormData] = useState({
@@ -13,31 +13,36 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
 
   useEffect(() => {
     if (nutrient) {
-      setFormData(nutrient);
+      setFormData(nutrient)
     }
   }, [nutrient])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const { _id, user, ...body } = formData;
-      const nutrient_id = nutrient.nutrient_id || nutrient._id;
-      const res = await axios.put(`${import.meta.env.VITE_API_URL}/nutrient/${nutrient_id}/${user_id}`, body)
-      const nutrientData = res.data.nutrients;
-      const messageData = res.data.message;
+      const { _id, user, ...body } = formData
+      const nutrient_id = nutrient.nutrient_id || nutrient._id
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/nutrient/${nutrient_id}/${user_id}`,
+        body
+      )
+      const nutrientData = res.data.nutrients
+      const messageData = res.data.message
       onResult(
         nutrientData,
         messageData,
-        messageData === 'success' ? "Successfully updated nutrient" : "Failed to update nutrient"
+        messageData === 'success'
+          ? 'Successfully updated nutrient'
+          : 'Failed to update nutrient'
       )
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
@@ -143,8 +148,9 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
           <div className="modal-action">
             <button
               type="button"
-              className="btn rounded-xl px-8" onClick={onClose
-            }>
+              className="btn rounded-xl px-8"
+              onClick={onClose}
+            >
               Cancel
             </button>
             <button

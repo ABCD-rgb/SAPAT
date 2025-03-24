@@ -7,7 +7,9 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
   const handleRowClick = (ingredient) => {
     const isChecked = checkedIngredients.includes(ingredient._id)
     if (isChecked) {
-      setCheckedIngredients(checkedIngredients.filter(item => item !== ingredient._id))
+      setCheckedIngredients(
+        checkedIngredients.filter((item) => item !== ingredient._id)
+      )
     } else {
       setCheckedIngredients([...checkedIngredients, ingredient._id])
     }
@@ -15,9 +17,11 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
 
   const handleCheckboxChange = (ingredient, e) => {
     if (e.target.checked) {
-      setCheckedIngredients([...checkedIngredients, ingredient._id]);
+      setCheckedIngredients([...checkedIngredients, ingredient._id])
     } else {
-      setCheckedIngredients(checkedIngredients.filter(item => item !== ingredient._id));
+      setCheckedIngredients(
+        checkedIngredients.filter((item) => item !== ingredient._id)
+      )
     }
   }
 
@@ -41,49 +45,51 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
         {/* Ingredients table */}
-        <div className="max-h-64 overflow-y-auto overflow-hidden rounded-2xl border border-gray-200">
-          <table className="table table-pin-rows">
+        <div className="max-h-64 overflow-hidden overflow-y-auto rounded-2xl border border-gray-200">
+          <table className="table-pin-rows table">
             <thead className="bg-gray-50">
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    if (isChecked) {
-                      setCheckedIngredients(ingredients.map(ingredient => ingredient._id));
-                    } else {
-                      setCheckedIngredients([]);
-                    }
-                  }}
-                />
-              </th>
-              <th className="font-semibold">Name</th>
-              <th className="font-semibold">Price</th>
-              <th className="font-semibold">Available</th>
-              <th className="font-semibold">Group</th>
-            </tr>
-            </thead>
-            <tbody>
-            {ingredients.map((ingredient, index) => (
-              <tr
-                key={index}
-                className={`hover ${checkedIngredients.includes(ingredient._id) ? 'bg-blue-100' : ''}`}
-                onClick={() => handleRowClick(ingredient)}
-              >
-                <td>
+              <tr>
+                <th>
                   <input
                     type="checkbox"
-                    checked={checkedIngredients.includes(ingredient._id)}
-                    onChange={(e) => handleCheckboxChange(ingredient, e)}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked
+                      if (isChecked) {
+                        setCheckedIngredients(
+                          ingredients.map((ingredient) => ingredient._id)
+                        )
+                      } else {
+                        setCheckedIngredients([])
+                      }
+                    }}
                   />
-                </td>
-                <td>{ingredient.name}</td>
-                <td>{ingredient.price}</td>
-                <td>{ingredient.available}</td>
-                <td>{ingredient.group}</td>
+                </th>
+                <th className="font-semibold">Name</th>
+                <th className="font-semibold">Price</th>
+                <th className="font-semibold">Available</th>
+                <th className="font-semibold">Group</th>
               </tr>
-            ))}
+            </thead>
+            <tbody>
+              {ingredients.map((ingredient, index) => (
+                <tr
+                  key={index}
+                  className={`hover ${checkedIngredients.includes(ingredient._id) ? 'bg-blue-100' : ''}`}
+                  onClick={() => handleRowClick(ingredient)}
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={checkedIngredients.includes(ingredient._id)}
+                      onChange={(e) => handleCheckboxChange(ingredient, e)}
+                    />
+                  </td>
+                  <td>{ingredient.name}</td>
+                  <td>{ingredient.price}</td>
+                  <td>{ingredient.available}</td>
+                  <td>{ingredient.group}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

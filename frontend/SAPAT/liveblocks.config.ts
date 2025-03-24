@@ -2,21 +2,18 @@ declare global {
   interface Liveblocks {
     // Custom user info set when authenticating with a secret key
     UserMeta: {
-      id: string;
+      id: string
       info: {
         // Example properties, for useSelf, useUser, useOthers, etc.
-        name: string;
-        email: string;
-        avatar: string;
-      };
-    };
+        name: string
+        email: string
+        avatar: string
+      }
+    }
   }
 }
 
-export {};
-
-
-
+export {}
 
 // // Define Liveblocks types for your application
 // // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data

@@ -7,16 +7,16 @@ import {
   RiFileDownloadLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
-import axios from 'axios';
-import Loading from "../../components/Loading.jsx";
-import ShareFormulationModal from "../../components/modals/formulations/ShareFormulationModal.jsx";
-import ConfirmationModal from "../../components/modals/ConfirmationModal.jsx";
-import Toast from "../../components/Toast.jsx";
-import Avatar from "../../components/Avatar.jsx";
-import Selection from "../../components/Selection.jsx";
-import ChooseIngredientsModal from "../../components/modals/viewformulation/ChooseIngredientsModal.jsx";
-import ChooseNutrientsModal from "../../components/modals/viewformulation/ChooseNutrientsModal.jsx";
-const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
+import axios from 'axios'
+import Loading from '../../components/Loading.jsx'
+import ShareFormulationModal from '../../components/modals/formulations/ShareFormulationModal.jsx'
+import ConfirmationModal from '../../components/modals/ConfirmationModal.jsx'
+import Toast from '../../components/Toast.jsx'
+import Avatar from '../../components/Avatar.jsx'
+import Selection from '../../components/Selection.jsx'
+import ChooseIngredientsModal from '../../components/modals/viewformulation/ChooseIngredientsModal.jsx'
+import ChooseNutrientsModal from '../../components/modals/viewformulation/ChooseNutrientsModal.jsx'
+const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
 
 function ViewFormulation({
   formulation,
@@ -31,39 +31,43 @@ function ViewFormulation({
   updateName,
   updateDescription,
   updateAnimalGroup,
+  updateIngredients,
+  updateNutrients,
 }) {
-  const VITE_API_URL = import.meta.env.VITE_API_URL;
+  const VITE_API_URL = import.meta.env.VITE_API_URL
 
   const sampleIngredients = [
-    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
-    { name: "Corn", maximum: 12 },
-    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
-    { name: "Corn", maximum: 12 },
-    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
-    { name: "Corn", maximum: 12 },
-    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
-    { name: "Corn", maximum: 12 },
-    { name: "Banana (peeled)", minimum: 1, maximum: 3 },
-    { name: "Corn", maximum: 12 },
+    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+    { name: 'Corn', maximum: 12 },
+    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+    { name: 'Corn', maximum: 12 },
+    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+    { name: 'Corn', maximum: 12 },
+    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+    { name: 'Corn', maximum: 12 },
+    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+    { name: 'Corn', maximum: 12 },
   ]
 
   const sampleNutrients = [
-    { name: "Dry Matter", minimum: 1, maximum: 3 },
-    { name: "Metabolizable Energy (Swine)", maximum: 12 },
-    { name: "Dry Matter", minimum: 1, maximum: 3 },
-    { name: "Metabolizable Energy (Swine)", maximum: 12 },
-    { name: "Dry Matter", minimum: 1, maximum: 3 },
-    { name: "Metabolizable Energy (Swine)", maximum: 12 },
-    { name: "Dry Matter", minimum: 1, maximum: 3 },
-    { name: "Metabolizable Energy (Swine)", maximum: 12 },
-    { name: "Dry Matter", minimum: 1, maximum: 3 },
-    { name: "Metabolizable Energy (Swine)", maximum: 12 },
+    { name: 'Dry Matter', minimum: 1, maximum: 3 },
+    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+    { name: 'Dry Matter', minimum: 1, maximum: 3 },
+    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+    { name: 'Dry Matter', minimum: 1, maximum: 3 },
+    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+    { name: 'Dry Matter', minimum: 1, maximum: 3 },
+    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+    { name: 'Dry Matter', minimum: 1, maximum: 3 },
+    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
   ]
 
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
-  const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] = useState(false)
-  const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] = useState(false)
+  const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] =
+    useState(false)
+  const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] =
+    useState(false)
   const [focusedInput, setFocusedInput] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   // toast visibility
@@ -75,8 +79,10 @@ function ViewFormulation({
   const [owner, setOwner] = useState()
   const [ingredients, setIngredients] = useState([])
   const [nutrients, setNutrients] = useState([])
-  const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] = useState(false)
-  const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] = useState(false)
+  const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
+    useState(false)
+  const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] =
+    useState(false)
 
   useEffect(() => {
     fetchOwner()
@@ -85,21 +91,23 @@ function ViewFormulation({
       fetchIngredients()
       fetchNutrients()
     }
-  }, [owner]);
+  }, [owner])
 
   useEffect(() => {
-    fetchCollaboratorData();
-    setIsLoading(false);
-  }, [formulation.collaborators]);
+    fetchCollaboratorData()
+    setIsLoading(false)
+  }, [formulation.collaborators])
 
-  console.log("owner", owner)
-  console.log("ingredients", ingredients);
-  console.log("nutrients", nutrients);
+  console.log('owner', owner)
+  console.log('ingredients', ingredients)
+  console.log('nutrients', nutrients)
 
   const fetchOwner = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/owner/${id}`);
-      setOwner(res.data.owner);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/formulation/owner/${id}`
+      )
+      setOwner(res.data.owner)
     } catch (err) {
       console.log(err)
     }
@@ -107,19 +115,23 @@ function ViewFormulation({
 
   const fetchIngredients = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}`);
-      const fetchedData = res.data.ingredients;
-      setIngredients(fetchedData);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}`
+      )
+      const fetchedData = res.data.ingredients
+      setIngredients(fetchedData)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const fetchNutrients = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`);
-      const fetchedData = res.data.nutrients;
-      setNutrients(fetchedData);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`
+      )
+      const fetchedData = res.data.nutrients
+      setNutrients(fetchedData)
     } catch (err) {
       console.log(err)
     }
@@ -127,24 +139,26 @@ function ViewFormulation({
 
   const fetchCollaboratorData = async () => {
     try {
-      if (!formulation.collaborators) return;
+      if (!formulation.collaborators) return
       // get details of collaborators
-      const collaboratorPromises = formulation.collaborators.map(async (collaborator) => {
-        const res = await axios.get(`${VITE_API_URL}/user-check/id/${collaborator.userId}`);
-        return {
-          ...res.data.user,
-          access: collaborator.access,
-        };
-      })
+      const collaboratorPromises = formulation.collaborators.map(
+        async (collaborator) => {
+          const res = await axios.get(
+            `${VITE_API_URL}/user-check/id/${collaborator.userId}`
+          )
+          return {
+            ...res.data.user,
+            access: collaborator.access,
+          }
+        }
+      )
       // wait for all requests to complete
-      const collaboratorsData = await Promise.all(collaboratorPromises);
-      setCollaborators(collaboratorsData);
+      const collaboratorsData = await Promise.all(collaboratorPromises)
+      setCollaborators(collaboratorsData)
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
-
-
 
   const handleFocus = (inputId) => {
     setFocusedInput(inputId)
@@ -180,19 +194,21 @@ function ViewFormulation({
       setShowToast(true)
       setMessage(message)
       setToastAction('success')
-    }
-    else {
-      setNewCollaborator(collaborator);
-      setIsAddCollaboratorModalOpen(true);
+    } else {
+      setNewCollaborator(collaborator)
+      setIsAddCollaboratorModalOpen(true)
     }
   }
   const handleAddCollaborator = async () => {
     try {
-      const res = await axios.put(`${VITE_API_URL}/formulation/collaborator/${id}`, {
-        'updaterId': user._id,
-        'collaboratorId': newCollaborator.newId,
-        'access': newCollaborator.newAccess,
-      })
+      const res = await axios.put(
+        `${VITE_API_URL}/formulation/collaborator/${id}`,
+        {
+          updaterId: user._id,
+          collaboratorId: newCollaborator.newId,
+          access: newCollaborator.newAccess,
+        }
+      )
 
       const newCollaboratorData = {
         _id: newCollaborator.newId,
@@ -205,14 +221,13 @@ function ViewFormulation({
       setShowToast(true)
       setMessage('Collaborator added successfully')
       setToastAction('success')
-
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
 
   const handleUpdateCollaborator = (updatedCollaborators) => {
-    setCollaborators(updatedCollaborators);
+    setCollaborators(updatedCollaborators)
     setShowToast(true)
     setMessage('Collaborator updated successfully')
     setToastAction('success')
@@ -220,16 +235,21 @@ function ViewFormulation({
 
   const handleDeleteCollaborator = async (collaboratorId) => {
     try {
-      const res = await axios.delete(`${VITE_API_URL}/formulation/collaborator/${id}/${collaboratorId}`)
-      setCollaborators(collaborators.filter(collaborator => collaborator._id !== collaboratorId))
+      const res = await axios.delete(
+        `${VITE_API_URL}/formulation/collaborator/${id}/${collaboratorId}`
+      )
+      setCollaborators(
+        collaborators.filter(
+          (collaborator) => collaborator._id !== collaboratorId
+        )
+      )
       setShowToast(true)
       setMessage('Collaborator deleted successfully')
       setToastAction('success')
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
   }
-
 
   // loading due to api calls
   if (isLoading) {
@@ -240,7 +260,7 @@ function ViewFormulation({
     return <Loading />
   }
 
-  const { code, name, description, animal_group } = formulationRealTime;
+  const { code, name, description, animal_group } = formulationRealTime
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -359,8 +379,8 @@ function ViewFormulation({
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
-              <div className="max-h-64 overflow-y-auto overflow-x-auto">
-                <table className="table-sm table w-full table-pin-rows">
+              <div className="max-h-64 overflow-x-auto overflow-y-auto">
+                <table className="table-sm table-pin-rows table w-full">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -401,8 +421,8 @@ function ViewFormulation({
                 <h3 className="mb-2 text-sm font-semibold">Nutrients</h3>
                 <p className="text-xs text-gray-500">description</p>
               </div>
-              <div className="max-h-64 overflow-y-auto overflow-x-auto">
-                <table className="table-sm table w-full table-pin-rows  ">
+              <div className="max-h-64 overflow-x-auto overflow-y-auto">
+                <table className="table-sm table-pin-rows table w-full">
                   <thead>
                     <tr>
                       <th>Name</th>
@@ -520,11 +540,11 @@ function Selections({ id, others }) {
               name={info.name}
               color={COLORS[connectionId % COLORS.length]}
             />
-          );
+          )
         }
       })}
     </>
-  );
+  )
 }
 
 export default ViewFormulation
