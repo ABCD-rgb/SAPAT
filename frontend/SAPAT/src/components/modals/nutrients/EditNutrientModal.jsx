@@ -11,6 +11,8 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
     description: '',
   })
 
+  const [isDisabled, setIsDisabled] = useState(false)
+
   useEffect(() => {
     if (nutrient) {
       setFormData(nutrient)
@@ -19,6 +21,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsDisabled(true)
     try {
       const { _id, user, ...body } = formData
       const nutrient_id = nutrient.nutrient_id || nutrient._id
@@ -155,7 +158,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
             </button>
             <button
               type="submit"
-              className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
+              className={`btn rounded-xl bg-amber-500 ${isDisabled ? 'disabled' : ''} px-8 text-white hover:bg-amber-600`}
             >
               Update
             </button>

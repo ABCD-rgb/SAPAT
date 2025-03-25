@@ -67,6 +67,8 @@ const updateNutrient = async (req, res) => {
       if (unit) nutrient.unit = unit;
       if (description) nutrient.description = description;
       if (group) nutrient.group = group;
+      const updatedNutrient = await nutrient.save();
+      res.status(200).json({ message: 'success', nutrients  : updatedNutrient });
     }
     // global-created nutrient
     else {
@@ -184,25 +186,31 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
   if (type === 'add') {
     // <user-created ingredients>
     const userIngredients = await Ingredient.find({ 'user': user_id });
-    const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
+    await Promise.all(userIngredients.map(async userIngredient => {
       // insert the new nutrient to list of nutrients on each User Ingredient
       userIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
       await userIngredient.save();
     }));
+
     // <global overrides ingredients>
     const globalIngredients = await Ingredient.find({ 'source': 'global' });
-    const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
-
+    await Promise.all(globalIngredients.map(async globalIngredient => {
       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
       // no existing override
       if (override.length === 0) {
-        const updatedIngredient = globalIngredient.toObject();  // convert Mongoose document to a plain Object
-        updatedIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
-        const ingredientOverride = await UserIngredientOverride.create({
-          ...updatedIngredient,
+        await UserIngredientOverride.create({
           ingredient_id: globalIngredient._id,
           user: user_id,
-        })
+          nutrients: [
+            ...globalIngredient.nutrients,
+            { 'nutrient': nutrient._id, 'value': 0 }
+          ],
+          // Copy other relevant fields from globalIngredient
+          name: globalIngredient.name,
+          price: globalIngredient.price,
+          available: globalIngredient.available,
+          source: globalIngredient.source
+        });
       }
       // has an existing override (and not deleted as well)
       else if (override[0].deleted !== 1) {
@@ -214,24 +222,28 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
   } else if (type === 'remove') {
     // <user-created ingredients>
     const userIngredients = await Ingredient.find({ user: user_id });
-    const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
+    await Promise.all(userIngredients.map(async userIngredient => {
       // remove the nutrient to be deleted on all User Ingredients
       userIngredient.nutrients = userIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
       await userIngredient.save();
-    }))
+    }));
+
     // <global overrides ingredients>
     const globalIngredients = await Ingredient.find({ 'source': 'global' });
-    const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
+    await Promise.all(globalIngredients.map(async globalIngredient => {
       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
       // no existing override
       if (override.length === 0) {
-        const updatedIngredient = globalIngredient.toObject();
-        updatedIngredient.nutrients = updatedIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
-        const ingredientOverride = await UserIngredientOverride.create({
-          ...updatedIngredient,
+        await UserIngredientOverride.create({
           ingredient_id: globalIngredient._id,
           user: user_id,
-        })
+          nutrients: globalIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id)),
+          // Copy other relevant fields from globalIngredient
+          name: globalIngredient.name,
+          price: globalIngredient.price,
+          available: globalIngredient.available,
+          source: globalIngredient.source
+        });
       }
       // has an existing override (and not deleted as well)
       else if (override[0].deleted !== 1) {
@@ -241,6 +253,68 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
     }));
   }
 }
+
+// const handleIngredientChanges = async (type, nutrient, user_id) => {
+//   if (type === 'add') {
+//     // <user-created ingredients>
+//     const userIngredients = await Ingredient.find({ 'user': user_id });
+//     const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
+//       // insert the new nutrient to list of nutrients on each User Ingredient
+//       userIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
+//       await userIngredient.save();
+//     }));
+//     // <global overrides ingredients>
+//     const globalIngredients = await Ingredient.find({ 'source': 'global' });
+//     const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
+//
+//       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
+//       // no existing override
+//       if (override.length === 0) {
+//         const updatedIngredient = globalIngredient.toObject();  // convert Mongoose document to a plain Object
+//         updatedIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
+//         const ingredientOverride = await UserIngredientOverride.create({
+//           ...updatedIngredient,
+//           ingredient_id: globalIngredient._id,
+//           user: user_id,
+//         })
+//       }
+//       // has an existing override (and not deleted as well)
+//       else if (override[0].deleted !== 1) {
+//         override[0].nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
+//         await override[0].save();
+//       }
+//     }));
+//
+//   } else if (type === 'remove') {
+//     // <user-created ingredients>
+//     const userIngredients = await Ingredient.find({ user: user_id });
+//     const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
+//       // remove the nutrient to be deleted on all User Ingredients
+//       userIngredient.nutrients = userIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
+//       await userIngredient.save();
+//     }))
+//     // <global overrides ingredients>
+//     const globalIngredients = await Ingredient.find({ 'source': 'global' });
+//     const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
+//       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
+//       // no existing override
+//       if (override.length === 0) {
+//         const updatedIngredient = globalIngredient.toObject();
+//         updatedIngredient.nutrients = updatedIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
+//         const ingredientOverride = await UserIngredientOverride.create({
+//           ...updatedIngredient,
+//           ingredient_id: globalIngredient._id,
+//           user: user_id,
+//         })
+//       }
+//       // has an existing override (and not deleted as well)
+//       else if (override[0].deleted !== 1) {
+//         override[0].nutrients = override[0].nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
+//         await override[0].save();
+//       }
+//     }));
+//   }
+// }
 
 
 export {

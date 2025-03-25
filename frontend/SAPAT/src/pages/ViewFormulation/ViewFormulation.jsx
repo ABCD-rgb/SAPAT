@@ -295,86 +295,91 @@ function ViewFormulation({
 
   // Render function for Ingredients table rows
   const renderIngredientsTableRows = () => {
-    return ingredients.map((ingredient, index) => (
-      <tr key={index}>
-        <td>{ingredient.name}</td>
-        <td>
-          <input
-            id={`ingredient-${index}-minimum`}
-            type="number"
-            className="input input-bordered input-xs w-20"
-            value={ingredient.minimum ?? ''}
-            onChange={(e) =>
-              handleIngredientMinimumChange(index, e.target.value)
-            }
-            onFocus={() =>
-              updateMyPresence({ focusedId: `ingredient-${index}-minimum` })
-            }
-            onBlur={() => updateMyPresence({ focusedId: null })}
-          />
-          <Selections id={`ingredient-${index}-minimum`} others={others} />
-        </td>
-        <td>
-          <input
-            id={`ingredient-${index}-maximum`}
-            type="number"
-            className="input input-bordered input-xs w-20"
-            value={ingredient.maximum ?? ''}
-            onChange={(e) =>
-              handleIngredientMaximumChange(index, e.target.value)
-            }
-            onFocus={() =>
-              updateMyPresence({ focusedId: `ingredient-${index}-maximum` })
-            }
-            onBlur={() => updateMyPresence({ focusedId: null })}
-          />
-          <Selections id={`ingredient-${index}-maximum`} others={others} />
-        </td>
-        <td>{ingredient.value}</td>
-        <td>
-          <button className="btn btn-ghost btn-xs">×</button>
-        </td>
-      </tr>
-    ))
+    if (ingredients) {
+      return ingredients.map((ingredient, index) => (
+        <tr key={index}>
+          <td>{ingredient.name}</td>
+          <td>
+            <input
+              id={`ingredient-${index}-minimum`}
+              type="number"
+              className="input input-bordered input-xs w-20"
+              value={ingredient.minimum ?? ''}
+              onChange={(e) =>
+                handleIngredientMinimumChange(index, e.target.value)
+              }
+              onFocus={() =>
+                updateMyPresence({ focusedId: `ingredient-${index}-minimum` })
+              }
+              onBlur={() => updateMyPresence({ focusedId: null })}
+            />
+            <Selections id={`ingredient-${index}-minimum`} others={others} />
+          </td>
+          <td>
+            <input
+              id={`ingredient-${index}-maximum`}
+              type="number"
+              className="input input-bordered input-xs w-20"
+              value={ingredient.maximum ?? ''}
+              onChange={(e) =>
+                handleIngredientMaximumChange(index, e.target.value)
+              }
+              onFocus={() =>
+                updateMyPresence({ focusedId: `ingredient-${index}-maximum` })
+              }
+              onBlur={() => updateMyPresence({ focusedId: null })}
+            />
+            <Selections id={`ingredient-${index}-maximum`} others={others} />
+          </td>
+          <td>{ingredient.value}</td>
+          <td>
+            <button className="btn btn-ghost btn-xs">×</button>
+          </td>
+        </tr>
+      ))
+    }
   }
 
   // Render function for Nutrients table rows
   const renderNutrientsTableRows = () => {
-    return nutrients.map((nutrient, index) => (
-      <tr key={index}>
-        <td>{nutrient.name}</td>
-        <td>
-          <input
-            type="number"
-            className="input input-bordered input-xs w-20"
-            value={nutrient.minimum ?? ''}
-            onChange={(e) => handleNutrientMinimumChange(index, e.target.value)}
-            onFocus={() =>
-              updateMyPresence({ focusedId: `nutrient-${index}-minimum` })
-            }
-            onBlur={() => updateMyPresence({ focusedId: null })}
-          />
-          <Selections id={`nutrient-${index}-minimum`} others={others} />
-        </td>
-        <td>
-          <input
-            type="number"
-            className="input input-bordered input-xs w-20"
-            value={nutrient.maximum ?? ''}
-            onChange={(e) => handleNutrientMaximumChange(index, e.target.value)}
-            onFocus={() =>
-              updateMyPresence({ focusedId: `nutrient-${index}-maximum` })
-            }
-            onBlur={() => updateMyPresence({ focusedId: null })}
-          />
-          <Selections id={`nutrient-${index}-maximum`} others={others} />
-        </td>
-        <td>{nutrient.value}</td>
-        <td>
-          <button className="btn btn-ghost btn-xs">×</button>
-        </td>
-      </tr>
-    ))
+    if (nutrients) {
+
+      return nutrients.map((nutrient, index) => (
+        <tr key={index}>
+          <td>{nutrient.name}</td>
+          <td>
+            <input
+              type="number"
+              className="input input-bordered input-xs w-20"
+              value={nutrient.minimum ?? ''}
+              onChange={(e) => handleNutrientMinimumChange(index, e.target.value)}
+              onFocus={() =>
+                updateMyPresence({ focusedId: `nutrient-${index}-minimum` })
+              }
+              onBlur={() => updateMyPresence({ focusedId: null })}
+            />
+            <Selections id={`nutrient-${index}-minimum`} others={others} />
+          </td>
+          <td>
+            <input
+              type="number"
+              className="input input-bordered input-xs w-20"
+              value={nutrient.maximum ?? ''}
+              onChange={(e) => handleNutrientMaximumChange(index, e.target.value)}
+              onFocus={() =>
+                updateMyPresence({ focusedId: `nutrient-${index}-maximum` })
+              }
+              onBlur={() => updateMyPresence({ focusedId: null })}
+            />
+            <Selections id={`nutrient-${index}-maximum`} others={others} />
+          </td>
+          <td>{nutrient.value}</td>
+          <td>
+            <button className="btn btn-ghost btn-xs">×</button>
+          </td>
+        </tr>
+      ))
+    }
   }
 
   // loading due to api calls
