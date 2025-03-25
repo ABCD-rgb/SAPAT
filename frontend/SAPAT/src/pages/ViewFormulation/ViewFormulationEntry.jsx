@@ -111,16 +111,18 @@ function ViewFormulationEntry({ id }) {
   }, [user])
 
   // Auto-sync on internal navigation (when the URL changes)
-  useEffect(() => {
-    return () => {
-      updateDatabase() // Sync before navigating away
-    }
-  }, [location.pathname]) // Runs when the user changes the page within the app
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("HERE!")
+  //     updateDatabase() // Sync before navigating away
+  //   }
+  // }, [location.pathname]) // Runs when the user changes the page within the app
 
   // Sync on saving using 'ctrl + s'
   useEffect(() => {
     const handleKeyPress = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        console.log("HERE 2")
         event.preventDefault() // Prevent the default browser save action
         updateDatabase() // Call database update function
         setShowToast(true) // Show success toast
@@ -169,6 +171,7 @@ function ViewFormulationEntry({ id }) {
 
   const updateDatabase = async () => {
     try {
+      console.log("BAKEET ")
       const currentFormulation = formulationRef.current
       const VITE_API_URL = import.meta.env.VITE_API_URL
       await axios.put(`${VITE_API_URL}/formulation/${id}`, {
