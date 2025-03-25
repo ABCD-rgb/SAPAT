@@ -1,5 +1,5 @@
-import {useEffect} from "react";
-import { FaCheck, FaTimes  } from 'react-icons/fa'
+import { useEffect } from 'react'
+import { FaCheck, FaTimes } from 'react-icons/fa'
 
 function Toast({ show, action, message, onHide }) {
   useEffect(() => {
@@ -30,4 +30,4 @@ function Toast({ show, action, message, onHide }) {
   )
 }
 
-export default Toast;
+export default Toast

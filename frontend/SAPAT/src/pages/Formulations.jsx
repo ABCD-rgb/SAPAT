@@ -6,9 +6,9 @@ import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
 import Loading from '../components/Loading'
 import Toast from '../components/Toast'
-import {Navigate, useNavigate} from 'react-router-dom'
-import useAuth from "../hook/useAuth.js";
-import axios from "axios";
+import { Navigate, useNavigate } from 'react-router-dom'
+import useAuth from '../hook/useAuth.js'
+import axios from 'axios'
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -28,16 +28,18 @@ function Formulations() {
 
   useEffect(() => {
     if (user) {
-      fetchData();
+      fetchData()
     }
-  }, [user]);
+  }, [user])
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`);
-      const fetchedData = res.data.formulations;
-      setFormulations(fetchedData);
-      setIsLoading(false);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`
+      )
+      const fetchedData = res.data.formulations
+      setFormulations(fetchedData)
+      setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
@@ -55,15 +57,23 @@ function Formulations() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const selectedId = selectedFormulation._id;
-      const res = await axios.delete(`${import.meta.env.VITE_API_URL}/formulation/${selectedFormulation._id}`);
-      const messageData = res.data.message;
+      const selectedId = selectedFormulation._id
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/formulation/${selectedFormulation._id}`
+      )
+      const messageData = res.data.message
       if (messageData === 'success') {
-        setFormulations(formulations.filter((formulation) => formulation._id !== selectedId))
+        setFormulations(
+          formulations.filter((formulation) => formulation._id !== selectedId)
+        )
       }
       // toast instructions
       setShowToast(true)
-      setMessage(messageData === 'success' ? 'Formulation deleted successfully' : 'Failed to delete formulation.')
+      setMessage(
+        messageData === 'success'
+          ? 'Formulation deleted successfully'
+          : 'Failed to delete formulation.'
+      )
       setToastAction(messageData)
     } catch (err) {
       console.log(err)
@@ -86,11 +96,13 @@ function Formulations() {
   const handleEditResult = (updatedFormulation, action, message) => {
     setIsEditModalOpen(false)
     setFormulations((prevFormulations) => {
-      const index = prevFormulations.findIndex((formulation) => formulation._id === updatedFormulation._id)
+      const index = prevFormulations.findIndex(
+        (formulation) => formulation._id === updatedFormulation._id
+      )
       const updated = [...prevFormulations]
       const formulationAccess = updated[index].access
-      updated[index] = {...updatedFormulation, access: formulationAccess};
-      return updated;
+      updated[index] = { ...updatedFormulation, access: formulationAccess }
+      return updated
     })
     // toast instructions
     setShowToast(true)
@@ -185,18 +197,17 @@ function Formulations() {
         onConfirm={handleDeleteConfirm}
         title="Delete Formulation"
         description={`Are you sure you want to delete ${selectedFormulation?.name}? This action cannot be undone.`}
-        type='delete'
+        type="delete"
       />
 
       {/*  Toasts */}
       <Toast
-        className="transition ease-in-out delay-150"
+        className="transition delay-150 ease-in-out"
         show={showToast}
         action={toastAction}
         message={message}
         onHide={hideToast}
       />
-
     </div>
   )
 }

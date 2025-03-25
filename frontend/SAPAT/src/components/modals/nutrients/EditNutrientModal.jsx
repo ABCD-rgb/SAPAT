@@ -1,6 +1,53 @@
 import { RiCloseLine } from 'react-icons/ri'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
-function EditNutrientModal({ isOpen, onClose, nutrient }) {
+function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
+  const [formData, setFormData] = useState({
+    abbreviation: '',
+    name: '',
+    unit: '',
+    group: '',
+    description: '',
+  })
+
+  useEffect(() => {
+    if (nutrient) {
+      setFormData(nutrient)
+    }
+  }, [nutrient])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const { _id, user, ...body } = formData
+      const nutrient_id = nutrient.nutrient_id || nutrient._id
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/nutrient/${nutrient_id}/${user_id}`,
+        body
+      )
+      const nutrientData = res.data.nutrients
+      const messageData = res.data.message
+      onResult(
+        nutrientData,
+        messageData,
+        messageData === 'success'
+          ? 'Successfully updated nutrient'
+          : 'Failed to update nutrient'
+      )
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
   return (
     <dialog
       id="edit_nutrient_modal"
@@ -17,82 +64,103 @@ function EditNutrientModal({ isOpen, onClose, nutrient }) {
 
         <h3 className="text-deepbrown mb-4 text-lg font-bold">Edit Nutrient</h3>
 
-        {/* Form fields */}
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Abbreviation</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter abbreviation"
-              className="input input-bordered w-full rounded-xl"
-              defaultValue={nutrient?.abbreviation}
-            />
+        <form onSubmit={handleSubmit}>
+          {/* Form fields */}
+          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Abbreviation</span>
+              </label>
+              <input
+                type="text"
+                name="abbreviation"
+                value={formData.abbreviation}
+                required
+                onChange={handleChange}
+                placeholder="Enter abbreviation"
+                className="input input-bordered w-full rounded-xl"
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Name</span>
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                required
+                onChange={handleChange}
+                placeholder="Enter name"
+                className="input input-bordered w-full rounded-xl"
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Unit</span>
+              </label>
+              <input
+                type="text"
+                name="unit"
+                value={formData.unit}
+                required
+                onChange={handleChange}
+                placeholder="Enter unit"
+                className="input input-bordered w-full rounded-xl"
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Group</span>
+              </label>
+              <select
+                name="group"
+                value={formData.group}
+                onChange={handleChange}
+                className="select select-bordered w-full rounded-xl"
+              >
+                <option value="Energy">Energy</option>
+                <option value="Composition">Composition</option>
+                <option value="Minerals">Minerals</option>
+                <option value="Amino acids">Amino acids</option>
+              </select>
+            </div>
+
+            <div className="form-control w-full md:col-span-2">
+              <label className="label">
+                <span className="label-text">Description</span>
+              </label>
+              <textarea
+                name="description"
+                value={nutrient?.description}
+                onChange={handleChange}
+                placeholder="Enter description"
+                className="textarea textarea-bordered w-full rounded-xl"
+                rows="3"
+              ></textarea>
+            </div>
           </div>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Name</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter name"
-              className="input input-bordered w-full rounded-xl"
-              defaultValue={nutrient?.name}
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Unit</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter unit"
-              className="input input-bordered w-full rounded-xl"
-              defaultValue={nutrient?.unit}
-            />
-          </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Group</span>
-            </label>
-            <select
-              className="select select-bordered w-full rounded-xl"
-              defaultValue={nutrient?.group}
+          {/* Modal actions */}
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn rounded-xl px-8"
+              onClick={onClose}
             >
-              <option disabled>Select group</option>
-              <option>Composition</option>
-              <option>Amino acids</option>
-              <option>Minerals</option>
-              <option>Vitamins</option>
-            </select>
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
+            >
+              Update
+            </button>
           </div>
-
-          <div className="form-control w-full md:col-span-2">
-            <label className="label">
-              <span className="label-text">Description</span>
-            </label>
-            <textarea
-              placeholder="Enter description"
-              className="textarea textarea-bordered w-full rounded-xl"
-              rows="3"
-              defaultValue={nutrient?.description}
-            ></textarea>
-          </div>
-        </div>
-
-        {/* Modal actions */}
-        <div className="modal-action">
-          <button className="btn rounded-xl px-8" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600">
-            Update
-          </button>
-        </div>
+        </form>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button onClick={onClose}>close</button>

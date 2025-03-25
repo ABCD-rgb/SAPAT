@@ -13,13 +13,16 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const body = { ...formData, owner }
-    console.log("body:",body)
+    console.log('body:', body)
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/formulation`, body)
-      console.log("res:",res)
-      const newFormulation = res.data.formulations;
-      newFormulation.access = "owner"
-      onResult(newFormulation, "success", "Successfully created formulation.")
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/formulation`,
+        body
+      )
+      console.log('res:', res)
+      const newFormulation = res.data.formulations
+      newFormulation.access = 'owner'
+      onResult(newFormulation, 'success', 'Successfully created formulation.')
       // Reset form
       setFormData({
         code: '',
@@ -29,9 +32,8 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
       })
     } catch (err) {
       console.log(err)
-      onResult(null, "error", "Failed to create formulation.")
+      onResult(null, 'error', 'Failed to create formulation.')
     }
-
   }
 
   const handleChange = (e) => {

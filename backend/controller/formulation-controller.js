@@ -63,14 +63,14 @@ const getFormulation = async (req, res) => {
 
 const updateFormulation = async (req, res) => {
     const { id } = req.params;
-    const { code, name, description, animal_group } = req.body;
+    const { code, name, description, animal_group, ingredients, nutrients } = req.body;
     try {
         const formulation = await Formulation.findByIdAndUpdate(
           id,
           {
               $set:
                 {
-                    code, name, description, animal_group
+                    code, name, description, animal_group, ingredients, nutrients
                 }
           },
           { new: true },
@@ -84,6 +84,8 @@ const updateFormulation = async (req, res) => {
             "name": name,
             "description": description ? description : "",
             "animal_group": animal_group ? animal_group : "",
+            "ingredients": ingredients ? ingredients : [],
+            "nutrients": nutrients ? nutrients : [],
         }
         res.status(200).json({ message: 'success', formulations: filteredFormulation });
     } catch (err) {
@@ -105,6 +107,67 @@ const deleteFormulation = async (req, res) => {
     }
 };
 
+const getFormulationOwner = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const formulation = await Formulation.findById(id);
+        const owner = formulation.collaborators.filter(item => item.access === 'owner');
+        if (owner.length === 0) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', owner: owner[0].userId });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const addIngredients = async (req, res) => {
+    const { id } = req.params;
+    const { ingredients } = req.body;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $push:
+                {
+                    ingredients: { $each: ingredients },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', addedIngredients: ingredients });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const addNutrients = async (req, res) => {
+    const { id } = req.params;
+    const { nutrients } = req.body;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $push:
+                {
+                    nutrients: { $each: nutrients },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', addedNutrients: nutrients });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
 
 const validateCollaborator = async (req, res) => {
     const { formulationId, collaboratorId } = req.params;
@@ -208,6 +271,9 @@ export {
     getFormulation,
     updateFormulation,
     deleteFormulation,
+    getFormulationOwner,
+    addIngredients,
+    addNutrients,
     validateCollaborator,
     updateCollaborator,
     removeCollaborator

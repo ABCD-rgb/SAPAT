@@ -1,8 +1,10 @@
-"use client";
+'use client'
 
 import {
-  LiveblocksProvider, RoomProvider, ClientSideSuspense
-} from "@liveblocks/react/suspense";
+  LiveblocksProvider,
+  RoomProvider,
+  ClientSideSuspense,
+} from '@liveblocks/react/suspense'
 import { useParams } from 'react-router-dom'
 
 import {
@@ -21,13 +23,12 @@ import Error from './pages/Error'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import Loading from './components/Loading'
-import useAuth from "./hook/useAuth.js";
-import {LiveObject} from "@liveblocks/client";
+import useAuth from './hook/useAuth.js'
+import { LiveObject } from '@liveblocks/client'
 
 function AppLayout() {
   const location = useLocation()
-  const isAuthPage =
-    location.pathname === '/'
+  const isAuthPage = location.pathname === '/'
 
   return (
     <div className="flex h-screen flex-col">
@@ -43,7 +44,7 @@ function AppLayout() {
 }
 
 function FormulationRoom() {
-  const { id } = useParams();
+  const { id } = useParams()
   return (
     <RoomProvider
       id={`formulation-${id}`}
@@ -54,16 +55,15 @@ function FormulationRoom() {
           name: '',
           description: '',
           animal_group: '',
-        })
+        }),
       }}
     >
       <ClientSideSuspense fallback={<Loading />}>
         {() => <ViewFormulationEntry id={id} />}
       </ClientSideSuspense>
     </RoomProvider>
-  );
+  )
 }
-
 
 const router = createBrowserRouter([
   {
@@ -91,8 +91,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/formulations/:id',
-        element: <FormulationRoom />
-
+        element: <FormulationRoom />,
       },
       {
         path: '/error',
@@ -103,7 +102,7 @@ const router = createBrowserRouter([
 ])
 
 function App() {
-  const {liveblocksAuth} = useAuth();
+  const { liveblocksAuth } = useAuth()
 
   return (
     <LiveblocksProvider authEndpoint={liveblocksAuth}>
