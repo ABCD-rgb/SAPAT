@@ -48,6 +48,42 @@ function ViewFormulationEntry({ id }) {
     storage.get('formulation').set('nutrients', nutrients)
   }, [])
 
+  // New mutation to update a specific ingredient's property
+  const updateIngredientProperty = useMutation(
+    ({ storage }, ingredientIndex, propertyName, propertyValue) => {
+      const ingredients = storage.get('formulation').get('ingredients')
+
+      // Create a new array with the updated ingredient
+      const updatedIngredients = ingredients.map((ingredient, index) =>
+        index === ingredientIndex
+          ? { ...ingredient, [propertyName]: propertyValue }
+          : ingredient
+      )
+
+      // Update the entire ingredients array
+      storage.get('formulation').set('ingredients', updatedIngredients)
+    },
+    []
+  )
+
+  // New mutation to update a specific nutrient's property
+  const updateNutrientProperty = useMutation(
+    ({ storage }, nutrientIndex, propertyName, propertyValue) => {
+      const nutrients = storage.get('formulation').get('nutrients')
+
+      // Create a new array with the updated nutrient
+      const updatedNutrients = nutrients.map((nutrient, index) =>
+        index === nutrientIndex
+          ? { ...nutrient, [propertyName]: propertyValue }
+          : nutrient
+      )
+
+      // Update the entire nutrients array
+      storage.get('formulation').set('nutrients', updatedNutrients)
+    },
+    []
+  )
+
   const [formulation, setFormulation] = useState({
     code: '',
     name: '',
@@ -144,12 +180,15 @@ function ViewFormulationEntry({ id }) {
   const updateDatabase = async () => {
     try {
       const currentFormulation = formulationRef.current
+      console.log('currentFormulation', formulationRef.current)
       const VITE_API_URL = import.meta.env.VITE_API_URL
       await axios.put(`${VITE_API_URL}/formulation/${id}`, {
         code: currentFormulation.code,
         name: currentFormulation.name,
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
+        ingredients: currentFormulation.ingredients,
+        nutrients: currentFormulation.nutrients
       })
 
       console.log('Database updated successfully!')
@@ -185,6 +224,8 @@ function ViewFormulationEntry({ id }) {
         updateAnimalGroup={updateAnimalGroup}
         updateIngredients={updateIngredients}
         updateNutrients={updateNutrients}
+        updateIngredientProperty={updateIngredientProperty}
+        updateNutrientProperty={updateNutrientProperty}
       />
       {/*  Toasts */}
       <Toast
