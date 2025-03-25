@@ -1,29 +1,35 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 
-function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
+function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   const [checkedIngredients, setCheckedIngredients] = useState([])
+  console.log("checkedIngredients on modal: ",checkedIngredients)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onResult(checkedIngredients)
+  }
 
   const handleRowClick = (ingredient) => {
-    const isChecked = checkedIngredients.includes(ingredient._id)
+    const isChecked = checkedIngredients.some(item => item.ingredientId === ingredient._id);
     if (isChecked) {
       setCheckedIngredients(
-        checkedIngredients.filter((item) => item !== ingredient._id)
-      )
+        checkedIngredients.filter((item) => item.ingredientId !== ingredient._id)
+      );
     } else {
-      setCheckedIngredients([...checkedIngredients, ingredient._id])
+      setCheckedIngredients([...checkedIngredients, { ingredientId: ingredient._id, name: ingredient.name }]);
     }
-  }
+  };
 
   const handleCheckboxChange = (ingredient, e) => {
     if (e.target.checked) {
-      setCheckedIngredients([...checkedIngredients, ingredient._id])
+      setCheckedIngredients([...checkedIngredients, { ingredientId: ingredient._id, name: ingredient.name }]);
     } else {
       setCheckedIngredients(
-        checkedIngredients.filter((item) => item !== ingredient._id)
-      )
+        checkedIngredients.filter((item) => item.ingredientId !== ingredient._id)
+      );
     }
-  }
+  };
 
   return (
     <dialog
@@ -45,64 +51,80 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients }) {
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
         {/* Ingredients table */}
-        <div className="max-h-64 overflow-hidden overflow-y-auto rounded-2xl border border-gray-200">
-          <table className="table-pin-rows table">
-            <thead className="bg-gray-50">
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    onChange={(e) => {
-                      const isChecked = e.target.checked
-                      if (isChecked) {
-                        setCheckedIngredients(
-                          ingredients.map((ingredient) => ingredient._id)
-                        )
-                      } else {
-                        setCheckedIngredients([])
-                      }
-                    }}
-                  />
-                </th>
-                <th className="font-semibold">Name</th>
-                <th className="font-semibold">Price</th>
-                <th className="font-semibold">Available</th>
-                <th className="font-semibold">Group</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ingredients.map((ingredient, index) => (
-                <tr
-                  key={index}
-                  className={`hover ${checkedIngredients.includes(ingredient._id) ? 'bg-blue-100' : ''}`}
-                  onClick={() => handleRowClick(ingredient)}
-                >
-                  <td>
+        <form onSubmit={handleSubmit}>
+          <div className="max-h-64 overflow-hidden overflow-y-auto rounded-2xl border border-gray-200">
+            <table className="table-pin-rows table">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th>
                     <input
                       type="checkbox"
-                      checked={checkedIngredients.includes(ingredient._id)}
-                      onChange={(e) => handleCheckboxChange(ingredient, e)}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked
+                        if (isChecked) {
+                          setCheckedIngredients(
+                            ingredients.map((ingredient) => {
+                              return (
+                                {
+                                  ingredientId: ingredient._id,
+                                  name: ingredient.name
+                                }
+                              )
+                            })
+                          )
+                        } else {
+                          setCheckedIngredients([])
+                        }
+                      }}
                     />
-                  </td>
-                  <td>{ingredient.name}</td>
-                  <td>{ingredient.price}</td>
-                  <td>{ingredient.available}</td>
-                  <td>{ingredient.group}</td>
+                  </th>
+                  <th className="font-semibold">Name</th>
+                  <th className="font-semibold">Price</th>
+                  <th className="font-semibold">Available</th>
+                  <th className="font-semibold">Group</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {ingredients.map((ingredient, index) => (
+                  <tr
+                    key={index}
+                    className={`hover ${checkedIngredients.some(item => item.ingredientId === ingredient._id) ? 'bg-blue-100' : ''}`}
+                    onClick={() => handleRowClick(ingredient)}
+                  >
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={checkedIngredients.some(item => item.ingredientId === ingredient._id)}
+                        onChange={(e) => handleCheckboxChange(ingredient, e)}
+                      />
+                    </td>
+                    <td>{ingredient.name}</td>
+                    <td>{ingredient.price}</td>
+                    <td>{ingredient.available}</td>
+                    <td>{ingredient.group}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Modal actions */}
-        <div className="modal-action">
-          <button className="btn rounded-xl px-8" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600">
-            Add
-          </button>
-        </div>
+          {/* Modal actions */}
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn rounded-xl px-8"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600"
+            >
+              Add
+            </button>
+          </div>
+        </form>
       </div>
       <form method="dialog" className="modal-backdrop">
         <button onClick={onClose}>close</button>

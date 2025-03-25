@@ -45,9 +45,11 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    fetchFormulationData()
-    fetchIngredientData()
-  }, [])
+    if (user) {
+      fetchFormulationData()
+      fetchIngredientData()
+    }
+  }, [user])
 
   const fetchFormulationData = async () => {
     try {

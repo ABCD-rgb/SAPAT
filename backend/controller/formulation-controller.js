@@ -119,6 +119,53 @@ const getFormulationOwner = async (req, res) => {
     }
 }
 
+const addIngredients = async (req, res) => {
+    const { id } = req.params;
+    const { ingredients } = req.body;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $push:
+                {
+                    ingredients: { $each: ingredients },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', addedIngredients: ingredients });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const addNutrients = async (req, res) => {
+    const { id } = req.params;
+    const { nutrients } = req.body;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $push:
+                {
+                    nutrients: { $each: nutrients },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success', addedNutrients: nutrients });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
 
 const validateCollaborator = async (req, res) => {
     const { formulationId, collaboratorId } = req.params;
@@ -223,6 +270,8 @@ export {
     updateFormulation,
     deleteFormulation,
     getFormulationOwner,
+    addIngredients,
+    addNutrients,
     validateCollaborator,
     updateCollaborator,
     removeCollaborator

@@ -3,17 +3,17 @@ import { Schema, model } from 'mongoose';
 const ingredientConstraintSchema = new Schema({
     ingredientId: { type: Schema.Types.ObjectId, ref: 'Ingredient' },
     name: { type: String },
-    min: { type: Number },
-    max: { type: Number },
-    value: { type: Number },
+    min: { type: Number, default: 0 },
+    max: { type: Number, default: 0 },
+    value: { type: Number, default: 0 },
 });
 
 const nutrientConstraintSchema = new Schema({
     nutrientId: { type: Schema.Types.ObjectId, ref: 'Nutrient' },
     name: { type: String },
-    min: { type: Number },
-    max: { type: Number },
-    value: { type: Number },
+    min: { type: Number, default: 0 },
+    max: { type: Number, default: 0 },
+    value: { type: Number, default:     0 },
 })
 
 const userAccessSchema = new Schema({

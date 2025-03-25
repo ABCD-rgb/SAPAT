@@ -36,31 +36,31 @@ function ViewFormulation({
 }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL
 
-  const sampleIngredients = [
-    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-    { name: 'Corn', maximum: 12 },
-    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-    { name: 'Corn', maximum: 12 },
-    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-    { name: 'Corn', maximum: 12 },
-    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-    { name: 'Corn', maximum: 12 },
-    { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-    { name: 'Corn', maximum: 12 },
-  ]
-
-  const sampleNutrients = [
-    { name: 'Dry Matter', minimum: 1, maximum: 3 },
-    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-    { name: 'Dry Matter', minimum: 1, maximum: 3 },
-    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-    { name: 'Dry Matter', minimum: 1, maximum: 3 },
-    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-    { name: 'Dry Matter', minimum: 1, maximum: 3 },
-    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-    { name: 'Dry Matter', minimum: 1, maximum: 3 },
-    { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  ]
+  // const sampleIngredients = [
+  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+  //   { name: 'Corn', maximum: 12 },
+  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+  //   { name: 'Corn', maximum: 12 },
+  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+  //   { name: 'Corn', maximum: 12 },
+  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+  //   { name: 'Corn', maximum: 12 },
+  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
+  //   { name: 'Corn', maximum: 12 },
+  // ]
+  //
+  // const sampleNutrients = [
+  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
+  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
+  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
+  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
+  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
+  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
+  // ]
 
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
@@ -77,12 +77,25 @@ function ViewFormulation({
 
   // choosing ingredients and nutrients to create feeds
   const [owner, setOwner] = useState()
-  const [ingredients, setIngredients] = useState([])
-  const [nutrients, setNutrients] = useState([])
+  const [listOfIngredients, setListOfIngredients] = useState([])
+  const [listofNutrients, setListofNutrients] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
     useState(false)
   const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] =
     useState(false)
+  // chosen ingredients and nutrients
+  const [selectedIngredients, setSelectedIngredients] = useState([])
+  const [selectedNutrients, setSelectedNutrients] = useState([])
+
+  console.log("formulation parameter:", formulation)
+  console.log("selected Ingredients: ", selectedIngredients)
+
+  useEffect(() => {
+    if (formulation) {
+      setSelectedIngredients(formulation.ingredients || [])
+      setSelectedNutrients(formulation.nutrients || [])
+    }
+  }, [formulation])
 
   useEffect(() => {
     fetchOwner()
@@ -99,8 +112,6 @@ function ViewFormulation({
   }, [formulation.collaborators])
 
   console.log('owner', owner)
-  console.log('ingredients', ingredients)
-  console.log('nutrients', nutrients)
 
   const fetchOwner = async () => {
     try {
@@ -119,7 +130,7 @@ function ViewFormulation({
         `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}`
       )
       const fetchedData = res.data.ingredients
-      setIngredients(fetchedData)
+      setListOfIngredients(fetchedData)
     } catch (err) {
       console.log(err)
     }
@@ -131,7 +142,7 @@ function ViewFormulation({
         `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`
       )
       const fetchedData = res.data.nutrients
-      setNutrients(fetchedData)
+      setListofNutrients(fetchedData)
     } catch (err) {
       console.log(err)
     }
@@ -251,6 +262,46 @@ function ViewFormulation({
     }
   }
 
+  const handleAddIngredients = async (ingredientsToAdd) => {
+    try {
+      const res = await axios.put(`${VITE_API_URL}/formulation/ingredients/${id}`, {"ingredients": ingredientsToAdd});
+      const newIngredients = res.data.addedIngredients
+      setSelectedIngredients([...selectedIngredients, ...newIngredients])
+      updateIngredients([...selectedIngredients, ...newIngredients])
+      setIsChooseIngredientsModalOpen(false)
+      // toast instructions
+      setShowToast(true)
+      setMessage("Ingredients added successfully")
+      setToastAction("success")
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Error adding ingredients')
+      setToastAction('error')
+    }
+  }
+
+  const handleAddNutrients = async (nutrientsToAdd) => {
+    try {
+      const res = await axios.put(`${VITE_API_URL}/formulation/nutrients/${id}`, {"nutrients": nutrientsToAdd});
+      const newNutrients = res.data.addedNutrients
+      setSelectedNutrients([...selectedNutrients, ...newNutrients])
+      updateNutrients([...selectedNutrients, ...newNutrients])
+      setIsChooseIngredientsModalOpen(false)
+      // toast instructions
+      setShowToast(true)
+      setMessage("Nutrients added successfully")
+      setToastAction("success")
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage("Error adding nutrients")
+      setToastAction("error")
+    }
+  }
+
   // loading due to api calls
   if (isLoading) {
     return <Loading />
@@ -260,7 +311,7 @@ function ViewFormulation({
     return <Loading />
   }
 
-  const { code, name, description, animal_group } = formulationRealTime
+  const { code, name, description, animal_group, ingredients, nutrients } = formulationRealTime
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -391,7 +442,7 @@ function ViewFormulation({
                     </tr>
                   </thead>
                   <tbody>
-                    {sampleIngredients.map((ingredient, index) => (
+                    {ingredients.map((ingredient, index) => (
                       <tr key={index}>
                         <td>{ingredient.name}</td>
                         <td>{ingredient.minimum}</td>
@@ -433,7 +484,7 @@ function ViewFormulation({
                     </tr>
                   </thead>
                   <tbody>
-                    {sampleNutrients.map((nutrient, index) => (
+                    {nutrients.map((nutrient, index) => (
                       <tr key={index}>
                         <td>{nutrient.name}</td>
                         <td>{nutrient.minimum}</td>
@@ -507,14 +558,14 @@ function ViewFormulation({
       <ChooseIngredientsModal
         isOpen={isChooseIngredientsModalOpen}
         onClose={() => setIsChooseIngredientsModalOpen(false)}
-        ingredients={ingredients}
-        // onResult={handleCreateResult}
+        ingredients={listOfIngredients}
+        onResult={handleAddIngredients}
       />
       <ChooseNutrientsModal
         isOpen={isChooseNutrientsModalOpen}
         onClose={() => setIsChooseNutrientsModalOpen(false)}
-        nutrients={nutrients}
-        // onResult={handleCreateResult}
+        nutrients={listofNutrients}
+        onResult={handleAddNutrients}
       />
 
       {/*  Toasts */}
