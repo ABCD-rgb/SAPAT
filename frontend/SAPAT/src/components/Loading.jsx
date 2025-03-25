@@ -1,14 +1,13 @@
-
-function Loading(){
-  return(
-      <div className="flex flex-col items-center justify-center p-10 w-full h-full bg-white shadow-lg rounded-lg">
-        <img
-          className="mx-auto w-20 h-20"
-          src="/assets/loading.gif"
-          alt="Loading..."
-        />
-      </div>
-    )
+function Loading() {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center rounded-lg bg-white p-10 shadow-lg">
+      <img
+        className="mx-auto h-20 w-20"
+        src="/assets/loading.gif"
+        alt="Loading..."
+      />
+    </div>
+  )
 }
 
-export default Loading;
+export default Loading
