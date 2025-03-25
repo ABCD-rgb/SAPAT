@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   const [checkedIngredients, setCheckedIngredients] = useState([])
-  console.log("checkedIngredients on modal: ",checkedIngredients)
+  console.log('checkedIngredients on modal: ', checkedIngredients)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -11,25 +11,37 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   }
 
   const handleRowClick = (ingredient) => {
-    const isChecked = checkedIngredients.some(item => item.ingredientId === ingredient._id);
+    const isChecked = checkedIngredients.some(
+      (item) => item.ingredientId === ingredient._id
+    )
     if (isChecked) {
       setCheckedIngredients(
-        checkedIngredients.filter((item) => item.ingredientId !== ingredient._id)
-      );
+        checkedIngredients.filter(
+          (item) => item.ingredientId !== ingredient._id
+        )
+      )
     } else {
-      setCheckedIngredients([...checkedIngredients, { ingredientId: ingredient._id, name: ingredient.name }]);
+      setCheckedIngredients([
+        ...checkedIngredients,
+        { ingredientId: ingredient._id, name: ingredient.name },
+      ])
     }
-  };
+  }
 
   const handleCheckboxChange = (ingredient, e) => {
     if (e.target.checked) {
-      setCheckedIngredients([...checkedIngredients, { ingredientId: ingredient._id, name: ingredient.name }]);
+      setCheckedIngredients([
+        ...checkedIngredients,
+        { ingredientId: ingredient._id, name: ingredient.name },
+      ])
     } else {
       setCheckedIngredients(
-        checkedIngredients.filter((item) => item.ingredientId !== ingredient._id)
-      );
+        checkedIngredients.filter(
+          (item) => item.ingredientId !== ingredient._id
+        )
+      )
     }
-  };
+  }
 
   return (
     <dialog
@@ -64,12 +76,10 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                         if (isChecked) {
                           setCheckedIngredients(
                             ingredients.map((ingredient) => {
-                              return (
-                                {
-                                  ingredientId: ingredient._id,
-                                  name: ingredient.name
-                                }
-                              )
+                              return {
+                                ingredientId: ingredient._id,
+                                name: ingredient.name,
+                              }
                             })
                           )
                         } else {
@@ -88,13 +98,15 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                 {ingredients.map((ingredient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedIngredients.some(item => item.ingredientId === ingredient._id) ? 'bg-blue-100' : ''}`}
+                    className={`hover ${checkedIngredients.some((item) => item.ingredientId === ingredient._id) ? 'bg-blue-100' : ''}`}
                     onClick={() => handleRowClick(ingredient)}
                   >
                     <td>
                       <input
                         type="checkbox"
-                        checked={checkedIngredients.some(item => item.ingredientId === ingredient._id)}
+                        checked={checkedIngredients.some(
+                          (item) => item.ingredientId === ingredient._id
+                        )}
                         onChange={(e) => handleCheckboxChange(ingredient, e)}
                       />
                     </td>

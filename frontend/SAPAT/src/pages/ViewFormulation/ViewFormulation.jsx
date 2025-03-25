@@ -38,40 +38,15 @@ function ViewFormulation({
 }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL
 
-  // const sampleIngredients = [
-  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-  //   { name: 'Corn', maximum: 12 },
-  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-  //   { name: 'Corn', maximum: 12 },
-  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-  //   { name: 'Corn', maximum: 12 },
-  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-  //   { name: 'Corn', maximum: 12 },
-  //   { name: 'Banana (peeled)', minimum: 1, maximum: 3 },
-  //   { name: 'Corn', maximum: 12 },
-  // ]
-  //
-  // const sampleNutrients = [
-  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
-  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
-  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
-  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
-  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  //   { name: 'Dry Matter', minimum: 1, maximum: 3 },
-  //   { name: 'Metabolizable Energy (Swine)', maximum: 12 },
-  // ]
-
   const [collaborators, setCollaborators] = useState([])
   const [newCollaborator, setNewCollaborator] = useState({})
+
   const [isShareFormulationModalOpen, setIsShareFormulationModalOpen] =
     useState(false)
   const [isAddCollaboratorModalOpen, setIsAddCollaboratorModalOpen] =
     useState(false)
-  const [focusedInput, setFocusedInput] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+
   // toast visibility
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
@@ -80,17 +55,15 @@ function ViewFormulation({
   // choosing ingredients and nutrients to create feeds
   const [owner, setOwner] = useState()
   const [listOfIngredients, setListOfIngredients] = useState([])
-  const [listofNutrients, setListofNutrients] = useState([])
+  const [listOfNutrients, setListOfNutrients] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
     useState(false)
   const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] =
     useState(false)
+
   // chosen ingredients and nutrients
   const [selectedIngredients, setSelectedIngredients] = useState([])
   const [selectedNutrients, setSelectedNutrients] = useState([])
-
-  console.log("formulation parameter:", formulation)
-  console.log("selected Ingredients: ", selectedIngredients)
 
   useEffect(() => {
     if (formulation) {
@@ -101,7 +74,7 @@ function ViewFormulation({
 
   useEffect(() => {
     fetchOwner()
-    // make sure owner has been fetched before getting the ingredients and nutrients
+    // make sure owner has been fetched before getting the ingredients and nutrients (these are for choosing in the 'add ingredients' and 'add nutrients')
     if (owner) {
       fetchIngredients()
       fetchNutrients()
@@ -112,8 +85,6 @@ function ViewFormulation({
     fetchCollaboratorData()
     setIsLoading(false)
   }, [formulation.collaborators])
-
-  console.log('owner', owner)
 
   const fetchOwner = async () => {
     try {
@@ -144,7 +115,7 @@ function ViewFormulation({
         `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`
       )
       const fetchedData = res.data.nutrients
-      setListofNutrients(fetchedData)
+      setListOfNutrients(fetchedData)
     } catch (err) {
       console.log(err)
     }
@@ -171,14 +142,6 @@ function ViewFormulation({
     } catch (err) {
       console.log(err)
     }
-  }
-
-  const handleFocus = (inputId) => {
-    setFocusedInput(inputId)
-  }
-
-  const handleBlur = () => {
-    setFocusedInput(null)
   }
 
   const hideToast = () => {
@@ -266,15 +229,18 @@ function ViewFormulation({
 
   const handleAddIngredients = async (ingredientsToAdd) => {
     try {
-      const res = await axios.put(`${VITE_API_URL}/formulation/ingredients/${id}`, {"ingredients": ingredientsToAdd});
+      const res = await axios.put(
+        `${VITE_API_URL}/formulation/ingredients/${id}`,
+        { ingredients: ingredientsToAdd }
+      )
       const newIngredients = res.data.addedIngredients
       setSelectedIngredients([...selectedIngredients, ...newIngredients])
       updateIngredients([...selectedIngredients, ...newIngredients])
       setIsChooseIngredientsModalOpen(false)
       // toast instructions
       setShowToast(true)
-      setMessage("Ingredients added successfully")
-      setToastAction("success")
+      setMessage('Ingredients added successfully')
+      setToastAction('success')
     } catch (err) {
       console.log(err)
       // toast instructions
@@ -286,47 +252,25 @@ function ViewFormulation({
 
   const handleAddNutrients = async (nutrientsToAdd) => {
     try {
-      const res = await axios.put(`${VITE_API_URL}/formulation/nutrients/${id}`, {"nutrients": nutrientsToAdd});
+      const res = await axios.put(
+        `${VITE_API_URL}/formulation/nutrients/${id}`,
+        { nutrients: nutrientsToAdd }
+      )
       const newNutrients = res.data.addedNutrients
       setSelectedNutrients([...selectedNutrients, ...newNutrients])
       updateNutrients([...selectedNutrients, ...newNutrients])
-      setIsChooseIngredientsModalOpen(false)
+      setIsChooseNutrientsModalOpen(false)
       // toast instructions
       setShowToast(true)
-      setMessage("Nutrients added successfully")
-      setToastAction("success")
+      setMessage('Nutrients added successfully')
+      setToastAction('success')
     } catch (err) {
       console.log(err)
       // toast instructions
       setShowToast(true)
-      setMessage("Error adding nutrients")
-      setToastAction("error")
+      setMessage('Error adding nutrients')
+      setToastAction('error')
     }
-  }
-
-  const [focusedIngredientInput, setFocusedIngredientInput] = useState(null)
-  const [focusedNutrientInput, setFocusedNutrientInput] = useState(null)
-
-  const handleIngredientInputFocus = (index, field) => {
-    const focusId = `ingredient-${index}-${field}`
-    setFocusedIngredientInput(focusId)
-    updateMyPresence({ focusedId: focusId })
-  }
-
-  const handleNutrientInputFocus = (index, field) => {
-    const focusId = `nutrient-${index}-${field}`
-    setFocusedNutrientInput(focusId)
-    updateMyPresence({ focusedId: focusId })
-  }
-
-  const handleIngredientBlur = () => {
-    setFocusedIngredientInput(null)
-    updateMyPresence({ focusedId: null })
-  }
-
-  const handleNutrientBlur = () => {
-    setFocusedNutrientInput(null)
-    updateMyPresence({ focusedId: null })
   }
 
   const handleIngredientMinimumChange = (index, value) => {
@@ -360,14 +304,15 @@ function ViewFormulation({
             type="number"
             className="input input-bordered input-xs w-20"
             value={ingredient.minimum ?? ''}
-            onChange={(e) => handleIngredientMinimumChange(index, e.target.value)}
-            onFocus={() => updateMyPresence({ focusedId: `ingredient-${index}-minimum` })}
+            onChange={(e) =>
+              handleIngredientMinimumChange(index, e.target.value)
+            }
+            onFocus={() =>
+              updateMyPresence({ focusedId: `ingredient-${index}-minimum` })
+            }
             onBlur={() => updateMyPresence({ focusedId: null })}
           />
-          <Selections
-            id={`ingredient-${index}-minimum`}
-            others={others}
-          />
+          <Selections id={`ingredient-${index}-minimum`} others={others} />
         </td>
         <td>
           <input
@@ -375,14 +320,15 @@ function ViewFormulation({
             type="number"
             className="input input-bordered input-xs w-20"
             value={ingredient.maximum ?? ''}
-            onChange={(e) => handleIngredientMaximumChange(index, e.target.value)}
-            onFocus={() => updateMyPresence({ focusedId: `ingredient-${index}-maximum` })}
+            onChange={(e) =>
+              handleIngredientMaximumChange(index, e.target.value)
+            }
+            onFocus={() =>
+              updateMyPresence({ focusedId: `ingredient-${index}-maximum` })
+            }
             onBlur={() => updateMyPresence({ focusedId: null })}
           />
-          <Selections
-            id={`ingredient-${index}-maximum`}
-            others={others}
-          />
+          <Selections id={`ingredient-${index}-maximum`} others={others} />
         </td>
         <td>{ingredient.value}</td>
         <td>
@@ -403,13 +349,12 @@ function ViewFormulation({
             className="input input-bordered input-xs w-20"
             value={nutrient.minimum ?? ''}
             onChange={(e) => handleNutrientMinimumChange(index, e.target.value)}
-            onFocus={() => updateMyPresence({ focusedId: `nutrient-${index}-minimum` })}
+            onFocus={() =>
+              updateMyPresence({ focusedId: `nutrient-${index}-minimum` })
+            }
             onBlur={() => updateMyPresence({ focusedId: null })}
           />
-          <Selections
-            id={`nutrient-${index}-minimum`}
-            others={others}
-          />
+          <Selections id={`nutrient-${index}-minimum`} others={others} />
         </td>
         <td>
           <input
@@ -417,13 +362,12 @@ function ViewFormulation({
             className="input input-bordered input-xs w-20"
             value={nutrient.maximum ?? ''}
             onChange={(e) => handleNutrientMaximumChange(index, e.target.value)}
-            onFocus={() => updateMyPresence({ focusedId: `nutrient-${index}-maximum` })}
+            onFocus={() =>
+              updateMyPresence({ focusedId: `nutrient-${index}-maximum` })
+            }
             onBlur={() => updateMyPresence({ focusedId: null })}
           />
-          <Selections
-            id={`nutrient-${index}-maximum`}
-            others={others}
-          />
+          <Selections id={`nutrient-${index}-maximum`} others={others} />
         </td>
         <td>{nutrient.value}</td>
         <td>
@@ -431,43 +375,6 @@ function ViewFormulation({
         </td>
       </tr>
     ))
-  }
-
-  // New components for selections
-  function IngredientSelections({ id, others }) {
-    return (
-      <>
-        {others.map(({ connectionId, info, presence }) => {
-          if (presence.focusedId === id) {
-            return (
-              <Selection
-                key={connectionId}
-                name={info.name}
-                color={COLORS[connectionId % COLORS.length]}
-              />
-            )
-          }
-        })}
-      </>
-    )
-  }
-
-  function NutrientSelections({ id, others }) {
-    return (
-      <>
-        {others.map(({ connectionId, info, presence }) => {
-          if (presence.focusedId === id) {
-            return (
-              <Selection
-                key={connectionId}
-                name={info.name}
-                color={COLORS[connectionId % COLORS.length]}
-              />
-            )
-          }
-        })}
-      </>
-    )
   }
 
   // loading due to api calls
@@ -479,8 +386,8 @@ function ViewFormulation({
     return <Loading />
   }
 
-  const { code, name, description, animal_group, ingredients, nutrients } = formulationRealTime
-  console.log("nutrients in liveblocks: ", nutrients)
+  const { code, name, description, animal_group, ingredients, nutrients } =
+    formulationRealTime
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -610,9 +517,7 @@ function ViewFormulation({
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {renderIngredientsTableRows()}
-                  </tbody>
+                  <tbody>{renderIngredientsTableRows()}</tbody>
                 </table>
               </div>
               <div className="p-4">
@@ -642,9 +547,7 @@ function ViewFormulation({
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {renderNutrientsTableRows()}
-                  </tbody>
+                  <tbody>{renderNutrientsTableRows()}</tbody>
                 </table>
               </div>
               <div className="p-4">
@@ -665,8 +568,6 @@ function ViewFormulation({
               <input
                 type="number"
                 className="input input-bordered input-sm w-24 rounded-lg"
-                onFocus={() => handleFocus('total-cost')}
-                onBlur={handleBlur}
               />
             </div>
             <button className="btn btn-primary gap-2 rounded-lg">
@@ -713,7 +614,7 @@ function ViewFormulation({
       <ChooseNutrientsModal
         isOpen={isChooseNutrientsModalOpen}
         onClose={() => setIsChooseNutrientsModalOpen(false)}
-        nutrients={listofNutrients}
+        nutrients={listOfNutrients}
         onResult={handleAddNutrients}
       />
 
@@ -729,22 +630,22 @@ function ViewFormulation({
   )
 }
 
-  function Selections({ id, others }) {
-    return (
-      <>
-        {others.map(({ connectionId, info, presence }) => {
-          if (presence.focusedId === id) {
-            return (
-              <Selection
-                key={connectionId}
-                name={info.name}
-                color={COLORS[connectionId % COLORS.length]}
-              />
-            )
-          }
-        })}
-      </>
-    )
-  }
+function Selections({ id, others }) {
+  return (
+    <>
+      {others.map(({ connectionId, info, presence }) => {
+        if (presence.focusedId === id) {
+          return (
+            <Selection
+              key={connectionId}
+              name={info.name}
+              color={COLORS[connectionId % COLORS.length]}
+            />
+          )
+        }
+      })}
+    </>
+  )
+}
 
 export default ViewFormulation

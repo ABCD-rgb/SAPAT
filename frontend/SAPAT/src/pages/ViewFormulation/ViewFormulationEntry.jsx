@@ -4,14 +4,12 @@ import {
   useOthers,
   useSelf,
   useUpdateMyPresence,
-  useOthersMapped,
   useMutation,
   useStorage,
 } from '@liveblocks/react/suspense'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { debounce } from 'lodash'
 import useAuth from '../../hook/useAuth.js'
 import Loading from '../../components/Loading.jsx'
 import ViewFormulation from './ViewFormulation.jsx'
@@ -24,8 +22,6 @@ function ViewFormulationEntry({ id }) {
   const others = useOthers()
   const self = useSelf()
   const updateMyPresence = useUpdateMyPresence()
-  // console.log("LB Others: ", others);
-  // console.log("LB Self: ", self);
 
   const formulationRealTime = useStorage((root) => root.formulation)
 
@@ -48,36 +44,32 @@ function ViewFormulationEntry({ id }) {
     storage.get('formulation').set('nutrients', nutrients)
   }, [])
 
-  // New mutation to update a specific ingredient's property
+  // Update a specific ingredient's property
   const updateIngredientProperty = useMutation(
     ({ storage }, ingredientIndex, propertyName, propertyValue) => {
       const ingredients = storage.get('formulation').get('ingredients')
-
       // Create a new array with the updated ingredient
       const updatedIngredients = ingredients.map((ingredient, index) =>
         index === ingredientIndex
           ? { ...ingredient, [propertyName]: propertyValue }
           : ingredient
       )
-
       // Update the entire ingredients array
       storage.get('formulation').set('ingredients', updatedIngredients)
     },
     []
   )
 
-  // New mutation to update a specific nutrient's property
+  // Update a specific nutrient's property
   const updateNutrientProperty = useMutation(
     ({ storage }, nutrientIndex, propertyName, propertyValue) => {
       const nutrients = storage.get('formulation').get('nutrients')
-
       // Create a new array with the updated nutrient
       const updatedNutrients = nutrients.map((nutrient, index) =>
         index === nutrientIndex
           ? { ...nutrient, [propertyName]: propertyValue }
           : nutrient
       )
-
       // Update the entire nutrients array
       storage.get('formulation').set('nutrients', updatedNutrients)
     },
@@ -136,9 +128,7 @@ function ViewFormulationEntry({ id }) {
         setToastAction('success')
       }
     }
-
     window.addEventListener('keydown', handleKeyPress)
-
     return () => {
       window.removeEventListener('keydown', handleKeyPress)
     }
@@ -180,7 +170,6 @@ function ViewFormulationEntry({ id }) {
   const updateDatabase = async () => {
     try {
       const currentFormulation = formulationRef.current
-      console.log('currentFormulation', formulationRef.current)
       const VITE_API_URL = import.meta.env.VITE_API_URL
       await axios.put(`${VITE_API_URL}/formulation/${id}`, {
         code: currentFormulation.code,
@@ -188,10 +177,8 @@ function ViewFormulationEntry({ id }) {
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
         ingredients: currentFormulation.ingredients,
-        nutrients: currentFormulation.nutrients
+        nutrients: currentFormulation.nutrients,
       })
-
-      console.log('Database updated successfully!')
     } catch (error) {
       console.error('Error updating database:', error)
     }
