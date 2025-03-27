@@ -59,13 +59,21 @@ const determineOptimizedNutrients = (optimizedIngredients, constraints) => {
     ratios[ingredient] = total > 0 ? (value / total).toFixed(2) : "0.00";
   }
 
+  console.log("optimizedIngredients", optimizedIngredients);
+
   const finalNutrients = constraints.map(constraint => {
     const nutrientName = constraint.name;
     var optimizedNutrientValue = 0;
     // get the percentage of each optimized ingredient
-    Object.entries(ratios).forEach(([ingredient, percentage]) => {
+    // Object.entries(ratios).forEach(([ingredient, percentage]) => {
+    //   const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
+    //   const nutrientValue = involvedIngredient.coef * percentage;
+    //   optimizedNutrientValue += nutrientValue;
+    // })
+    // NOTE: its not percentage!!
+    Object.entries(optimizedIngredients).forEach(([ingredient, value]) => {
       const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
-      const nutrientValue = involvedIngredient.coef * percentage;
+      const nutrientValue = involvedIngredient.coef * value;
       optimizedNutrientValue += nutrientValue;
     })
     return {
