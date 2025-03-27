@@ -3,7 +3,6 @@ import { useState } from 'react'
 
 function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   const [checkedIngredients, setCheckedIngredients] = useState([])
-  console.log('checkedIngredients on modal: ', checkedIngredients)
 
   const handleSubmit = (e) => {
     e.preventDefault()

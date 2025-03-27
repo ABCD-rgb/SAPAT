@@ -151,9 +151,9 @@ const simplex = async (req, res) => {
       // Return the solution values
       res.status(200).json({
         status: 'Optimal solution found',
-        objectives: objectives,
-        constraints: constraints,
-        variableBounds: variableBounds,
+        // objectives: objectives,
+        // constraints: constraints,
+        // variableBounds: variableBounds,
         optimizedCost: output.result.z.toFixed(2),
         optimizedIngredients: optimizedIngredients,
         optimizedNutrients: optimizedNutrients

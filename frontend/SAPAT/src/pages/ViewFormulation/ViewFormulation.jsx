@@ -65,6 +65,11 @@ function ViewFormulation({
   const [selectedIngredients, setSelectedIngredients] = useState([])
   const [selectedNutrients, setSelectedNutrients] = useState([])
 
+  // results of optimization
+  const [optimizedCost, setOptimizedCost] = useState(0)
+  const [optimizedIngredients, setOptimizedIngredients] = useState([])
+  const [optimizedNutrients, setOptimizedNutrients] = useState([])
+
   useEffect(() => {
     if (formulation) {
       setSelectedIngredients(formulation.ingredients || [])
@@ -175,6 +180,33 @@ function ViewFormulation({
       setIsAddCollaboratorModalOpen(true)
     }
   }
+
+  const handleOptimize = async (ingredientsData, ingredients, nutrients) => {
+    console.log("ingredientsData", ingredientsData)
+    console.log("ingredients", ingredients)
+    console.log("nutrients", nutrients)
+    try {
+      const res = await axios.post(`${VITE_API_URL}/optimize/simplex`, {ingredientsData, ingredients, nutrients});
+      setOptimizedCost(res.data.optimizedCost)
+      setOptimizedIngredients(res.data.optimizedIngredients)
+      setOptimizedNutrients(res.data.optimizedNutrients)
+      const optimizedCost = res.data.optimizedCost
+      const optimizedIngredients = res.data.optimizedIngredients
+      const optimizedNutrients = res.data.optimizedNutrients
+
+      console.log("optimization: ", res.data)
+      optimizedIngredients.map((ing, index) => {
+        updateIngredientProperty(index, 'value', Number(ing.value))
+      })
+      optimizedNutrients.map((nut, index) => {
+        updateNutrientProperty(index, 'value', Number(nut.value))
+      })
+
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const handleAddCollaborator = async () => {
     try {
       const res = await axios.put(
@@ -572,10 +604,16 @@ function ViewFormulation({
               <span className="text-sm text-gray-500">Total cost (per kg)</span>
               <input
                 type="number"
+                value={optimizedCost}
                 className="input input-bordered input-sm w-24 rounded-lg"
               />
             </div>
-            <button className="btn btn-primary gap-2 rounded-lg">
+            <button
+              className="btn btn-primary gap-2 rounded-lg"
+              onClick={() => {
+                handleOptimize(listOfIngredients || 0, ingredients || 0, nutrients || 0)
+              }}
+            >
               <RiCalculatorLine /> Optimize
             </button>
             <button className="btn btn-warning gap-2 rounded-lg">
