@@ -9,6 +9,7 @@ import {
 import {
   createNutrient, getAllNutrients, getNutrient, updateNutrient, deleteNutrient
 } from './controller/nutrient-controller.js'
+import { simplex, pso } from './controller/optimize-controller.js'
 import handleLiveblocksAuth from './config/liveblocks-auth.js';
 
 const handleRoutes = (app) => {
@@ -91,6 +92,9 @@ const handleRoutes = (app) => {
   app.get('/nutrient/:id/:userId', getNutrient);
   app.put('/nutrient/:id/:userId', updateNutrient);
   app.delete('/nutrient/:id/:userId', deleteNutrient);
+
+  app.post('/optimize/simplex', simplex);
+  app.post('/optimize/pso', pso);
 
 };
 
