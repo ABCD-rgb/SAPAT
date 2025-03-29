@@ -46,6 +46,23 @@ const formatInput = (data) => {
     }
   });
 
+  // === total weight constraint ===
+  const totalWeightConstraint = {
+    name: "Total Weight",
+    vars: ingredients.map(ingredient => ({
+      name: ingredient.name,
+      coef: 1 // Coefficient of 1 for each ingredient to sum to 100
+    })),
+    bnds: {
+      type: "GLP_FX", // Fixed bound (exactly equal)
+      lb: 100,
+      ub: 100
+    }
+  };
+
+  // Add the total weight constraint to the existing constraints
+  constraints.push(totalWeightConstraint);
+
   console.log("objectives", objectives);
   console.log("constraints", constraints);
   console.log("variableBounds", variableBounds);
