@@ -65,9 +65,9 @@ const formatInput = (data) => {
   // Add the total weight constraint to the existing constraints
   constraints.push(totalWeightConstraint);
 
-  console.log("objectives", objectives);
-  console.log("constraints", constraints);
-  console.log("variableBounds", variableBounds);
+  // console.log("objectives", objectives);
+  // console.log("constraints", constraints);
+  // console.log("variableBounds", variableBounds);
   return { objectives, constraints, variableBounds };
 }
 
@@ -77,9 +77,6 @@ const determineOptimizedNutrients = (optimizedIngredients, constraints) => {
   for (const [ingredient, value] of Object.entries(optimizedIngredients)) {
     ratios[ingredient] = total > 0 ? (value / total).toFixed(2) : "0.00";
   }
-
-  console.log("optimizedIngredients", optimizedIngredients);
-
   const finalNutrients = constraints.map(constraint => {
     const nutrientName = constraint.name;
     var optimizedNutrientValue = 0;

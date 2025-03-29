@@ -12,9 +12,7 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
 
   const handleRowClick = (nutrient) => {
     const id = nutrient.nutrient_id ?? nutrient._id
-    const isChecked = checkedNutrients.some(
-      (item) => item.nutrient_id === id
-    )
+    const isChecked = checkedNutrients.some((item) => item.nutrient_id === id)
     if (isChecked) {
       setCheckedNutrients(
         checkedNutrients.filter((item) => item.nutrient_id !== id)
@@ -97,14 +95,16 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
                 {nutrients.map((nutrient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedNutrients.some((item) => nutrient.nutrient_id ? (item.nutrient_id === nutrient.nutrient_id) : (item.nutrient_id === nutrient._id)) ? 'bg-blue-100' : ''}`}
+                    className={`hover ${checkedNutrients.some((item) => (nutrient.nutrient_id ? item.nutrient_id === nutrient.nutrient_id : item.nutrient_id === nutrient._id)) ? 'bg-blue-100' : ''}`}
                     onClick={() => handleRowClick(nutrient)}
                   >
                     <td>
                       <input
                         type="checkbox"
-                        checked={checkedNutrients.some(
-                          (item) => nutrient.nutrient_id ? (item.nutrient_id === nutrient.nutrient_id) : (item.nutrient_id === nutrient._id)
+                        checked={checkedNutrients.some((item) =>
+                          nutrient.nutrient_id
+                            ? item.nutrient_id === nutrient.nutrient_id
+                            : item.nutrient_id === nutrient._id
                         )}
                         onChange={(e) => handleCheckboxChange(nutrient, e)}
                       />
@@ -123,7 +123,8 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
           <div className="modal-action">
             <button
               type="button"
-              className="btn rounded-xl px-8" onClick={onClose}
+              className="btn rounded-xl px-8"
+              onClick={onClose}
             >
               Cancel
             </button>

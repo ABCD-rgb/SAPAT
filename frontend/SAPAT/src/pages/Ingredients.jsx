@@ -1,9 +1,4 @@
-import {
-  RiAddLine,
-  RiFileDownloadLine,
-  RiFileUploadLine,
-  RiFilterLine, RiSearchLine,
-} from 'react-icons/ri'
+import { RiAddLine, RiFileDownloadLine, RiFileUploadLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'

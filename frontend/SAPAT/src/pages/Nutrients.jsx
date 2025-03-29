@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  RiAddLine,
-  RiFileUploadLine,
-  RiFileDownloadLine,
-  RiSearchLine,
-  RiFilterLine,
-} from 'react-icons/ri'
+import { RiAddLine, RiFileUploadLine, RiFileDownloadLine } from 'react-icons/ri'
 import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
@@ -15,7 +9,7 @@ import useAuth from '../hook/useAuth.js'
 import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
-import Search from "../components/Search.jsx";
+import Search from '../components/Search.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()

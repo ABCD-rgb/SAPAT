@@ -17,9 +17,7 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
     )
     if (isChecked) {
       setCheckedIngredients(
-        checkedIngredients.filter(
-          (item) => item.ingredient_id !== id
-        )
+        checkedIngredients.filter((item) => item.ingredient_id !== id)
       )
     } else {
       setCheckedIngredients([
@@ -38,9 +36,7 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
       ])
     } else {
       setCheckedIngredients(
-        checkedIngredients.filter(
-          (item) => item.ingredient_id !== id
-        )
+        checkedIngredients.filter((item) => item.ingredient_id !== id)
       )
     }
   }
@@ -78,7 +74,8 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                         if (isChecked) {
                           setCheckedIngredients(
                             ingredients.map((ingredient) => {
-                              const id = ingredient.ingredient_id ?? ingredient._id
+                              const id =
+                                ingredient.ingredient_id ?? ingredient._id
                               return {
                                 ingredient_id: id,
                                 name: ingredient.name,
@@ -101,14 +98,16 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                 {ingredients.map((ingredient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedIngredients.some((item) => ingredient.ingredient_id ? (item.ingredient_id === ingredient.ingredient_id) : (item.ingredient_id === ingredient._id)) ? 'bg-blue-100' : ''}`}
+                    className={`hover ${checkedIngredients.some((item) => (ingredient.ingredient_id ? item.ingredient_id === ingredient.ingredient_id : item.ingredient_id === ingredient._id)) ? 'bg-blue-100' : ''}`}
                     onClick={() => handleRowClick(ingredient)}
                   >
                     <td>
                       <input
                         type="checkbox"
-                        checked={checkedIngredients.some(
-                          (item) => ingredient.ingredient_id ? (item.ingredient_id === ingredient.ingredient_id) : (item.ingredient_id === ingredient._id)
+                        checked={checkedIngredients.some((item) =>
+                          ingredient.ingredient_id
+                            ? item.ingredient_id === ingredient.ingredient_id
+                            : item.ingredient_id === ingredient._id
                         )}
                         onChange={(e) => handleCheckboxChange(ingredient, e)}
                       />
