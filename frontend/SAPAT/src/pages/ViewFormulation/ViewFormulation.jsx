@@ -83,7 +83,7 @@ function ViewFormulation({
     if (owner) {
       fetchIngredients()
       fetchNutrients()
-    }g
+    }
   }, [owner])
 
   useEffect(() => {
