@@ -83,7 +83,7 @@ function ViewFormulation({
     if (owner) {
       fetchIngredients()
       fetchNutrients()
-    }
+    }g
   }, [owner])
 
   useEffect(() => {
@@ -336,6 +336,7 @@ function ViewFormulation({
               id={`ingredient-${index}-minimum`}
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === "view"}
               value={ingredient.minimum ?? ''}
               onChange={(e) =>
                 handleIngredientMinimumChange(index, e.target.value)
@@ -352,6 +353,7 @@ function ViewFormulation({
               id={`ingredient-${index}-maximum`}
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === "view"}
               value={ingredient.maximum ?? ''}
               onChange={(e) =>
                 handleIngredientMaximumChange(index, e.target.value)
@@ -365,7 +367,11 @@ function ViewFormulation({
           </td>
           <td>{ingredient.value}</td>
           <td>
-            <button className="btn btn-ghost btn-xs">×</button>
+            <button
+              disabled={userAccess === "view"}
+              className="btn btn-ghost btn-xs">
+              ×
+            </button>
           </td>
         </tr>
       ))
@@ -383,6 +389,7 @@ function ViewFormulation({
             <input
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === "view"}
               value={nutrient.minimum ?? ''}
               onChange={(e) => handleNutrientMinimumChange(index, e.target.value)}
               onFocus={() =>
@@ -396,6 +403,7 @@ function ViewFormulation({
             <input
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === "view"}
               value={nutrient.maximum ?? ''}
               onChange={(e) => handleNutrientMaximumChange(index, e.target.value)}
               onFocus={() =>
@@ -407,7 +415,11 @@ function ViewFormulation({
           </td>
           <td>{nutrient.value}</td>
           <td>
-            <button className="btn btn-ghost btn-xs">×</button>
+            <button
+              disabled={userAccess === "view"}
+              className="btn btn-ghost btn-xs">
+              ×
+            </button>
           </td>
         </tr>
       ))
@@ -436,11 +448,16 @@ function ViewFormulation({
           </h1>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
-              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
+              <button
+                disabled={userAccess === "view"}
+                className="disabled:hidden cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white"
+              >
                 <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
                 <span>Import</span>
               </button>
-              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
+              <button
+                className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white"
+              >
                 <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
                 <span>Export</span>
               </button>
@@ -479,6 +496,7 @@ function ViewFormulation({
                 id="input-code"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={code}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -495,6 +513,7 @@ function ViewFormulation({
                 id="input-name"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={name}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -509,6 +528,7 @@ function ViewFormulation({
                 id="input-description"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={description}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -521,6 +541,7 @@ function ViewFormulation({
               <select
                 id="input-animal_group"
                 className="select select-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 name="input-animal_group"
                 value={animal_group}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
@@ -559,8 +580,10 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
+                  disabled={userAccess === 'view'}
                   onClick={() => setIsChooseIngredientsModalOpen(true)}
-                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="disabled:bg-gray-300 disabled:cursor-not-allowed
+                   bg-green-button cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
                 >
                   <RiAddLine /> Add ingredient
                 </button>
@@ -589,8 +612,10 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
+                  disabled={userAccess === 'view'}
                   onClick={() => setIsChooseNutrientsModalOpen(true)}
-                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="disabled:bg-gray-300 disabled:cursor-not-allowed
+                  bg-green-button cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
                 >
                   <RiAddLine /> Add nutrient
                 </button>
@@ -610,13 +635,17 @@ function ViewFormulation({
             </div>
             <button
               className="btn btn-primary gap-2 rounded-lg"
+              disabled={userAccess === 'view'}
               onClick={() => {
                 handleOptimize(listOfIngredients || 0, ingredients || 0, nutrients || 0)
               }}
             >
               <RiCalculatorLine /> Optimize
             </button>
-            <button className="btn btn-warning gap-2 rounded-lg">
+            <button
+              disabled={userAccess === 'view'}
+              className="btn btn-warning gap-2 rounded-lg"
+            >
               <RiFileChartLine /> Generate report
             </button>
           </div>
