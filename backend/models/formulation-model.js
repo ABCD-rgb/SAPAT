@@ -26,6 +26,7 @@ const formulationSchema = new Schema({
     name: { type: String, required: true },
     description: { type: String, default: '' },
     animal_group: { type: String, default: '' },
+    cost: { type: Number, default: 0 },
     ingredients: {
         type: [ingredientConstraintSchema],
         default: []

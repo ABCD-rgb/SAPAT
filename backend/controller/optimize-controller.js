@@ -8,7 +8,7 @@ const formatInput = (data) => {
   // === objective function (minimize cost) ===
   const objectives = ingredients.map(ingredient => {
     // the copy of ingredient either comes from global or user-revised
-    const coef = ingredientsData.find(item => (item._id === ingredient.ingredientId) || (item.ingredient_id === ingredient.ingredientId)).price;
+    const coef = ingredientsData.find(item => (item._id === ingredient.ingredient_id) || (item.ingredient_id === ingredient.ingredient_id)).price;
 
     return {
       name: ingredient.name,
@@ -23,7 +23,7 @@ const formatInput = (data) => {
       name: nutrient.name,
       vars: ingredients.map(ingredient => {
         const nutrientData = ingredientsData.find(item => item.name === ingredient.name).nutrients;
-        const nutrientValue = nutrientData.find(n => n.nutrient === nutrient.nutrientId)?.value || 0;
+        const nutrientValue = nutrientData.find(n => n.nutrient === nutrient.nutrient_id)?.value || 0;
         return {
           name: ingredient.name,
           coef: nutrientValue
@@ -179,7 +179,7 @@ const simplex = async (req, res) => {
       res.status(200).json({
         status: 'Optimal solution found',
         // objectives: objectives,
-        // constraints: constraints,
+        constraints: constraints,
         // variableBounds: variableBounds,
         optimizedCost: output.result.z.toFixed(2),
         optimizedIngredients: optimizedIngredients,

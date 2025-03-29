@@ -32,6 +32,7 @@ function ViewFormulation({
   updateName,
   updateDescription,
   updateAnimalGroup,
+  updateCost,
   updateIngredients,
   updateNutrients,
   updateIngredientProperty,
@@ -69,11 +70,6 @@ function ViewFormulation({
   // chosen ingredients and nutrients
   const [selectedIngredients, setSelectedIngredients] = useState([])
   const [selectedNutrients, setSelectedNutrients] = useState([])
-
-  // results of optimization
-  const [optimizedCost, setOptimizedCost] = useState(0)
-  const [optimizedIngredients, setOptimizedIngredients] = useState([])
-  const [optimizedNutrients, setOptimizedNutrients] = useState([])
 
   useEffect(() => {
     if (formulation) {
@@ -198,19 +194,13 @@ function ViewFormulation({
   }
 
   const handleOptimize = async (ingredientsData, ingredients, nutrients) => {
-    console.log("ingredientsData", ingredientsData)
-    console.log("ingredients", ingredients)
-    console.log("nutrients", nutrients)
     try {
       const res = await axios.post(`${VITE_API_URL}/optimize/simplex`, {ingredientsData, ingredients, nutrients});
-      setOptimizedCost(res.data.optimizedCost)
-      setOptimizedIngredients(res.data.optimizedIngredients)
-      setOptimizedNutrients(res.data.optimizedNutrients)
       const optimizedCost = res.data.optimizedCost
       const optimizedIngredients = res.data.optimizedIngredients
       const optimizedNutrients = res.data.optimizedNutrients
 
-      console.log("optimization: ", res.data)
+      updateCost(optimizedCost)
       optimizedIngredients.map((ing, index) => {
         updateIngredientProperty(index, 'value', Number(ing.value))
       })
@@ -524,7 +514,7 @@ function ViewFormulation({
   }
 
   // loading due to api calls
-  if (isLoading) {
+  if (isLoading || formulation.length === 0 || !owner) {
     return <Loading />
   }
   // loading due to liveblocks storage
@@ -532,7 +522,7 @@ function ViewFormulation({
     return <Loading />
   }
 
-  const { code, name, description, animal_group, ingredients, nutrients } =
+  const { code, name, description, animal_group, cost, ingredients, nutrients } =
     formulationRealTime
 
   return (
@@ -547,15 +537,13 @@ function ViewFormulation({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
               <button
-                disabled={userAccess === "view"}
-                className="disabled:hidden cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white"
+                disabled={userAccess === 'view'}
+                className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white disabled:hidden"
               >
                 <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
                 <span>Import</span>
               </button>
-              <button
-                className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white"
-              >
+              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
                 <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
                 <span>Export</span>
               </button>
@@ -680,8 +668,7 @@ function ViewFormulation({
                 <button
                   disabled={userAccess === 'view'}
                   onClick={() => setIsChooseIngredientsModalOpen(true)}
-                  className="disabled:bg-gray-300 disabled:cursor-not-allowed
-                   bg-green-button cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                   <RiAddLine /> Add ingredient
                 </button>
@@ -712,8 +699,7 @@ function ViewFormulation({
                 <button
                   disabled={userAccess === 'view'}
                   onClick={() => setIsChooseNutrientsModalOpen(true)}
-                  className="disabled:bg-gray-300 disabled:cursor-not-allowed
-                  bg-green-button cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                   <RiAddLine /> Add nutrient
                 </button>
@@ -722,20 +708,22 @@ function ViewFormulation({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2">
-            <div className="flex items-center justify-end">
-              <span className="text-sm text-gray-500">Total cost (per kg)</span>
-              <input
-                type="number"
-                value={optimizedCost}
-                className="input input-bordered input-sm w-24 rounded-lg"
-              />
+          <div className="flex flex-wrap justify-end gap-2">
+            <div className="flex items-center justify-end gap-5">
+              <span className="text-sm text-gray-500">
+                Total cost (per 100 kg):
+              </span>
+              <span className="pr-10 font-semibold underline text-lg">₱ {cost}</span>
             </div>
             <button
               className="btn btn-primary gap-2 rounded-lg"
               disabled={userAccess === 'view'}
               onClick={() => {
-                handleOptimize(listOfIngredients || [], ingredients || [], nutrients || [])
+                handleOptimize(
+                  listOfIngredients || [],
+                  ingredients || [],
+                  nutrients || []
+                )
               }}
             >
               <RiCalculatorLine /> Optimize
