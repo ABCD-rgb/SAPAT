@@ -534,20 +534,20 @@ function ViewFormulation({
           <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
             View Formulation
           </h1>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-2">
-              <button
-                disabled={userAccess === 'view'}
-                className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white disabled:hidden"
-              >
-                <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
-                <span>Import</span>
-              </button>
-              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
-                <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
-                <span>Export</span>
-              </button>
-            </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+            {/*<div className="flex flex-wrap gap-2">*/}
+            {/*  <button*/}
+            {/*    disabled={userAccess === 'view'}*/}
+            {/*    className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white disabled:hidden"*/}
+            {/*  >*/}
+            {/*    <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
+            {/*    <span>Import</span>*/}
+            {/*  </button>*/}
+            {/*  <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">*/}
+            {/*    <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
+            {/*    <span>Export</span>*/}
+            {/*  </button>*/}
+            {/*</div>*/}
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
                 {others.map(({ connectionId, info }) => (
