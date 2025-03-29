@@ -7,7 +7,9 @@ const formatInput = (data) => {
 
   // === objective function (minimize cost) ===
   const objectives = ingredients.map(ingredient => {
-    const coef = ingredientsData.find(item => item.name === ingredient.name).price;
+    // the copy of ingredient either comes from global or user-revised
+    const coef = ingredientsData.find(item => (item._id === ingredient.ingredientId) || (item.ingredient_id === ingredient.ingredientId)).price;
+
     return {
       name: ingredient.name,
       coef: coef

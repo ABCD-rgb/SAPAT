@@ -52,10 +52,14 @@ function ViewFormulation({
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
 
-  // choosing ingredients and nutrients to create feeds
-  const [owner, setOwner] = useState()
+  // all available ingredients and nutrients of the owner
   const [listOfIngredients, setListOfIngredients] = useState([])
   const [listOfNutrients, setListOfNutrients] = useState([])
+
+  // choosing ingredients and nutrients to create feeds
+  const [owner, setOwner] = useState()
+  const [ingredientsMenu, setIngredientsMenu] = useState([])
+  const [nutrientsMenu, setNutrientsMenu] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
     useState(false)
   const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] =
@@ -80,11 +84,11 @@ function ViewFormulation({
   useEffect(() => {
     fetchOwner()
     // make sure owner has been fetched before getting the ingredients and nutrients (these are for choosing in the 'add ingredients' and 'add nutrients')
-    if (owner) {
+    if (owner && formulation) {
       fetchIngredients()
       fetchNutrients()
     }
-  }, [owner])
+  }, [owner, formulation])
 
   useEffect(() => {
     fetchCollaboratorData()
@@ -109,6 +113,13 @@ function ViewFormulation({
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
+      console.log("fetchedData", fetchedData)
+      // don't include already added ingredients to the ingredients menu
+      const arr2Ids = new Set(formulation.ingredients.map(item => item.ingredientId));  // ingredients already in the formulation
+      console.log("arr2Ids", arr2Ids);
+      const unusedIngredients = fetchedData.filter(item => !arr2Ids.has(item.ingredient_id || item._id))
+      console.log("unusedIngredients", unusedIngredients)
+      setIngredientsMenu(unusedIngredients)
     } catch (err) {
       console.log(err)
     }
@@ -121,6 +132,10 @@ function ViewFormulation({
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
+      // don't include already added nutrients to the nutrients menu
+      const arr2Ids = new Set(formulation.nutrients.map(item => item.nutrientId));  // nutrients already in the formulation
+      const unusedNutrients = fetchedData.filter(item => !arr2Ids.has(item.nutrient_id || item._id))
+      setNutrientsMenu(unusedNutrients)
     } catch (err) {
       console.log(err)
     }
@@ -267,6 +282,10 @@ function ViewFormulation({
       )
       const newIngredients = res.data.addedIngredients
       setSelectedIngredients([...selectedIngredients, ...newIngredients])
+      const arr2Ids = new Set(newIngredients.map(item => item.ingredientId));
+      setIngredientsMenu(prev =>
+        prev.filter(item => !arr2Ids.has(item.ingredient_id || item._id))
+      )
       updateIngredients([...selectedIngredients, ...newIngredients])
       setIsChooseIngredientsModalOpen(false)
       // toast instructions
@@ -290,6 +309,10 @@ function ViewFormulation({
       )
       const newNutrients = res.data.addedNutrients
       setSelectedNutrients([...selectedNutrients, ...newNutrients])
+      const arr2Ids = new Set(newNutrients.map(item => item.nutrientId));
+      setNutrientsMenu(prev =>
+        prev.filter(item => !arr2Ids.has(item.nutrient_id || item._id))
+      )
       updateNutrients([...selectedNutrients, ...newNutrients])
       setIsChooseNutrientsModalOpen(false)
       // toast instructions
@@ -437,6 +460,7 @@ function ViewFormulation({
 
   const { code, name, description, animal_group, ingredients, nutrients } =
     formulationRealTime
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -637,7 +661,7 @@ function ViewFormulation({
               className="btn btn-primary gap-2 rounded-lg"
               disabled={userAccess === 'view'}
               onClick={() => {
-                handleOptimize(listOfIngredients || 0, ingredients || 0, nutrients || 0)
+                handleOptimize(listOfIngredients || [], ingredients || [], nutrients || [])
               }}
             >
               <RiCalculatorLine /> Optimize
@@ -680,13 +704,13 @@ function ViewFormulation({
       <ChooseIngredientsModal
         isOpen={isChooseIngredientsModalOpen}
         onClose={() => setIsChooseIngredientsModalOpen(false)}
-        ingredients={listOfIngredients}
+        ingredients={ingredientsMenu}
         onResult={handleAddIngredients}
       />
       <ChooseNutrientsModal
         isOpen={isChooseNutrientsModalOpen}
         onClose={() => setIsChooseNutrientsModalOpen(false)}
-        nutrients={listOfNutrients}
+        nutrients={nutrientsMenu}
         onResult={handleAddNutrients}
       />
 
