@@ -169,6 +169,51 @@ const addNutrients = async (req, res) => {
     }
 }
 
+const removeIngredient = async (req, res) => {
+    const { id, ingredient_id } = req.params;
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $pull:
+                {
+                    ingredients: { ingredient_id: ingredient_id },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success' });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const removeNutrient = async (req, res) => {
+    const { id, nutrient_id } = req.params;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $pull:
+                {
+                    nutrients: { nutrient_id: nutrient_id },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success' });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
 const validateCollaborator = async (req, res) => {
     const { formulationId, collaboratorId } = req.params;
     try {
@@ -274,6 +319,8 @@ export {
     getFormulationOwner,
     addIngredients,
     addNutrients,
+    removeIngredient,
+    removeNutrient,
     validateCollaborator,
     updateCollaborator,
     removeCollaborator

@@ -13,18 +13,18 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   const handleRowClick = (ingredient) => {
     const id = ingredient.ingredient_id ?? ingredient._id
     const isChecked = checkedIngredients.some(
-      (item) => item.ingredientId === id
+      (item) => item.ingredient_id === id
     )
     if (isChecked) {
       setCheckedIngredients(
         checkedIngredients.filter(
-          (item) => item.ingredientId !== id
+          (item) => item.ingredient_id !== id
         )
       )
     } else {
       setCheckedIngredients([
         ...checkedIngredients,
-        { ingredientId: id, name: ingredient.name },
+        { ingredient_id: id, name: ingredient.name },
       ])
     }
   }
@@ -34,12 +34,12 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
     if (e.target.checked) {
       setCheckedIngredients([
         ...checkedIngredients,
-        { ingredientId: id, name: ingredient.name },
+        { ingredient_id: id, name: ingredient.name },
       ])
     } else {
       setCheckedIngredients(
         checkedIngredients.filter(
-          (item) => item.ingredientId !== id
+          (item) => item.ingredient_id !== id
         )
       )
     }
@@ -80,7 +80,7 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                             ingredients.map((ingredient) => {
                               const id = ingredient.ingredient_id ?? ingredient._id
                               return {
-                                ingredientId: id,
+                                ingredient_id: id,
                                 name: ingredient.name,
                               }
                             })
@@ -101,14 +101,14 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                 {ingredients.map((ingredient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedIngredients.some((item) => ingredient.ingredient_id ? (item.ingredientId === ingredient.ingredient_id) : (item.ingredientId === ingredient._id)) ? 'bg-blue-100' : ''}`}
+                    className={`hover ${checkedIngredients.some((item) => ingredient.ingredient_id ? (item.ingredient_id === ingredient.ingredient_id) : (item.ingredient_id === ingredient._id)) ? 'bg-blue-100' : ''}`}
                     onClick={() => handleRowClick(ingredient)}
                   >
                     <td>
                       <input
                         type="checkbox"
                         checked={checkedIngredients.some(
-                          (item) => ingredient.ingredient_id ? (item.ingredientId === ingredient.ingredient_id) : (item.ingredientId === ingredient._id)
+                          (item) => ingredient.ingredient_id ? (item.ingredient_id === ingredient.ingredient_id) : (item.ingredient_id === ingredient._id)
                         )}
                         onChange={(e) => handleCheckboxChange(ingredient, e)}
                       />

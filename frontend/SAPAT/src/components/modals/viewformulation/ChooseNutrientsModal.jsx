@@ -13,16 +13,16 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
   const handleRowClick = (nutrient) => {
     const id = nutrient.nutrient_id ?? nutrient._id
     const isChecked = checkedNutrients.some(
-      (item) => item.nutrientId === id
+      (item) => item.nutrient_id === id
     )
     if (isChecked) {
       setCheckedNutrients(
-        checkedNutrients.filter((item) => item.nutrientId !== id)
+        checkedNutrients.filter((item) => item.nutrient_id !== id)
       )
     } else {
       setCheckedNutrients([
         ...checkedNutrients,
-        { nutrientId: id, name: nutrient.name },
+        { nutrient_id: id, name: nutrient.name },
       ])
     }
   }
@@ -32,11 +32,11 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
     if (e.target.checked) {
       setCheckedNutrients([
         ...checkedNutrients,
-        { nutrientId: id, name: nutrient.name },
+        { nutrient_id: id, name: nutrient.name },
       ])
     } else {
       setCheckedNutrients(
-        checkedNutrients.filter((item) => item.nutrientId !== id)
+        checkedNutrients.filter((item) => item.nutrient_id !== id)
       )
     }
   }
@@ -76,7 +76,7 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
                             nutrients.map((nutrient) => {
                               const id = nutrient.nutrient_id ?? nutrient._id
                               return {
-                                nutrientId: id,
+                                nutrient_id: id,
                                 name: nutrient.name,
                               }
                             })
@@ -97,14 +97,14 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
                 {nutrients.map((nutrient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedNutrients.some((item) => nutrient.nutrient_id ? (item.nutrientId === nutrient.nutrient_id) : (item.nutrientId === nutrient._id)) ? 'bg-blue-100' : ''}`}
+                    className={`hover ${checkedNutrients.some((item) => nutrient.nutrient_id ? (item.nutrient_id === nutrient.nutrient_id) : (item.nutrient_id === nutrient._id)) ? 'bg-blue-100' : ''}`}
                     onClick={() => handleRowClick(nutrient)}
                   >
                     <td>
                       <input
                         type="checkbox"
                         checked={checkedNutrients.some(
-                          (item) => nutrient.nutrient_id ? (item.nutrientId === nutrient.nutrient_id) : (item.nutrientId === nutrient._id)
+                          (item) => nutrient.nutrient_id ? (item.nutrient_id === nutrient.nutrient_id) : (item.nutrient_id === nutrient._id)
                         )}
                         onChange={(e) => handleCheckboxChange(nutrient, e)}
                       />

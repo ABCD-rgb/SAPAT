@@ -1,7 +1,19 @@
 import mongoose from 'mongoose';
 import { getUserById, getUserByEmail } from './controller/user-controller.js';
 import {
-  createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, getFormulationOwner, addIngredients, addNutrients, validateCollaborator, updateCollaborator, removeCollaborator
+  createFormulation,
+  getAllFormulations,
+  getFormulation,
+  updateFormulation,
+  deleteFormulation,
+  getFormulationOwner,
+  addIngredients,
+  addNutrients,
+  removeIngredient,
+  removeNutrient,
+  validateCollaborator,
+  updateCollaborator,
+  removeCollaborator
 } from './controller/formulation-controller.js';
 import {
   createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient, importIngredient
@@ -76,6 +88,8 @@ const handleRoutes = (app) => {
   app.get('/formulation/owner/:id', getFormulationOwner)
   app.put('/formulation/ingredients/:id', addIngredients);
   app.put('/formulation/nutrients/:id', addNutrients);
+  app.delete('/formulation/ingredients/:id/:ingredient_id', removeIngredient);
+  app.delete('/formulation/nutrients/:id/:nutrient_id', removeNutrient);
   app.get('/formulation/collaborator/:formulationId/:collaboratorId', validateCollaborator);
   app.put('/formulation/collaborator/:id', updateCollaborator);
   app.delete('/formulation/collaborator/:formulationId/:collaboratorId', removeCollaborator);

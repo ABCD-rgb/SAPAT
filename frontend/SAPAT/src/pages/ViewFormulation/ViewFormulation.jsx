@@ -5,6 +5,7 @@ import {
   RiFileChartLine,
   RiFileUploadLine,
   RiFileDownloadLine,
+  RiDeleteBinLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -115,7 +116,7 @@ function ViewFormulation({
       setListOfIngredients(fetchedData)
       console.log("fetchedData", fetchedData)
       // don't include already added ingredients to the ingredients menu
-      const arr2Ids = new Set(formulation.ingredients.map(item => item.ingredientId));  // ingredients already in the formulation
+      const arr2Ids = new Set(formulation.ingredients.map(item => item.ingredient_id));  // ingredients already in the formulation
       console.log("arr2Ids", arr2Ids);
       const unusedIngredients = fetchedData.filter(item => !arr2Ids.has(item.ingredient_id || item._id))
       console.log("unusedIngredients", unusedIngredients)
@@ -133,7 +134,7 @@ function ViewFormulation({
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
       // don't include already added nutrients to the nutrients menu
-      const arr2Ids = new Set(formulation.nutrients.map(item => item.nutrientId));  // nutrients already in the formulation
+      const arr2Ids = new Set(formulation.nutrients.map(item => item.nutrient_id));  // nutrients already in the formulation
       const unusedNutrients = fetchedData.filter(item => !arr2Ids.has(item.nutrient_id || item._id))
       setNutrientsMenu(unusedNutrients)
     } catch (err) {
@@ -275,6 +276,7 @@ function ViewFormulation({
   }
 
   const handleAddIngredients = async (ingredientsToAdd) => {
+    console.log("ingredientsToAdd", ingredientsToAdd)
     try {
       const res = await axios.put(
         `${VITE_API_URL}/formulation/ingredients/${id}`,
@@ -282,7 +284,7 @@ function ViewFormulation({
       )
       const newIngredients = res.data.addedIngredients
       setSelectedIngredients([...selectedIngredients, ...newIngredients])
-      const arr2Ids = new Set(newIngredients.map(item => item.ingredientId));
+      const arr2Ids = new Set(newIngredients.map(item => item.ingredient_id));
       setIngredientsMenu(prev =>
         prev.filter(item => !arr2Ids.has(item.ingredient_id || item._id))
       )
@@ -309,7 +311,7 @@ function ViewFormulation({
       )
       const newNutrients = res.data.addedNutrients
       setSelectedNutrients([...selectedNutrients, ...newNutrients])
-      const arr2Ids = new Set(newNutrients.map(item => item.nutrientId));
+      const arr2Ids = new Set(newNutrients.map(item => item.nutrient_id));
       setNutrientsMenu(prev =>
         prev.filter(item => !arr2Ids.has(item.nutrient_id || item._id))
       )
@@ -324,6 +326,74 @@ function ViewFormulation({
       // toast instructions
       setShowToast(true)
       setMessage('Error adding nutrients')
+      setToastAction('error')
+    }
+  }
+
+  const handleRemoveIngredient = async(ingredientToRemove) => {
+    try {
+      const res = await axios.delete(
+        `${VITE_API_URL}/formulation/ingredients/${id}/${ingredientToRemove.ingredient_id}`,
+      )
+      // remove ingredientToRemove from selected ingredients
+      setSelectedIngredients(
+        selectedIngredients.filter(
+          (item) => item.ingredient_id !== ingredientToRemove.ingredient_id
+        )
+      )
+      updateIngredients(
+        ingredients.filter(
+          (item) => item.ingredient_id !== ingredientToRemove.ingredient_id
+        )
+      )
+      // add ingredientToRemove to ingredients menu
+      const removedIngredient = listOfIngredients.find(item => item.ingredient_id ? (item.ingredient_id === ingredientToRemove.ingredient_id) : (item._id === ingredientToRemove.ingredient_id))
+      if (removedIngredient) {
+        setIngredientsMenu( [removedIngredient, ...ingredientsMenu])
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage('Ingredient removed successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Error removing ingredient')
+      setToastAction('error')
+    }
+  }
+
+  const handleRemoveNutrient = async (nutrientToRemove) => {
+    try {
+      const res = await axios.delete(
+        `${VITE_API_URL}/formulation/nutrients/${id}/${nutrientToRemove.nutrient_id}`,
+      )
+      // remove nutrientToRemove from selected nutrients
+      setSelectedNutrients(
+        selectedNutrients.filter(
+          (item) => item.nutrient_id !== nutrientToRemove.nutrient_id
+        )
+      )
+      updateNutrients(
+        nutrients.filter(
+          (item) => item.nutrient_id !== nutrientToRemove.nutrient_id
+        )
+      )
+      // add nutrientToRemove to nutrients menu
+      const removedNutrient = listOfNutrients.find(item => item.nutrient_id ? (item.nutrient_id === nutrientToRemove.nutrient_id) : (item._id === nutrientToRemove.nutrient_id))
+      if (removedNutrient) {
+        setNutrientsMenu( [removedNutrient, ...nutrientsMenu])
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage('Nutrient removed successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Error removing nutrient')
       setToastAction('error')
     }
   }
@@ -392,8 +462,10 @@ function ViewFormulation({
           <td>
             <button
               disabled={userAccess === "view"}
-              className="btn btn-ghost btn-xs">
-              ×
+              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              onClick={() => handleRemoveIngredient(ingredient)}
+            >
+              <RiDeleteBinLine />
             </button>
           </td>
         </tr>
@@ -440,8 +512,10 @@ function ViewFormulation({
           <td>
             <button
               disabled={userAccess === "view"}
-              className="btn btn-ghost btn-xs">
-              ×
+              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              onClick={() => handleRemoveNutrient(nutrient)}
+            >
+              <RiDeleteBinLine />
             </button>
           </td>
         </tr>
