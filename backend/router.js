@@ -1,14 +1,27 @@
 import mongoose from 'mongoose';
 import { getUserById, getUserByEmail } from './controller/user-controller.js';
 import {
-  createFormulation, getAllFormulations, getFormulation, updateFormulation, deleteFormulation, getFormulationOwner, addIngredients, addNutrients, validateCollaborator, updateCollaborator, removeCollaborator
+  createFormulation,
+  getAllFormulations,
+  getFormulation,
+  updateFormulation,
+  deleteFormulation,
+  getFormulationOwner,
+  addIngredients,
+  addNutrients,
+  removeIngredient,
+  removeNutrient,
+  validateCollaborator,
+  updateCollaborator,
+  removeCollaborator
 } from './controller/formulation-controller.js';
 import {
-  createIngredient, getAllIngredients, getIngredient, updateIngredient, deleteIngredient, importIngredient
+  createIngredient, getAllIngredients, getIngredient, getIngredientsByName, updateIngredient, deleteIngredient, importIngredient
 } from './controller/ingredient-controller.js'
 import {
-  createNutrient, getAllNutrients, getNutrient, updateNutrient, deleteNutrient
+  createNutrient, getAllNutrients, getNutrient, getNutrientsByName, updateNutrient, deleteNutrient
 } from './controller/nutrient-controller.js'
+import { simplex, pso } from './controller/optimize-controller.js'
 import handleLiveblocksAuth from './config/liveblocks-auth.js';
 
 const handleRoutes = (app) => {
@@ -75,6 +88,8 @@ const handleRoutes = (app) => {
   app.get('/formulation/owner/:id', getFormulationOwner)
   app.put('/formulation/ingredients/:id', addIngredients);
   app.put('/formulation/nutrients/:id', addNutrients);
+  app.delete('/formulation/ingredients/:id/:ingredient_id', removeIngredient);
+  app.delete('/formulation/nutrients/:id/:nutrient_id', removeNutrient);
   app.get('/formulation/collaborator/:formulationId/:collaboratorId', validateCollaborator);
   app.put('/formulation/collaborator/:id', updateCollaborator);
   app.delete('/formulation/collaborator/:formulationId/:collaboratorId', removeCollaborator);
@@ -82,6 +97,7 @@ const handleRoutes = (app) => {
   app.post('/ingredient', createIngredient);
   app.get('/ingredient/filtered/:userId', getAllIngredients);
   app.get('/ingredient/:id/:userId', getIngredient);
+  app.get('/ingredient/filtered/search/:userId', getIngredientsByName);
   app.put('/ingredient/:id/:userId', updateIngredient);
   app.delete('/ingredient/:id/:userId', deleteIngredient);
   app.post('/ingredient/import/:id', importIngredient);
@@ -89,8 +105,12 @@ const handleRoutes = (app) => {
   app.post('/nutrient', createNutrient);
   app.get('/nutrient/filtered/:userId', getAllNutrients);
   app.get('/nutrient/:id/:userId', getNutrient);
+  app.get('/nutrient/filtered/search/:userId', getNutrientsByName);
   app.put('/nutrient/:id/:userId', updateNutrient);
   app.delete('/nutrient/:id/:userId', deleteNutrient);
+
+  app.post('/optimize/simplex', simplex);
+  app.post('/optimize/pso', pso);
 
 };
 

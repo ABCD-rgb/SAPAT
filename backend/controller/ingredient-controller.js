@@ -49,6 +49,23 @@ const getIngredient = async (req, res) => {
   }
 }
 
+const getIngredientsByName = async (req, res) => {
+  const { searchQuery } = req.query;
+  const { userId } = req.params;
+  try {
+    // user-created ingredients
+    const userIngredients = await Ingredient.find({'user': userId});
+    //  global ingredients (and overrides)
+    const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
+    const ingredients = [...globalIngredients, ...userIngredients];
+    // partial matching
+    const filteredIngredients = ingredients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    res.status(200).json({ message: 'success', fetched: filteredIngredients });
+  } catch (err) {
+    res.status(500).json({ error: err.message, message: 'error' })
+  }
+}
+
 const updateIngredient = async (req, res) => {
   const { id, userId } = req.params;
   const { name, price, available, group, nutrients } = req.body;
@@ -207,6 +224,7 @@ export {
   createIngredient,
   getAllIngredients,
   getIngredient,
+  getIngredientsByName,
   updateIngredient,
   deleteIngredient,
   importIngredient,

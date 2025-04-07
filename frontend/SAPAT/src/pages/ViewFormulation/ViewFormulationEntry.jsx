@@ -37,6 +37,9 @@ function ViewFormulationEntry({ id }) {
   const updateAnimalGroup = useMutation(({ storage }, animal_group) => {
     storage.get('formulation').set('animal_group', animal_group)
   }, [])
+  const updateCost = useMutation(({ storage }, cost) => {
+    storage.get('formulation').set('cost', cost)
+  }, [])
   const updateIngredients = useMutation(({ storage }, ingredients) => {
     storage.get('formulation').set('ingredients', ingredients)
   }, [])
@@ -122,7 +125,6 @@ function ViewFormulationEntry({ id }) {
   useEffect(() => {
     const handleKeyPress = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        console.log("HERE 2")
         event.preventDefault() // Prevent the default browser save action
         updateDatabase() // Call database update function
         setShowToast(true) // Show success toast
@@ -147,6 +149,7 @@ function ViewFormulationEntry({ id }) {
         updateName(formulationData.name)
         updateDescription(formulationData.description)
         updateAnimalGroup(formulationData.animal_group)
+        updateCost(formulationData.cost)
         updateIngredients(formulationData.ingredients)
         updateNutrients(formulationData.nutrients)
       }
@@ -171,7 +174,6 @@ function ViewFormulationEntry({ id }) {
 
   const updateDatabase = async () => {
     try {
-      console.log("BAKEET ")
       const currentFormulation = formulationRef.current
       const VITE_API_URL = import.meta.env.VITE_API_URL
       await axios.put(`${VITE_API_URL}/formulation/${id}`, {
@@ -179,6 +181,7 @@ function ViewFormulationEntry({ id }) {
         name: currentFormulation.name,
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
+        cost: currentFormulation.cost,
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })
@@ -212,6 +215,7 @@ function ViewFormulationEntry({ id }) {
         updateName={updateName}
         updateDescription={updateDescription}
         updateAnimalGroup={updateAnimalGroup}
+        updateCost={updateCost}
         updateIngredients={updateIngredients}
         updateNutrients={updateNutrients}
         updateIngredientProperty={updateIngredientProperty}

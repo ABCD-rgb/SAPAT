@@ -1,10 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  RiAddLine,
-  RiFileUploadLine,
-  RiFileDownloadLine,
-  RiFilterLine,
-} from 'react-icons/ri'
+import { RiAddLine, RiFileUploadLine, RiFileDownloadLine } from 'react-icons/ri'
 import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
@@ -14,6 +9,7 @@ import useAuth from '../hook/useAuth.js'
 import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
+import Search from '../components/Search.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -45,6 +41,10 @@ function Nutrients() {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSearchQuery = (data) => {
+    setNutrients(data)
   }
 
   const handleEditClick = (nutrient) => {
@@ -156,17 +156,11 @@ function Nutrients() {
               <span>Export</span>
             </button>
           </div>
-          <div className="flex w-full gap-2 md:w-auto">
-            <input
-              type="text"
-              placeholder="Search"
-              className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
-            />
-            <button className="text-darkbrown hover:border-deepbrown flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-gray-50 active:bg-gray-100 md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFilterLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Filter</span>
-            </button>
-          </div>
+          <Search
+            userId={user._id}
+            handleSearchQuery={handleSearchQuery}
+            use="nutrient"
+          />
         </div>
       </div>
 

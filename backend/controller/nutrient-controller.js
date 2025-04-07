@@ -51,6 +51,23 @@ const getNutrient = async (req, res) => {
   }
 }
 
+const getNutrientsByName = async (req, res) => {
+  const { searchQuery } = req.query;
+  const { userId } = req.params;
+  try {
+    // user-created nutrients
+    const userNutrients  = await Nutrient.find({'user': userId});
+    //  global nutrients (and overrides)
+    const globalNutrients  = await handleGetNutrientGlobalAndOverride(userId);
+    const nutrients = [...globalNutrients , ...userNutrients  ];
+    // partial matching
+    const filteredNutrients  = nutrients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    res.status(200).json({ message: 'success', fetched: filteredNutrients  });
+  } catch (err) {
+    res.status(500).json({ error: err.message, message: 'error' })
+  }
+}
+
 const updateNutrient = async (req, res) => {
   const { id, userId } = req.params;
   const { abbreviation, name, unit, description, group } = req.body;
@@ -321,6 +338,7 @@ export {
   createNutrient,
   getAllNutrients,
   getNutrient,
+  getNutrientsByName,
   updateNutrient,
   deleteNutrient,
 };
