@@ -176,12 +176,14 @@ function Ingredients() {
       </div>
 
       <AddIngredientModal
+        ingredients={ingredients}
         user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditIngredientModal
+        ingredients={ingredients}
         user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

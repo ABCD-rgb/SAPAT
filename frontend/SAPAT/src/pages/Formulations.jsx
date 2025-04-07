@@ -179,12 +179,14 @@ function Formulations() {
 
       {/* Modals */}
       <CreateFormulationModal
+        formulations={formulations}
         owner={user._id}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditFormulationModal
+        formulations={formulations}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}

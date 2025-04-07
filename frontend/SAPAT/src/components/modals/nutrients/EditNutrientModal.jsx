@@ -28,10 +28,12 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
     // client-side validation
     if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
       setAbbrevError('Abbreviation already exists')
+      setNameError('')
       setIsDisabled(false)
       return;
     } else if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.name.toLowerCase() === formData.name.toLowerCase())) {
       setNameError('Name already exists')
+      setAbbrevError('')
       setIsDisabled(false)
       return;
     } else {
@@ -57,6 +59,7 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
       console.log(err)
     } finally {
       setIsDisabled(false)
+      setAbbrevError('')
       setNameError('')
     }
   }
