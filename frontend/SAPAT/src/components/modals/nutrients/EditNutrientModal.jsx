@@ -2,7 +2,7 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
+function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onResult }) {
   const [formData, setFormData] = useState({
     abbreviation: '',
     name: '',
@@ -12,6 +12,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
   })
 
   const [isDisabled, setIsDisabled] = useState(false)
+  const [nameError, setNameError] = useState('')
 
   useEffect(() => {
     if (nutrient) {
@@ -22,6 +23,15 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsDisabled(true)
+
+    // client-side validation
+    if (nutrients.some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
+      setNameError('Abbreviation already exists ')
+      setIsDisabled(false)
+      return;
+    } else {
+      setNameError('')
+    }
     try {
       const { _id, user, ...body } = formData
       const nutrient_id = nutrient.nutrient_id || nutrient._id
@@ -40,6 +50,9 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
       )
     } catch (err) {
       console.log(err)
+    } finally {
+      setIsDisabled(false)
+      setNameError('')
     }
   }
 
@@ -79,10 +92,16 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
                 name="abbreviation"
                 value={formData.abbreviation}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter abbreviation"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
               />
+              {nameError && (
+                <p className="text-red-500 text-sm mt-1" role="alert">
+                  {nameError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">
@@ -94,6 +113,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
                 name="name"
                 value={formData.name}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
                 className="input input-bordered w-full rounded-xl"
@@ -109,6 +129,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
                 name="unit"
                 value={formData.unit}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter unit"
                 className="input input-bordered w-full rounded-xl"
@@ -122,6 +143,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
               <select
                 name="group"
                 value={formData.group}
+                disabled={isDisabled}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
@@ -137,6 +159,7 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
                 <span className="label-text">Description</span>
               </label>
               <textarea
+                disabled={isDisabled}
                 name="description"
                 value={nutrient?.description}
                 onChange={handleChange}
@@ -158,9 +181,9 @@ function EditNutrientModal({ user_id, isOpen, onClose, nutrient, onResult }) {
             </button>
             <button
               type="submit"
-              className={`btn rounded-xl bg-amber-500 ${isDisabled ? 'disabled' : ''} px-8 text-white hover:bg-amber-600`}
+              className={`btn rounded-xl bg-amber-500 ${isDisabled ? 'disabled bg-red-100' : 'hover:bg-amber-600'} px-8 text-white`}
             >
-              Update
+              {`${isDisabled ? 'Updating...' : 'Update'}`}
             </button>
           </div>
         </form>

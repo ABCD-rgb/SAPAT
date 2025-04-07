@@ -177,12 +177,14 @@ function Nutrients() {
 
       {/* Modals */}
       <AddNutrientModal
+        nutrients={nutrients}
         user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditNutrientModal
+        nutrients={nutrients}
         user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

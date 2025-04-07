@@ -1,8 +1,8 @@
 import { RiCloseLine } from 'react-icons/ri'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 
-function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
+function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
   const [formData, setFormData] = useState({
     abbreviation: '',
     name: '',
@@ -10,12 +10,22 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
     group: '',
     description: '',
   })
-
   const [isDisabled, setIsDisabled] = useState(false)
+  const [nameError, setNameError] = useState('')
+
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsDisabled(true)
+
+    // client-side validation
+    if (nutrients.some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
+      setNameError('Abbreviation already exists ')
+      setIsDisabled(false)
+      return;
+    } else {
+      setNameError('')
+    }
     try {
       const body = { ...formData, source: 'user', user: user_id }
       const res = await axios.post(
@@ -41,6 +51,9 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
       })
     } catch (err) {
       console.log(err)
+    } finally {
+      setIsDisabled(false)
+      setNameError('')
     }
   }
 
@@ -80,10 +93,16 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
                 name="abbreviation"
                 value={formData.abbreviation}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter abbreviation"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
               />
+              {nameError && (
+                <p className="text-red-500 text-sm mt-1" role="alert">
+                  {nameError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">
@@ -95,6 +114,7 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
                 name="name"
                 value={formData.name}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
                 className="input input-bordered w-full rounded-xl"
@@ -110,6 +130,7 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
                 name="unit"
                 value={formData.unit}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter unit"
                 className="input input-bordered w-full rounded-xl"
@@ -123,6 +144,7 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
               <select
                 name="group"
                 value={formData.group}
+                disabled={isDisabled}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
@@ -141,6 +163,10 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
                 <span className="label-text">Description</span>
               </label>
               <textarea
+                disabled={isDisabled}
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
                 placeholder="Enter description"
                 className="textarea textarea-bordered w-full rounded-xl"
                 rows="3"
@@ -159,9 +185,9 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
             </button>
             <button
               type="submit"
-              className={`btn bg-green-button ${isDisabled ? 'disabled' : ''} rounded-xl px-8 text-white hover:bg-green-600`}
+              className={`btn bg-green-button ${isDisabled ? 'disabled bg-red-100' : 'hover:bg-green-600'} rounded-xl px-8 text-white`}
             >
-              Add
+              {`${isDisabled ? 'Adding...' : 'Add'}`}
             </button>
           </div>
         </form>
