@@ -24,7 +24,15 @@ const getAllIngredients = async (req, res) => {
     //  global ingredients (and overrides)
     const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
     const ingredients = [...globalIngredients, ...userIngredients];
-    res.status(200).json({ message: 'success', ingredients: ingredients });
+    console.log(ingredients);
+    const formattedIngredients = ingredients.map((ingredient) => {
+      const data = ingredient._doc || ingredient;
+      return {
+        ...data,
+        price: Number(data.price).toFixed(2)
+      };
+    })
+    res.status(200).json({ message: 'success', ingredients: formattedIngredients });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
   }
