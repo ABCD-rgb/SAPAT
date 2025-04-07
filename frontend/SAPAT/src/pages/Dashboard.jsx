@@ -5,7 +5,7 @@ import StatCard from '../components/StatCard'
 import useAuth from '../hook/useAuth'
 import { Navigate } from 'react-router-dom'
 import Loading from '../components/Loading'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -16,8 +16,9 @@ function Dashboard() {
   const [formulationCount, setFormulationCount] = useState(0)
   const [ingredientCount, setIngredientCount] = useState(0)
   const [formulationTypeCount, setFormulationTypeCount] = useState([0, 0, 0])
+  const [recentFormulations, setRecentFormulations] = useState([])
 
-  const pieData = {
+  const pieData = useMemo(() => ({
     labels: ['Swine', 'Pig', 'Poultry'],
     datasets: [
       {
@@ -26,9 +27,9 @@ function Dashboard() {
         borderWidth: 0,
       },
     ],
-  }
+  }), [formulationTypeCount]);
 
-  const pieOptions = {
+  const pieOptions = useMemo(() => ({
     plugins: {
       legend: {
         position: 'right',
@@ -42,7 +43,7 @@ function Dashboard() {
       },
     },
     maintainAspectRatio: false,
-  }
+  }), []);
 
   useEffect(() => {
     if (user) {
@@ -66,6 +67,9 @@ function Dashboard() {
       )
       const typeCount = [swine.length, pig.length, poultry.length]
       setFormulationTypeCount(typeCount)
+      // recent formulations
+      const recent = formulations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,5);
+      setRecentFormulations(recent)
     } catch (err) {
       console.log(err)
     }
@@ -118,10 +122,43 @@ function Dashboard() {
 
       <div className="rounded-lg bg-white p-4 shadow-sm">
         <h2 className="text-deepbrown mb-4 text-lg font-semibold">
-          Recently Viewed
+          Recently Created Formulations
         </h2>
-        <div className="text-darkbrown flex h-[300px] items-center justify-center">
-          No recent items
+        <div className="w-full">
+          {recentFormulations.length > 0 ? (
+            <div className="space-y-3">
+              {recentFormulations.map((f) => (
+                <div
+                  key={f._id}
+                  className="flex justify-between items-center bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-4 md:min-w-[200px]">
+                      <span className="hidden md:block font-mono md:min-w-[60px] text-right pr-2 text-gray-500">
+                        {f.code || '-'}
+                      </span>
+                      <span className="hidden md:block font-mono text-right pr-2 text-gray-500">
+                        |
+                      </span>
+                      <span className="font-medium text-deepbrown">
+                        {f.name}
+                      </span>
+                    </div>
+                    {/*<span className="badge badge-sm badge-outline badge-neutral text-gray-500">*/}
+                    {/*  {f.animal_group || '-'}*/}
+                    {/*</span>*/}
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {new Date(f.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              No recent formulations
+            </div>
+          )}
         </div>
       </div>
     </div>
