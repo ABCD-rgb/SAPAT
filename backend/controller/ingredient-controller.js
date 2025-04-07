@@ -24,7 +24,6 @@ const getAllIngredients = async (req, res) => {
     //  global ingredients (and overrides)
     const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
     const ingredients = [...globalIngredients, ...userIngredients];
-    console.log(ingredients);
     const formattedIngredients = ingredients.map((ingredient) => {
       const data = ingredient._doc || ingredient;
       return {
