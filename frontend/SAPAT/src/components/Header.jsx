@@ -9,7 +9,7 @@ function Header() {
       <div className="text-darkbrown flex items-center justify-between">
         <div className="items-left border-darkbrown ml-6 flex flex-col border-b pb-1">
           <p className="text-base font-bold">
-            {new Date().toLocaleTimeString()}
+            Welcome to <span className="text-green-button">SAPAT!</span>
           </p>
           <p className="text-sm">
             {' '}
