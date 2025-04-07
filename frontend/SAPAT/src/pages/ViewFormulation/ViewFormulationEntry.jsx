@@ -37,6 +37,9 @@ function ViewFormulationEntry({ id }) {
   const updateAnimalGroup = useMutation(({ storage }, animal_group) => {
     storage.get('formulation').set('animal_group', animal_group)
   }, [])
+  const updateCost = useMutation(({ storage }, cost) => {
+    storage.get('formulation').set('cost', cost)
+  }, [])
   const updateIngredients = useMutation(({ storage }, ingredients) => {
     storage.get('formulation').set('ingredients', ingredients)
   }, [])
@@ -111,11 +114,12 @@ function ViewFormulationEntry({ id }) {
   }, [user])
 
   // Auto-sync on internal navigation (when the URL changes)
-  useEffect(() => {
-    return () => {
-      updateDatabase() // Sync before navigating away
-    }
-  }, [location.pathname]) // Runs when the user changes the page within the app
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("HERE!")
+  //     updateDatabase() // Sync before navigating away
+  //   }
+  // }, [location.pathname]) // Runs when the user changes the page within the app
 
   // Sync on saving using 'ctrl + s'
   useEffect(() => {
@@ -145,6 +149,7 @@ function ViewFormulationEntry({ id }) {
         updateName(formulationData.name)
         updateDescription(formulationData.description)
         updateAnimalGroup(formulationData.animal_group)
+        updateCost(formulationData.cost)
         updateIngredients(formulationData.ingredients)
         updateNutrients(formulationData.nutrients)
       }
@@ -176,6 +181,7 @@ function ViewFormulationEntry({ id }) {
         name: currentFormulation.name,
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
+        cost: currentFormulation.cost,
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })
@@ -209,6 +215,7 @@ function ViewFormulationEntry({ id }) {
         updateName={updateName}
         updateDescription={updateDescription}
         updateAnimalGroup={updateAnimalGroup}
+        updateCost={updateCost}
         updateIngredients={updateIngredients}
         updateNutrients={updateNutrients}
         updateIngredientProperty={updateIngredientProperty}

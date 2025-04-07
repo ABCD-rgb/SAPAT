@@ -63,14 +63,14 @@ const getFormulation = async (req, res) => {
 
 const updateFormulation = async (req, res) => {
     const { id } = req.params;
-    const { code, name, description, animal_group, ingredients, nutrients } = req.body;
+    const { code, name, description, animal_group, cost, ingredients, nutrients } = req.body;
     try {
         const formulation = await Formulation.findByIdAndUpdate(
           id,
           {
               $set:
                 {
-                    code, name, description, animal_group, ingredients, nutrients
+                    code, name, description, animal_group, cost, ingredients, nutrients
                 }
           },
           { new: true },
@@ -84,6 +84,7 @@ const updateFormulation = async (req, res) => {
             "name": name,
             "description": description ? description : "",
             "animal_group": animal_group ? animal_group : "",
+            "cost": cost,
             "ingredients": ingredients ? ingredients : [],
             "nutrients": nutrients ? nutrients : [],
         }
@@ -164,6 +165,51 @@ const addNutrients = async (req, res) => {
             return res.status(404).json({ message: 'error' });
         }
         res.status(200).json({ message: 'success', addedNutrients: nutrients });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const removeIngredient = async (req, res) => {
+    const { id, ingredient_id } = req.params;
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $pull:
+                {
+                    ingredients: { ingredient_id: ingredient_id },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success' });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
+const removeNutrient = async (req, res) => {
+    const { id, nutrient_id } = req.params;
+
+    try {
+        const formulation = await Formulation.findByIdAndUpdate(
+          id,
+          {
+              $pull:
+                {
+                    nutrients: { nutrient_id: nutrient_id },
+                }
+          },
+          { new: true },
+        );
+        if (!formulation) {
+            return res.status(404).json({ message: 'error' });
+        }
+        res.status(200).json({ message: 'success' });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'error' })
     }
@@ -274,6 +320,8 @@ export {
     getFormulationOwner,
     addIngredients,
     addNutrients,
+    removeIngredient,
+    removeNutrient,
     validateCollaborator,
     updateCollaborator,
     removeCollaborator

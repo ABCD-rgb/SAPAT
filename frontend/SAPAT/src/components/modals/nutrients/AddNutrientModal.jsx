@@ -11,8 +11,11 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
     description: '',
   })
 
+  const [isDisabled, setIsDisabled] = useState(false)
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsDisabled(true)
     try {
       const body = { ...formData, source: 'user', user: user_id }
       const res = await axios.post(
@@ -156,7 +159,7 @@ function AddNutrientModal({ user_id, isOpen, onClose, onResult }) {
             </button>
             <button
               type="submit"
-              className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600"
+              className={`btn bg-green-button ${isDisabled ? 'disabled' : ''} rounded-xl px-8 text-white hover:bg-green-600`}
             >
               Add
             </button>
