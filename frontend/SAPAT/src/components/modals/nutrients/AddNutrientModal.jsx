@@ -11,6 +11,7 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
     description: '',
   })
   const [isDisabled, setIsDisabled] = useState(false)
+  const [abbrevError, setAbbrevError] = useState('')
   const [nameError, setNameError] = useState('')
 
 
@@ -20,7 +21,11 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
 
     // client-side validation
     if (nutrients.some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
-      setNameError('Abbreviation already exists ')
+      setAbbrevError('Abbreviation already exists ')
+      setIsDisabled(false)
+      return;
+    } else if (nutrients.some(nutrient => nutrient.name.toLowerCase() === formData.name.toLowerCase())) {
+      setNameError('Name already exists')
       setIsDisabled(false)
       return;
     } else {
@@ -117,8 +122,13 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${abbrevError ? "border-red-500" : ""}`}
               />
+              {abbrevError && (
+                <p className="text-red-500 text-sm mt-1" role="alert">
+                  {abbrevError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">

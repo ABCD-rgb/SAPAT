@@ -12,6 +12,7 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
   })
 
   const [isDisabled, setIsDisabled] = useState(false)
+  const [abbrevError, setAbbrevError] = useState('')
   const [nameError, setNameError] = useState('')
 
   useEffect(() => {
@@ -25,8 +26,12 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
     setIsDisabled(true)
 
     // client-side validation
-    if (nutrients.some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
-      setNameError('Abbreviation already exists ')
+    if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
+      setAbbrevError('Abbreviation already exists')
+      setIsDisabled(false)
+      return;
+    } else if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.name.toLowerCase() === formData.name.toLowerCase())) {
+      setNameError('Name already exists')
       setIsDisabled(false)
       return;
     } else {
@@ -95,11 +100,11 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter abbreviation"
-                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${abbrevError ? "border-red-500" : ""}`}
               />
-              {nameError && (
+              {abbrevError && (
                 <p className="text-red-500 text-sm mt-1" role="alert">
-                  {nameError}
+                  {abbrevError}
                 </p>
               )}
             </div>
@@ -116,8 +121,13 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
               />
+              {nameError && (
+                <p className="text-red-500 text-sm mt-1" role="alert">
+                  {nameError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">
