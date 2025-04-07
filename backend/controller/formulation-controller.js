@@ -60,6 +60,22 @@ const getFormulation = async (req, res) => {
     }
 };
 
+const getFormulationByName = async (req, res) => {
+    const { searchQuery } = req.query;
+    const { userId } = req.params;
+    try {
+        const formulations = await Formulation.find({'collaborators.userId': userId})
+        if (!formulations) {
+            return res.status(404).json({ message: 'No formulations', fetched: [] });
+        }
+        // partial matching
+        const filteredFormulations = formulations.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        res.status(200).json({ message: 'success', fetched: filteredFormulations });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
+
 
 const updateFormulation = async (req, res) => {
     const { id } = req.params;
@@ -315,6 +331,7 @@ export {
     createFormulation,
     getAllFormulations,
     getFormulation,
+    getFormulationByName,
     updateFormulation,
     deleteFormulation,
     getFormulationOwner,

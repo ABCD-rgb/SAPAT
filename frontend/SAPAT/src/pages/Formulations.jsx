@@ -1,4 +1,4 @@
-import { RiAddLine, RiFilterLine } from 'react-icons/ri'
+import { RiAddLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import CreateFormulationModal from '../components/modals/formulations/CreateFormulationModal'
 import EditFormulationModal from '../components/modals/formulations/EditFormulationModal'
@@ -9,6 +9,7 @@ import Toast from '../components/Toast'
 import { Navigate, useNavigate } from 'react-router-dom'
 import useAuth from '../hook/useAuth.js'
 import axios from 'axios'
+import Search from "../components/Search.jsx";
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -43,6 +44,10 @@ function Formulations() {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSearchQuery = (data) => {
+    setFormulations(data)
   }
 
   const handleEditClick = (formulation) => {
@@ -152,13 +157,11 @@ function Formulations() {
               <span>Add New</span>
             </button>
           </div>
-          <div className="flex w-full gap-2 md:w-auto">
-            <input
-              type="text"
-              placeholder="Search"
-              className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
-            />
-          </div>
+          <Search
+            userId={user._id}
+            handleSearchQuery={handleSearchQuery}
+            use="formulation"
+          />
         </div>
       </div>
 
