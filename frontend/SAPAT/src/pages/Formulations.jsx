@@ -146,7 +146,7 @@ function Formulations() {
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="cursor-pointer bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
@@ -158,10 +158,6 @@ function Formulations() {
               placeholder="Search"
               className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
             />
-            <button className="text-darkbrown hover:border-deepbrown flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-gray-50 active:bg-gray-100 md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFilterLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Filter</span>
-            </button>
           </div>
         </div>
       </div>

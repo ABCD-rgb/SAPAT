@@ -142,16 +142,16 @@ function Ingredients() {
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="cursor-pointer bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
             </button>
-            <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
+            <button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
               <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Import</span>
             </button>
-            <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
+            <button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
               <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Export</span>
             </button>
