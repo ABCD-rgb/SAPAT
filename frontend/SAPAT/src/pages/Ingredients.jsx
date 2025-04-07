@@ -4,42 +4,48 @@ import {
   RiFileUploadLine,
   RiFilterLine,
 } from 'react-icons/ri'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
 import Table from '../components/Table'
+import Loading from '../components/Loading'
+import useAuth from '../hook/useAuth.js'
+import { Navigate } from 'react-router-dom'
+import axios from 'axios'
+import Toast from '../components/Toast.jsx'
 
 function Ingredients() {
+  const { user, loading } = useAuth()
+  const [ingredients, setIngredients] = useState([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedIngredient, setSelectedIngredient] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  // toast visibility
+  const [showToast, setShowToast] = useState(false)
+  const [message, setMessage] = useState('')
+  const [toastAction, setToastAction] = useState('')
 
-  const ingredients = [
-    { name: 'Barley', price: '6.50', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    { name: 'Maize', price: '54.30', available: 'Yes', group: 'Cereals' },
-    {
-      name: 'Wheat, Starch',
-      price: '5.15',
-      available: 'Yes',
-      group: 'Wheat by-products',
-    },
-  ]
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user])
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`
+      )
+      const fetchedData = res.data.ingredients
+      setIngredients(fetchedData)
+      setIsLoading(false)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   const handleEditClick = (ingredient) => {
     setSelectedIngredient(ingredient)
@@ -51,15 +57,80 @@ function Ingredients() {
     setIsDeleteModalOpen(true)
   }
 
-  const handleDeleteConfirm = () => {
-    // TODO: Implement delete functionality
-    console.log('Deleting ingredient:', selectedIngredient)
+  const handleDeleteConfirm = async () => {
+    try {
+      const selectedId = selectedIngredient._id
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`
+      )
+      const messageData = res.data.message
+      if (messageData === 'success') {
+        setIngredients(
+          ingredients.filter((ingredient) => ingredient._id !== selectedId)
+        )
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage(
+        messageData === 'success'
+          ? 'Ingredient deleted successfully'
+          : 'Failed to delete ingredient.'
+      )
+      setToastAction(messageData)
+    } catch (err) {
+      console.log(err)
+      setShowToast(true)
+      setMessage('Failed to delete formulation.')
+      setToastAction('error')
+    }
+  }
+
+  const handleCreateResult = (newIngredient, action, message) => {
+    setIsAddModalOpen(false)
+    setIngredients([...ingredients, newIngredient])
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
+  const handleEditResult = (updatedIngredient, action, message) => {
+    setIsEditModalOpen(false)
+    setIngredients((prevIngredient) => {
+      const index = prevIngredient.findIndex(
+        (ingredient) => ingredient._id === updatedIngredient._id
+      )
+      const updated = [...prevIngredient]
+      updated[index] = { ...updatedIngredient }
+      return updated
+    })
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
+  const hideToast = () => {
+    setShowToast(false)
+    setMessage('')
+    setToastAction('')
   }
 
   const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
 
+  if (loading) {
+    return <Loading />
+  }
+  if (!user) {
+    return <Navigate to="/" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
+  }
+
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-auto flex-col bg-gray-50">
       {/* Fixed Header Section */}
       <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
         <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
@@ -104,19 +175,24 @@ function Ingredients() {
         <Table
           headers={headers}
           data={ingredients}
+          page="ingredients"
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
         />
       </div>
 
       <AddIngredientModal
+        user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+        onResult={handleCreateResult}
       />
       <EditIngredientModal
+        user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         ingredient={selectedIngredient}
+        onResult={handleEditResult}
       />
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
@@ -124,6 +200,16 @@ function Ingredients() {
         onConfirm={handleDeleteConfirm}
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
+        type="delete"
+      />
+
+      {/*  Toasts */}
+      <Toast
+        className="transition delay-150 ease-in-out"
+        show={showToast}
+        action={toastAction}
+        message={message}
+        onHide={hideToast}
       />
     </div>
   )
