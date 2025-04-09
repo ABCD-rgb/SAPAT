@@ -1,5 +1,6 @@
 import Ingredient from '../models/ingredient-model.js';
 import UserIngredientOverride from '../models/user_ingredient_override-model.js';
+import Nutrient from '../models/nutrient-model.js';
 
 const createIngredient = async (req, res) => {
   const {
@@ -126,26 +127,140 @@ const deleteIngredient = async (req, res) => {
   }
 };
 
-
+//
+// const importIngredient = async (req, res) => {
+//   const ingredientsData = req.body;  // Get the ingredients data from the request body
+//   try {
+//     // Validate that the incoming data is an array
+//     if (!ingredientsData || !Array.isArray(ingredientsData)) {
+//       return res.status(400).json({ message: "Invalid data format, expected an array of ingredients." });
+//     }
+//     // Validate that required fields are there
+//     if (ingredientsData.some(item => !item.name || !item.price || !item.nutrients)) {
+//       return res.status(400).json({ message: "Each ingredient must have a 'name' and 'quantity'." });
+//     }
+//
+//     const newIngredients = await Ingredient.insertMany(ingredientsData);
+//     res.status(200).json({ message: 'success', ingredients: newIngredients });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message, message: 'error' });
+//   }
+// }
 
 const importIngredient = async (req, res) => {
-  const ingredientsData = req.body;  // Get the ingredients data from the request body
+  const { userId } = req.params;
+  const ingredientsData = req.body;
+
   try {
     // Validate that the incoming data is an array
     if (!ingredientsData || !Array.isArray(ingredientsData)) {
       return res.status(400).json({ message: "Invalid data format, expected an array of ingredients." });
     }
+
     // Validate that required fields are there
     if (ingredientsData.some(item => !item.name || !item.price || !item.nutrients)) {
-      return res.status(400).json({ message: "Each ingredient must have a 'name' and 'quantity'." });
+      return res.status(400).json({ message: "Each ingredient must have a name, price, and nutrients." });
     }
 
-    const newIngredients = await Ingredient.insertMany(ingredientsData);
-    res.status(200).json({ message: 'success', ingredients: newIngredients });
+    // Escape special regex characters
+    const escapeRegex = (string) => {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    };
+
+    const newIngredientsData = await Promise.all(
+      ingredientsData.map(async (ingredient) => {
+        const existingIngredient = await Ingredient.findOne({
+          $or: [
+            { user: userId },
+            { source: 'global' }
+          ],
+          name: { $regex: new RegExp('^' + escapeRegex(ingredient.name) + '$', 'i') }
+        });
+
+        return existingIngredient ? null : ingredient;
+      })
+    ).then(results => results.filter(result => result !== null));
+
+    // Process all new ingredients and handle matching/creating nutrients
+    const processedIngredients = await Promise.all(newIngredientsData.map(async (ingredient) => {
+
+      // Escape special regex characters
+      const escapeRegex = (string) => {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      };
+
+      // Process each nutrient in the ingredient
+      const processedNutrients = await Promise.all(ingredient.nutrients.map(async (nutrientData) => {
+        // Get the nutrient name from the nutrient field
+        const nutrientName = nutrientData.nutrient.trim();
+
+        // Escape special regex characters
+        const escapeRegex = (string) => {
+          return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        };
+
+        const existingNutrient = await Nutrient.findOne({
+          $or: [
+            { user: userId },
+            { source: 'global' }
+          ],
+          name: { $regex: new RegExp('^' + escapeRegex(nutrientName) + '$', 'i') }
+        });
+
+        let nutrientId;
+        if (existingNutrient) {
+          console.log(`nutrient ${nutrientName} existing`);
+          // Use existing nutrient's ID
+          nutrientId = existingNutrient._id;
+        } else {
+          console.log(`Created new nutrient: ${nutrientName}`);
+          // Create a new nutrient
+          const newNutrient = await Nutrient.create({
+            name: nutrientName,
+            abbreviation: nutrientName.substring(0, 3).toUpperCase(),
+            unit: '',
+            description: '',
+            group: '',
+            source: 'user',
+            user: userId
+          });
+
+          // when nutrient is created, update all user ingredients to add that nutrient
+          await handleIngredientChanges(newNutrient, userId);
+          nutrientId = newNutrient._id;
+        }
+
+        // Return nutrient with ID and value
+        return {
+          nutrient: nutrientId,
+          value: nutrientData.value
+        };
+      }));
+
+      // Create the ingredient with processed nutrients
+      return {
+        name: ingredient.name,
+        price: ingredient.price,
+        available: ingredient.available || 1,
+        group: '',
+        source: ingredient.source || 'user',
+        user: userId,
+        nutrients: processedNutrients
+      };
+    }));
+
+    // Insert all processed new ingredients
+    const newIngredients = await Ingredient.insertMany(processedIngredients);
+
+    res.status(200).json({
+      message: 'success',
+      ingredients: newIngredients,
+      skippedIngredients: ingredientsData.length - newIngredients.length
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' });
   }
-}
+};
 
 
 // helpers
@@ -224,6 +339,43 @@ const handleDeleteIngredientOverride = async (ingredient_id, user_id) => {
   } catch (err) {
     console.log(err);
   }
+}
+
+const handleIngredientChanges = async (nutrient, user_id) => {
+  // <user-created ingredients>
+  const userIngredients = await Ingredient.find({ 'user': user_id });
+  await Promise.all(userIngredients.map(async userIngredient => {
+    // insert the new nutrient to list of nutrients on each User Ingredient
+    userIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
+    await userIngredient.save();
+  }));
+
+  // <global overrides ingredients>
+  const globalIngredients = await Ingredient.find({ 'source': 'global' });
+  await Promise.all(globalIngredients.map(async globalIngredient => {
+    const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
+    // no existing override
+    if (override.length === 0) {
+      await UserIngredientOverride.create({
+        ingredient_id: globalIngredient._id,
+        user: user_id,
+        nutrients: [
+          ...globalIngredient.nutrients,
+          { 'nutrient': nutrient._id, 'value': 0 }
+        ],
+        // Copy other relevant fields from globalIngredient
+        name: globalIngredient.name,
+        price: globalIngredient.price,
+        available: globalIngredient.available,
+        source: globalIngredient.source
+      });
+    }
+    // has an existing override (and not deleted as well)
+    else if (override[0].deleted !== 1) {
+      override[0].nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
+      await override[0].save();
+    }
+  }));
 }
 
 

@@ -11,6 +11,8 @@ import axios from 'axios'
 import Toast from '../components/Toast.jsx'
 import Search from '../components/Search.jsx'
 import Export from "../components/buttons/Export.jsx";
+import Import from "../components/Import.jsx";
+import ImportModal from "../components/modals/ImportModal.jsx";
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -18,6 +20,7 @@ function Ingredients() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [selectedIngredient, setSelectedIngredient] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   // toast visibility
@@ -111,6 +114,17 @@ function Ingredients() {
     setToastAction(action)
   }
 
+  const handleImportClick = () => {
+    setIsImportModalOpen(true)
+  }
+
+  const handleImportSubmit = () => {
+    // toast instructions
+    setShowToast(true)
+    setMessage("yey")
+    setToastAction("success")
+  }
+
   const handleExportSubmit = (message, action) => {
     // toast instructions
     setShowToast(true)
@@ -155,10 +169,9 @@ function Ingredients() {
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
             </button>
-            <button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Import</span>
-            </button>
+            <Import
+              onImport={handleImportClick}
+            />
             <Export
               ingredients={ingredients}
               onExport={handleExportSubmit}
@@ -205,6 +218,11 @@ function Ingredients() {
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
         type="delete"
+      />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onConfirm={handleImportSubmit}
       />
 
       {/*  Toasts */}

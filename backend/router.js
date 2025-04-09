@@ -102,7 +102,7 @@ const handleRoutes = (app) => {
   app.get('/ingredient/filtered/search/:userId', getIngredientsByName);
   app.put('/ingredient/:id/:userId', updateIngredient);
   app.delete('/ingredient/:id/:userId', deleteIngredient);
-  app.post('/ingredient/import/:id', importIngredient);
+  app.post('/ingredient/import/:userId', importIngredient);
 
   app.post('/nutrient', createNutrient);
   app.get('/nutrient/filtered/:userId', getAllNutrients);
