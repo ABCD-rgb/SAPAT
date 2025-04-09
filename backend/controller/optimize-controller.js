@@ -197,99 +197,418 @@ const simplex = async (req, res) => {
 }
 
 
-const pso = async (req, res) => {
-  try {
-    const { ingredients, nutrients } = req.body.formulations;
+// const pso = async (req, res) => {
+//   try {
+//     const { ingredients, nutrients } = req.body.formulations;
+//
+//     // Define the objective function for PSO
+//     const objectiveFunction = (particle) => {
+//       // Calculate total cost (placeholder - should use actual ingredient costs)
+//       const totalCost = particle.reduce((sum, value) => sum + value, 0);
+//
+//       // Check constraints
+//       let penalty = 0;
+//
+//       // 1. Sum must equal 100%
+//       const sum = particle.reduce((a, b) => a + b, 0);
+//       penalty += Math.abs(sum - 100) * 1000;
+//
+//       // 2. Ingredient constraints
+//       particle.forEach((value, index) => {
+//         const ingredient = ingredients[index];
+//         if (ingredient.minimum !== null && ingredient.minimum !== undefined) {
+//           if (value < ingredient.minimum) {
+//             penalty += (ingredient.minimum - value) * 1000;
+//           }
+//         }
+//         if (ingredient.maximum !== null && ingredient.maximum !== undefined) {
+//           if (value > ingredient.maximum) {
+//             penalty += (value - ingredient.maximum) * 1000;
+//           }
+//         }
+//       });
+//
+//       // 3. Nutrient constraints
+//       nutrients.forEach((nutrient, nutrientIndex) => {
+//         // Calculate nutrient value (placeholder - should use actual nutrient composition)
+//         const nutrientValue = particle.reduce((sum, value) => sum + value, 0);
+//
+//         if (nutrient.minimum !== null && nutrient.minimum !== undefined) {
+//           if (nutrientValue < nutrient.minimum) {
+//             penalty += (nutrient.minimum - nutrientValue) * 1000;
+//           }
+//         }
+//         if (nutrient.maximum !== null && nutrient.maximum !== undefined) {
+//           if (nutrientValue > nutrient.maximum) {
+//             penalty += (nutrientValue - nutrient.maximum) * 1000;
+//           }
+//         }
+//       });
+//
+//       return totalCost + penalty;
+//     };
+//
+//     // Define bounds for each dimension (ingredient)
+//     const bounds = ingredients.map(ingredient => ({
+//       min: ingredient.minimum !== null ? ingredient.minimum : 0,
+//       max: ingredient.maximum !== null ? ingredient.maximum : 100
+//     }));
+//
+//     // Configure PSO
+//     const options = {
+//       particles: 50,
+//       dimensions: ingredients.length,
+//       bounds: bounds,
+//       maxIterations: 1000,
+//       learningRate: 0.1,
+//       inertia: 0.8,
+//       tolerance: 1e-6
+//     };
+//
+//     // Create and run PSO
+//     const pso = new PSO(objectiveFunction, options);
+//     const result = pso.optimize();
+//
+//     // Process the results
+//     const solution = {
+//       status: result.converged ? 'converged' : 'not_converged',
+//       objective: result.bestFitness,
+//       variables: result.bestPosition,
+//       iterations: result.iterations,
+//       message: result.converged ? 'Optimal solution found' : 'No optimal solution found'
+//     };
+//
+//     res.status(200).json({
+//       message: 'success',
+//       solution
+//     });
+//
+//   } catch (err) {
+//     res.status(500).json({
+//       error: err.message,
+//       message: 'error'
+//     });
+//   }
+// };
 
-    // Define the objective function for PSO
-    const objectiveFunction = (particle) => {
-      // Calculate total cost (placeholder - should use actual ingredient costs)
-      const totalCost = particle.reduce((sum, value) => sum + value, 0);
+// PSO (Particle Swarm Optimization) implementation for diet formulation
+// This handles the same optimization problem as the simplex method
 
-      // Check constraints
-      let penalty = 0;
 
-      // 1. Sum must equal 100%
-      const sum = particle.reduce((a, b) => a + b, 0);
-      penalty += Math.abs(sum - 100) * 1000;
 
-      // 2. Ingredient constraints
-      particle.forEach((value, index) => {
-        const ingredient = ingredients[index];
-        if (ingredient.minimum !== null && ingredient.minimum !== undefined) {
-          if (value < ingredient.minimum) {
-            penalty += (ingredient.minimum - value) * 1000;
-          }
-        }
-        if (ingredient.maximum !== null && ingredient.maximum !== undefined) {
-          if (value > ingredient.maximum) {
-            penalty += (value - ingredient.maximum) * 1000;
-          }
-        }
-      });
+const determineOptimizedNutrientsPSO = (optimizedIngredients, constraints) => {
+  const total = Object.values(optimizedIngredients).reduce((sum, value) => sum + value, 0);
+  const ratios = {};
+  for (const [ingredient, value] of Object.entries(optimizedIngredients)) {
+    ratios[ingredient] = total > 0 ? (value / total).toFixed(2) : "0.00";
+  }
+  const finalNutrients = constraints.map(constraint => {
+    const nutrientName = constraint.name;
+    var optimizedNutrientValue = 0;
 
-      // 3. Nutrient constraints
-      nutrients.forEach((nutrient, nutrientIndex) => {
-        // Calculate nutrient value (placeholder - should use actual nutrient composition)
-        const nutrientValue = particle.reduce((sum, value) => sum + value, 0);
+    Object.entries(optimizedIngredients).forEach(([ingredient, value]) => {
+      const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
+      if (involvedIngredient) {
+        const nutrientValue = involvedIngredient.coef * value;
+        optimizedNutrientValue += nutrientValue;
+      }
+    })
+    return {
+      name: nutrientName,
+      value: optimizedNutrientValue.toFixed(2)
+    }
+  })
+  return finalNutrients;
+}
 
-        if (nutrient.minimum !== null && nutrient.minimum !== undefined) {
-          if (nutrientValue < nutrient.minimum) {
-            penalty += (nutrient.minimum - nutrientValue) * 1000;
-          }
-        }
-        if (nutrient.maximum !== null && nutrient.maximum !== undefined) {
-          if (nutrientValue > nutrient.maximum) {
-            penalty += (nutrientValue - nutrient.maximum) * 1000;
-          }
-        }
-      });
+/**
+ * PSO optimization function
+ * @param {Object} options PSO algorithm parameters
+ * @param {Number} options.iterations Maximum number of iterations
+ * @param {Number} options.particles Number of particles in the swarm
+ * @param {Number} options.inertia Inertia weight for velocity update
+ * @param {Number} options.social Social (global best) coefficient
+ * @param {Number} options.personal Personal (particle best) coefficient
+ * @param {Number} options.tolerance Convergence tolerance
+ */
+const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
+  const defaults = {
+    iterations: 2000,
+    particles: 50,
+    inertia: 0.7,
+    social: 1.5,
+    personal: 1.5,
+    tolerance: 1e-6
+  };
 
-      return totalCost + penalty;
-    };
+  const settings = { ...defaults, ...options };
 
-    // Define bounds for each dimension (ingredient)
-    const bounds = ingredients.map(ingredient => ({
-      min: ingredient.minimum !== null ? ingredient.minimum : 0,
-      max: ingredient.maximum !== null ? ingredient.maximum : 100
-    }));
+  // Extract ingredient names
+  const ingredientNames = objectives.map(obj => obj.name);
 
-    // Configure PSO
-    const options = {
-      particles: 50,
-      dimensions: ingredients.length,
-      bounds: bounds,
-      maxIterations: 1000,
-      learningRate: 0.1,
-      inertia: 0.8,
-      tolerance: 1e-6
-    };
+  // Create variable bounds array in the format needed for PSO
+  const bounds = [];
 
-    // Create and run PSO
-    const pso = new PSO(objectiveFunction, options);
-    const result = pso.optimize();
+  variableBounds.forEach(bound => {
+    const lb = bound.lb !== undefined ? bound.lb : 0;
+    const ub = bound.ub !== undefined ? bound.ub : 100;
+    bounds.push([lb, ub]);
+  });
 
-    // Process the results
-    const solution = {
-      status: result.converged ? 'converged' : 'not_converged',
-      objective: result.bestFitness,
-      variables: result.bestPosition,
-      iterations: result.iterations,
-      message: result.converged ? 'Optimal solution found' : 'No optimal solution found'
-    };
-
-    res.status(200).json({
-      message: 'success',
-      solution
+  // Initialize particles
+  const particles = [];
+  for (let i = 0; i < settings.particles; i++) {
+    // Random initial position within bounds
+    const position = variableBounds.map((bound, idx) => {
+      const lb = bound.lb !== undefined ? bound.lb : 0;
+      const ub = bound.ub !== undefined ? bound.ub : 100;
+      return lb + Math.random() * (ub - lb);
     });
 
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: 'error'
+    // Adjust to meet total weight constraint
+    let totalWeight = position.reduce((sum, val) => sum + val, 0);
+    if (totalWeight > 0) {
+      // Scale to sum to 100
+      position.forEach((val, idx) => {
+        position[idx] = (val / totalWeight) * 100;
+      });
+    } else {
+      // If all zeros, distribute evenly
+      const equalWeight = 100 / position.length;
+      position.forEach((val, idx) => {
+        position[idx] = equalWeight;
+      });
+    }
+
+    // Random initial velocity
+    const velocity = variableBounds.map((bound) => {
+      const lb = bound.lb !== undefined ? bound.lb : 0;
+      const ub = bound.ub !== undefined ? bound.ub : 100;
+      const range = ub - lb;
+      return -range/10 + Math.random() * range/5; // Velocity in range [-range/10, range/10]
+    });
+
+    particles.push({
+      position,
+      velocity,
+      bestPosition: [...position],
+      bestFitness: Infinity
     });
   }
+
+  // Global best
+  let globalBestPosition = null;
+  let globalBestFitness = Infinity;
+
+  // Fitness function (objective + penalty for constraint violations)
+  function calculateFitness(position) {
+    // Create a mapping of ingredient name to position value
+    const positionMap = {};
+    ingredientNames.forEach((name, idx) => {
+      positionMap[name] = position[idx];
+    });
+
+    // Calculate objective value (cost)
+    let cost = 0;
+    objectives.forEach((obj, idx) => {
+      cost += obj.coef * position[idx];
+    });
+
+    // Calculate constraint violations
+    let penalty = 0;
+
+    // Check total weight constraint (should be exactly 100)
+    const totalWeight = position.reduce((sum, val) => sum + val, 0);
+    penalty += Math.abs(totalWeight - 100) * 1000; // Strong penalty for total weight deviation
+
+    // Check other constraints
+    constraints.forEach(constraint => {
+      // Skip the total weight constraint as we handled it separately
+      if (constraint.name === "Total Weight") return;
+
+      // Calculate the current value for this constraint
+      let constraintValue = 0;
+      constraint.vars.forEach((variable) => {
+        const ingredientIndex = ingredientNames.indexOf(variable.name);
+        if (ingredientIndex !== -1) {
+          constraintValue += variable.coef * position[ingredientIndex];
+        }
+      });
+
+      // Check if constraint is violated
+      if (constraint.bnds.type === "GLP_LO" || constraint.bnds.type === "GLP_DB") {
+        // Lower bound constraint
+        if (constraintValue < constraint.bnds.lb) {
+          penalty += (constraint.bnds.lb - constraintValue) * 1000;
+        }
+      }
+
+      if (constraint.bnds.type === "GLP_UP" || constraint.bnds.type === "GLP_DB") {
+        // Upper bound constraint
+        if (constraintValue > constraint.bnds.ub) {
+          penalty += (constraintValue - constraint.bnds.ub) * 1000;
+        }
+      }
+
+      if (constraint.bnds.type === "GLP_FX") {
+        // Fixed constraint
+        penalty += Math.abs(constraintValue - constraint.bnds.lb) * 1000;
+      }
+    });
+
+    // Check variable bounds
+    variableBounds.forEach((bound, idx) => {
+      if (bound.type === "GLP_LO" || bound.type === "GLP_DB") {
+        if (position[idx] < bound.lb) {
+          penalty += (bound.lb - position[idx]) * 1000;
+        }
+      }
+
+      if (bound.type === "GLP_UP" || bound.type === "GLP_DB") {
+        if (position[idx] > bound.ub) {
+          penalty += (position[idx] - bound.ub) * 1000;
+        }
+      }
+    });
+
+    return cost + penalty;
+  }
+
+  // Run PSO iterations
+  let converged = false;
+  let bestFitness = Infinity;
+  let lastImprovement = 0;
+
+  console.log("Starting PSO optimization...");
+
+  for (let iter = 0; iter < settings.iterations && !converged; iter++) {
+    // Update each particle
+    particles.forEach(particle => {
+      // Calculate fitness
+      const fitness = calculateFitness(particle.position);
+
+      // Update personal best
+      if (fitness < particle.bestFitness) {
+        particle.bestFitness = fitness;
+        particle.bestPosition = [...particle.position];
+
+        // Update global best
+        if (fitness < globalBestFitness) {
+          globalBestFitness = fitness;
+          globalBestPosition = [...particle.bestPosition];
+          lastImprovement = iter;
+        }
+      }
+
+      // Update velocity and position
+      particle.position.forEach((pos, idx) => {
+        // Update velocity with inertia, cognitive and social components
+        particle.velocity[idx] =
+          settings.inertia * particle.velocity[idx] +
+          settings.personal * Math.random() * (particle.bestPosition[idx] - pos) +
+          settings.social * Math.random() * (globalBestPosition[idx] - pos);
+
+        // Update position
+        particle.position[idx] = pos + particle.velocity[idx];
+
+        // Clamp position to bounds
+        if (variableBounds[idx].type === "GLP_LO" || variableBounds[idx].type === "GLP_DB") {
+          particle.position[idx] = Math.max(variableBounds[idx].lb, particle.position[idx]);
+        }
+
+        if (variableBounds[idx].type === "GLP_UP" || variableBounds[idx].type === "GLP_DB") {
+          particle.position[idx] = Math.min(variableBounds[idx].ub, particle.position[idx]);
+        }
+      });
+
+      // Enforce total weight constraint = 100
+      let totalWeight = particle.position.reduce((sum, val) => sum + val, 0);
+      if (totalWeight > 0) {
+        particle.position.forEach((val, idx) => {
+          particle.position[idx] = (val / totalWeight) * 100;
+        });
+      }
+    });
+
+    // Check for convergence every 100 iterations
+    if (iter > 0 && iter % 100 === 0) {
+      const currentBestFitness = calculateFitness(globalBestPosition);
+      const improvement = Math.abs(bestFitness - currentBestFitness);
+
+      if (improvement < settings.tolerance || (iter - lastImprovement > 500)) {
+        converged = true;
+        console.log(`Converged at iteration ${iter}, improvement: ${improvement}`);
+      }
+
+      bestFitness = currentBestFitness;
+    }
+  }
+
+  // Format the results to match the simplex output
+  const optimizedIngredients = {};
+  ingredientNames.forEach((name, idx) => {
+    optimizedIngredients[name] = globalBestPosition[idx];
+  });
+
+  // Determine optimized nutrients
+  const optimizedNutrients = determineOptimizedNutrientsPSO(optimizedIngredients, constraints);
+
+  // Format output
+  const formattedOptimizedIngredients = ingredientNames.map((name, idx) => ({
+    name,
+    value: globalBestPosition[idx].toFixed(2)
+  }));
+
+  const optimizedCost = objectives.reduce((sum, obj, idx) =>
+    sum + obj.coef * globalBestPosition[idx], 0).toFixed(2);
+
+  return {
+    status: 'Optimal solution found',
+    optimizedCost,
+    optimizedIngredients: formattedOptimizedIngredients,
+    optimizedNutrients
+  };
 };
+
+const pso = async (req, res) => {
+  const { objectives, constraints, variableBounds } = formatInput(req.body);
+
+  try {
+    console.log("Running PSO optimization...");
+
+    // Configure PSO options
+    const options = {
+      iterations: 2000,
+      particles: 50,
+      inertia: 0.7,
+      social: 1.5,
+      personal: 1.5,
+      tolerance: 1e-5
+    };
+
+    // Run PSO optimization
+    const output = psoOptimize(objectives, constraints, variableBounds, options);
+
+    if (output.status === 'Optimal solution found') {
+      res.status(200).json({
+        status: 'Optimal solution found',
+        constraints: constraints,
+        optimizedCost: output.optimizedCost,
+        optimizedIngredients: output.optimizedIngredients,
+        optimizedNutrients: output.optimizedNutrients
+      });
+    } else {
+      res.status(400).json({
+        status: 'No optimal solution',
+        message: output.status,
+      });
+    }
+  } catch (error) {
+    console.error("Error in PSO optimization:", error);
+    res.status(500).json({ error: "An error occurred during PSO optimization." });
+  }
+};
+
 
 export {
   simplex,
