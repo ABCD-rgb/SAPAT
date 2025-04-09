@@ -209,11 +209,9 @@ const importIngredient = async (req, res) => {
 
         let nutrientId;
         if (existingNutrient) {
-          console.log(`nutrient ${nutrientName} existing`);
           // Use existing nutrient's ID
           nutrientId = existingNutrient._id;
         } else {
-          console.log(`Created new nutrient: ${nutrientName}`);
           // Create a new nutrient
           const newNutrient = await Nutrient.create({
             name: nutrientName,
