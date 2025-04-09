@@ -1,4 +1,4 @@
-import { RiAddLine, RiFileDownloadLine, RiFileUploadLine } from 'react-icons/ri'
+import { RiAddLine, RiFileUploadLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
 import Search from '../components/Search.jsx'
+import Export from "../components/buttons/Export.jsx";
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -110,6 +111,13 @@ function Ingredients() {
     setToastAction(action)
   }
 
+  const handleExportSubmit = (message, action) => {
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -151,10 +159,10 @@ function Ingredients() {
               <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Import</span>
             </button>
-            <button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Export</span>
-            </button>
+            <Export
+              ingredients={ingredients}
+              onExport={handleExportSubmit}
+            />
           </div>
           <Search
             userId={user._id}
@@ -164,7 +172,7 @@ function Ingredients() {
         </div>
       </div>
 
-      {/* Table Section - Removed overflow from container */}
+      {/* Table Section */}
       <div className="flex-1 p-3 md:px-6">
         <Table
           headers={headers}
