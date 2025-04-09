@@ -4,18 +4,13 @@ import Loading from '../../Loading.jsx'
 import axios from 'axios'
 
 function EditIngredientModal({
+  ingredients,
   user_id,
   isOpen,
   onClose,
   ingredient,
   onResult,
 }) {
-  // const nutrientInputs = [
-  //   { name: 'Dry Matter', unit: '%' },
-  //   { name: 'Crude Protein', unit: '%' },
-  //   { name: 'Lysine', unit: '%' },
-  //   { name: 'Glycine', unit: '%' },
-  // ]
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -28,6 +23,9 @@ function EditIngredientModal({
       },
     ],
   })
+
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [nameError, setNameError] = useState('')
 
   useEffect(() => {
     if (ingredient) {
@@ -66,6 +64,23 @@ function EditIngredientModal({
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsDisabled(true)
+
+    // client-side validation
+    if (
+      ingredients
+        .filter((i) => i.name !== ingredient.name)
+        .some(
+          (ingredient) =>
+            ingredient.name.toLowerCase() === formData.name.toLowerCase()
+        )
+    ) {
+      setNameError('Name already exists')
+      setIsDisabled(false)
+      return
+    } else {
+      setNameError('')
+    }
     try {
       const { _id, user, ...body } = formData
       const ingredient_id = ingredient.ingredient_id || ingredient._id
@@ -84,6 +99,9 @@ function EditIngredientModal({
       )
     } catch (err) {
       console.log(err)
+    } finally {
+      setIsDisabled(false)
+      setNameError('')
     }
   }
 
@@ -116,6 +134,7 @@ function EditIngredientModal({
             className="input input-bordered input-sm w-full max-w-xs rounded-xl"
             value={nutrient.value}
             pattern="[0-9]*"
+            disabled={isDisabled}
             onChange={(e) => handleNutrientChange(index, e)}
           />
         </td>
@@ -154,11 +173,17 @@ function EditIngredientModal({
                   type="text"
                   name="name"
                   value={formData.name}
+                  disabled={isDisabled}
                   required
                   onChange={handleChange}
                   placeholder="Enter name"
-                  className="input input-bordered w-full rounded-2xl"
+                  className={`input input-bordered w-full rounded-2xl ${nameError ? 'border-red-500' : ''}`}
                 />
+                {nameError && (
+                  <p className="mt-1 text-sm text-red-500" role="alert">
+                    {nameError}
+                  </p>
+                )}
               </div>
               <div className="form-control w-full">
                 <label className="label">
@@ -170,6 +195,7 @@ function EditIngredientModal({
                   value={formData.price}
                   pattern="[0-9]*"
                   required
+                  disabled={isDisabled}
                   onChange={handleChange}
                   placeholder="Enter price"
                   className="input input-bordered w-full rounded-2xl"
@@ -183,6 +209,7 @@ function EditIngredientModal({
                 <select
                   name="available"
                   value={formData.available}
+                  disabled={isDisabled}
                   onChange={handleChange}
                   className="select select-bordered w-full rounded-2xl"
                 >
@@ -198,6 +225,7 @@ function EditIngredientModal({
                 <select
                   name="group"
                   value={formData.group}
+                  disabled={isDisabled}
                   onChange={handleChange}
                   className="select select-bordered w-full rounded-2xl"
                 >
@@ -236,9 +264,9 @@ function EditIngredientModal({
             </button>
             <button
               type="submit"
-              className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
+              className={`btn rounded-xl bg-amber-500 ${isDisabled ? 'disabled bg-red-100' : 'hover:bg-amber-600'} px-8 text-white`}
             >
-              Update
+              {`${isDisabled ? 'Updating...' : 'Update'}`}
             </button>
           </div>
         </form>

@@ -31,7 +31,7 @@ function AppLayout() {
   const isAuthPage = location.pathname === '/'
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-gray-50">
       {!isAuthPage && <Header />}
       <div className="flex flex-1 overflow-hidden">
         {!isAuthPage && <Sidebar />}

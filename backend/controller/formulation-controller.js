@@ -27,9 +27,10 @@ const getAllFormulations = async (req, res) => {
     const { collaboratorId } = req.params;
     try {
         // only show formulations where the user is part of the collaborators
-        const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group collaborators');
+        const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group collaborators createdAt');
         // aside from the basic details, return the access level of the user
         const filteredFormulations = formulations.map(formulation => {
+            console.log(formulation);
             const access = formulation.collaborators.find(c => c.userId.toString() === collaboratorId)?.access;
             return {
                 "_id": formulation._id,
@@ -37,7 +38,8 @@ const getAllFormulations = async (req, res) => {
                 "name": formulation.name,
                 "description": formulation.description ? formulation.description : "",
                 "animal_group": formulation.animal_group ? formulation.animal_group : "",
-                "access": access
+                "access": access,
+                "createdAt": formulation.createdAt
             }
         })
         res.status(200).json({ message: 'success', formulations: filteredFormulations });
@@ -59,6 +61,22 @@ const getFormulation = async (req, res) => {
         res.status(500).json({ error: err.message, message: 'error' })
     }
 };
+
+const getFormulationByName = async (req, res) => {
+    const { searchQuery } = req.query;
+    const { userId } = req.params;
+    try {
+        const formulations = await Formulation.find({'collaborators.userId': userId})
+        if (!formulations) {
+            return res.status(404).json({ message: 'No formulations', fetched: [] });
+        }
+        // partial matching
+        const filteredFormulations = formulations.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        res.status(200).json({ message: 'success', fetched: filteredFormulations });
+    } catch (err) {
+        res.status(500).json({ error: err.message, message: 'error' })
+    }
+}
 
 
 const updateFormulation = async (req, res) => {
@@ -315,6 +333,7 @@ export {
     createFormulation,
     getAllFormulations,
     getFormulation,
+    getFormulationByName,
     updateFormulation,
     deleteFormulation,
     getFormulationOwner,
