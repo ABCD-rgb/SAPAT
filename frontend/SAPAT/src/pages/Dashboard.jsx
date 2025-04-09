@@ -115,7 +115,17 @@ function Dashboard() {
             Feed Classifications
           </h2>
           <div className="h-[200px] w-full">
-            <Pie data={pieData} options={pieOptions} />
+            { (formulationTypeCount[0] !== 0 || formulationTypeCount[1] !== 0 || formulationTypeCount[2] !== 0 )
+              ? <Pie data={pieData} options={pieOptions} />
+              :
+              <div className="flex items-center justify-center h-full w-full rounded-md">
+                <p className="text-gray-500 text-lg text-center p-4">
+                  No data to display yet.
+                  <br/>
+                  <span className="text-sm italic">Create/Classify a formulation to see results.</span>
+                </p>
+              </div>
+            }
           </div>
         </div>
       </div>
