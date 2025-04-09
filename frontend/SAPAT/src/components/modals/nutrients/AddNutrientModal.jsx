@@ -14,22 +14,32 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
   const [abbrevError, setAbbrevError] = useState('')
   const [nameError, setNameError] = useState('')
 
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsDisabled(true)
 
     // client-side validation
-    if (nutrients.some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
+    if (
+      nutrients.some(
+        (nutrient) =>
+          nutrient.abbreviation.toLowerCase() ===
+          formData.abbreviation.toLowerCase()
+      )
+    ) {
       setAbbrevError('Abbreviation already exists ')
       setNameError('')
       setIsDisabled(false)
-      return;
-    } else if (nutrients.some(nutrient => nutrient.name.toLowerCase() === formData.name.toLowerCase())) {
+      return
+    } else if (
+      nutrients.some(
+        (nutrient) =>
+          nutrient.name.toLowerCase() === formData.name.toLowerCase()
+      )
+    ) {
       setNameError('Name already exists')
       setAbbrevError('')
       setIsDisabled(false)
-      return;
+      return
     } else {
       setNameError('')
     }
@@ -104,10 +114,10 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter abbreviation"
-                className={`input input-bordered w-full rounded-xl ${abbrevError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${abbrevError ? 'border-red-500' : ''}`}
               />
               {abbrevError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {abbrevError}
                 </p>
               )}
@@ -125,10 +135,10 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${nameError ? 'border-red-500' : ''}`}
               />
               {nameError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {nameError}
                 </p>
               )}

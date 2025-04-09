@@ -1,7 +1,7 @@
-import {RiFileDownloadLine} from "react-icons/ri";
-import axios from "axios";
-import * as XLSX from "xlsx";
-import {useState} from "react";
+import { RiFileDownloadLine } from 'react-icons/ri'
+import axios from 'axios'
+import * as XLSX from 'xlsx'
+import { useState } from 'react'
 
 function Export({ ingredients, onExport }) {
   const [nutrientNames, setNutrientNames] = useState([])

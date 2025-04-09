@@ -2,7 +2,14 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onResult }) {
+function EditNutrientModal({
+  nutrients,
+  user_id,
+  isOpen,
+  onClose,
+  nutrient,
+  onResult,
+}) {
   const [formData, setFormData] = useState({
     abbreviation: '',
     name: '',
@@ -26,16 +33,31 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
     setIsDisabled(true)
 
     // client-side validation
-    if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.abbreviation.toLowerCase() === formData.abbreviation.toLowerCase())) {
+    if (
+      nutrients
+        .filter((n) => n.name !== nutrient.name)
+        .some(
+          (nutrient) =>
+            nutrient.abbreviation.toLowerCase() ===
+            formData.abbreviation.toLowerCase()
+        )
+    ) {
       setAbbrevError('Abbreviation already exists')
       setNameError('')
       setIsDisabled(false)
-      return;
-    } else if (nutrients.filter(n => n.name !== nutrient.name).some(nutrient => nutrient.name.toLowerCase() === formData.name.toLowerCase())) {
+      return
+    } else if (
+      nutrients
+        .filter((n) => n.name !== nutrient.name)
+        .some(
+          (nutrient) =>
+            nutrient.name.toLowerCase() === formData.name.toLowerCase()
+        )
+    ) {
       setNameError('Name already exists')
       setAbbrevError('')
       setIsDisabled(false)
-      return;
+      return
     } else {
       setNameError('')
     }
@@ -103,10 +125,10 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter abbreviation"
-                className={`input input-bordered w-full rounded-xl ${abbrevError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${abbrevError ? 'border-red-500' : ''}`}
               />
               {abbrevError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {abbrevError}
                 </p>
               )}
@@ -124,10 +146,10 @@ function EditNutrientModal({ nutrients, user_id, isOpen, onClose, nutrient, onRe
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${nameError ? 'border-red-500' : ''}`}
               />
               {nameError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {nameError}
                 </p>
               )}

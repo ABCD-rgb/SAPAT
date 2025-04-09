@@ -1,4 +1,4 @@
-import {RiFileUploadLine} from "react-icons/ri";
+import { RiFileUploadLine } from 'react-icons/ri'
 
 function Import({ onImport }) {
   return (
@@ -12,4 +12,4 @@ function Import({ onImport }) {
   )
 }
 
-export default Import;
+export default Import

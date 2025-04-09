@@ -67,10 +67,17 @@ function EditIngredientModal({
     setIsDisabled(true)
 
     // client-side validation
-    if (ingredients.filter(i => i.name !== ingredient.name).some(ingredient => ingredient.name.toLowerCase() === formData.name.toLowerCase())) {
+    if (
+      ingredients
+        .filter((i) => i.name !== ingredient.name)
+        .some(
+          (ingredient) =>
+            ingredient.name.toLowerCase() === formData.name.toLowerCase()
+        )
+    ) {
       setNameError('Name already exists')
       setIsDisabled(false)
-      return;
+      return
     } else {
       setNameError('')
     }
@@ -170,10 +177,10 @@ function EditIngredientModal({
                   required
                   onChange={handleChange}
                   placeholder="Enter name"
-                  className={`input input-bordered w-full rounded-2xl ${nameError ? "border-red-500" : ""}`}
+                  className={`input input-bordered w-full rounded-2xl ${nameError ? 'border-red-500' : ''}`}
                 />
                 {nameError && (
-                  <p className="text-red-500 text-sm mt-1" role="alert">
+                  <p className="mt-1 text-sm text-red-500" role="alert">
                     {nameError}
                   </p>
                 )}

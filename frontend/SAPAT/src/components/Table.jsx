@@ -73,96 +73,105 @@ function Table({
           </tr>
         </thead>
         <tbody>
-        {data && data.length > 0 ? (
-          data.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover">
-              {getRowData(row).map((cell, cellIndex) => (
-                <td key={cellIndex}>
-                  {/* only the name column (index 1) is clickable to go to ViewFormulation */}
-                  {onRowClick && cellIndex === 1 ? (
-                    <span
-                      onClick={() => onRowClick && onRowClick(row)}
-                      className="group text-deepbrown hover:bg-deepbrown inline-flex cursor-pointer items-center gap-2 rounded px-2 py-1 font-medium hover:text-white/80 hover:underline"
+          {data && data.length > 0 ? (
+            data.map((row, rowIndex) => (
+              <tr key={rowIndex} className="hover">
+                {getRowData(row).map((cell, cellIndex) => (
+                  <td key={cellIndex}>
+                    {/* only the name column (index 1) is clickable to go to ViewFormulation */}
+                    {onRowClick && cellIndex === 1 ? (
+                      <span
+                        onClick={() => onRowClick && onRowClick(row)}
+                        className="group text-deepbrown hover:bg-deepbrown inline-flex cursor-pointer items-center gap-2 rounded px-2 py-1 font-medium hover:text-white/80 hover:underline"
+                      >
+                        {cell}
+                        <FaEye className="h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                      </span>
+                    ) : (
+                      cell
+                    )}
+                  </td>
+                ))}
+                {actions && (
+                  <td className="flex justify-end gap-2">
+                    <div
+                      className={`${row?.access && row.access !== 'owner' && 'tooltip tooltip-left'}`}
+                      data-tip={`${row?.access && row.access !== 'owner' && 'Only the owner can edit this formulation.'}`}
                     >
-                      {cell}
-                      <FaEye className="h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                    </span>
-                  ) : (
-                    cell
-                  )}
-                </td>
-              ))}
-              {actions && (
-                <td className="flex justify-end gap-2">
-                  <div
-                    className={`${row?.access && row.access !== 'owner' && 'tooltip tooltip-left'}`}
-                    data-tip={`${row?.access && row.access !== 'owner' && 'Only the owner can edit this formulation.'}`}
-                  >
-                    <button
-                      disabled={row?.access && row?.access !== 'owner'}
-                      className={`btn btn-ghost btn-sm ${
-                        row?.access && row.access !== 'owner'
-                          ? 'cursor-not-allowed text-gray-500'
-                          : 'text-deepbrown hover:bg-deepbrown/10'
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        // non-owners should not be able to edit the basic data
-                        if (row?.access && row.access !== 'owner') {
-                          // toast instructions
-                          setShowToast(true)
-                          setMessage('Only the owner can edit the basic data.')
-                          setToastAction('error')
-                        } else {
-                          onEdit(row)
-                        }
-                      }}
+                      <button
+                        disabled={row?.access && row?.access !== 'owner'}
+                        className={`btn btn-ghost btn-sm ${
+                          row?.access && row.access !== 'owner'
+                            ? 'cursor-not-allowed text-gray-500'
+                            : 'text-deepbrown hover:bg-deepbrown/10'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // non-owners should not be able to edit the basic data
+                          if (row?.access && row.access !== 'owner') {
+                            // toast instructions
+                            setShowToast(true)
+                            setMessage(
+                              'Only the owner can edit the basic data.'
+                            )
+                            setToastAction('error')
+                          } else {
+                            onEdit(row)
+                          }
+                        }}
+                      >
+                        <RiPencilLine className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div
+                      className={`${row?.access && row.access !== 'owner' && 'tooltip tooltip-left'}`}
+                      data-tip={`${row?.access && row.access !== 'owner' && 'Only the owner can delete this formulation.'}`}
                     >
-                      <RiPencilLine className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div
-                    className={`${row?.access && row.access !== 'owner' && 'tooltip tooltip-left'}`}
-                    data-tip={`${row?.access && row.access !== 'owner' && 'Only the owner can delete this formulation.'}`}
-                  >
-                    <button
-                      disabled={row?.access && row?.access !== 'owner'}
-                      className={`btn btn-ghost btn-sm ${
-                        row?.access && row.access !== 'owner'
-                          ? 'cursor-not-allowed text-gray-500'
-                          : 'hover:bg-deepbrown/10 text-red-600'
-                      }`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        // non-owners should not be able to edit the basic data
-                        if (row?.access && row.access !== 'owner') {
-                          // toast instructions
-                          setShowToast(true)
-                          setMessage(
-                            'Only the owner can delete this formulation.'
-                          )
-                          setToastAction('error')
-                        } else {
-                          onDelete(row)
-                        }
-                      }}
-                    >
-                      <RiDeleteBinLine className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              )}
+                      <button
+                        disabled={row?.access && row?.access !== 'owner'}
+                        className={`btn btn-ghost btn-sm ${
+                          row?.access && row.access !== 'owner'
+                            ? 'cursor-not-allowed text-gray-500'
+                            : 'hover:bg-deepbrown/10 text-red-600'
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // non-owners should not be able to edit the basic data
+                          if (row?.access && row.access !== 'owner') {
+                            // toast instructions
+                            setShowToast(true)
+                            setMessage(
+                              'Only the owner can delete this formulation.'
+                            )
+                            setToastAction('error')
+                          } else {
+                            onDelete(row)
+                          }
+                        }}
+                      >
+                        <RiDeleteBinLine className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={
+                  actions ? getRowData({}).length + 1 : getRowData({}).length
+                }
+                className="py-8 text-center text-gray-500"
+              >
+                <RiTableLine className="mx-auto mb-2 h-12 w-12 opacity-60" />
+                <p>
+                  No data to display yet. Click &apos;Add New&apos; to get
+                  started.
+                </p>
+              </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan={actions ? getRowData({}).length + 1 : getRowData({}).length} className="text-center py-8 text-gray-500">
-              <RiTableLine className="mx-auto mb-2 h-12 w-12 opacity-60" />
-              <p>No data to display yet. Click &apos;Add New&apos; to get started.</p>
-            </td>
-          </tr>
-        )
-        }
+          )}
         </tbody>
       </table>
       {/*  Toasts */}

@@ -18,32 +18,38 @@ function Dashboard() {
   const [formulationTypeCount, setFormulationTypeCount] = useState([0, 0, 0])
   const [recentFormulations, setRecentFormulations] = useState([])
 
-  const pieData = useMemo(() => ({
-    labels: ['Swine', 'Pig', 'Poultry'],
-    datasets: [
-      {
-        data: formulationTypeCount,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-        borderWidth: 0,
-      },
-    ],
-  }), [formulationTypeCount]);
+  const pieData = useMemo(
+    () => ({
+      labels: ['Swine', 'Pig', 'Poultry'],
+      datasets: [
+        {
+          data: formulationTypeCount,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          borderWidth: 0,
+        },
+      ],
+    }),
+    [formulationTypeCount]
+  )
 
-  const pieOptions = useMemo(() => ({
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          usePointStyle: true,
-          padding: 20,
-          font: {
-            size: 12,
+  const pieOptions = useMemo(
+    () => ({
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: {
+              size: 12,
+            },
           },
         },
       },
-    },
-    maintainAspectRatio: false,
-  }), []);
+      maintainAspectRatio: false,
+    }),
+    []
+  )
 
   useEffect(() => {
     if (user) {
@@ -68,7 +74,9 @@ function Dashboard() {
       const typeCount = [swine.length, pig.length, poultry.length]
       setFormulationTypeCount(typeCount)
       // recent formulations
-      const recent = formulations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0,5);
+      const recent = formulations
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
       setRecentFormulations(recent)
     } catch (err) {
       console.log(err)
@@ -115,17 +123,21 @@ function Dashboard() {
             Feed Classifications
           </h2>
           <div className="h-[200px] w-full">
-            { (formulationTypeCount[0] !== 0 || formulationTypeCount[1] !== 0 || formulationTypeCount[2] !== 0 )
-              ? <Pie data={pieData} options={pieOptions} />
-              :
-              <div className="flex items-center justify-center h-full w-full rounded-md">
-                <p className="text-gray-500 text-lg text-center p-4">
+            {formulationTypeCount[0] !== 0 ||
+            formulationTypeCount[1] !== 0 ||
+            formulationTypeCount[2] !== 0 ? (
+              <Pie data={pieData} options={pieOptions} />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-md">
+                <p className="p-4 text-center text-lg text-gray-500">
                   No data to display yet.
-                  <br/>
-                  <span className="text-sm italic">Create/Classify a formulation to see results.</span>
+                  <br />
+                  <span className="text-sm italic">
+                    Create/Classify a formulation to see results.
+                  </span>
                 </p>
               </div>
-            }
+            )}
           </div>
         </div>
       </div>
@@ -140,17 +152,17 @@ function Dashboard() {
               {recentFormulations.map((f) => (
                 <div
                   key={f._id}
-                  className="flex justify-between items-center bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
                 >
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-4 md:min-w-[200px]">
-                      <span className="hidden md:block font-mono md:min-w-[60px] text-right pr-2 text-gray-500">
+                      <span className="hidden pr-2 text-right font-mono text-gray-500 md:block md:min-w-[60px]">
                         {f.code || '-'}
                       </span>
-                      <span className="hidden md:block font-mono text-right pr-2 text-gray-500">
+                      <span className="hidden pr-2 text-right font-mono text-gray-500 md:block">
                         |
                       </span>
-                      <span className="font-medium text-deepbrown">
+                      <span className="text-deepbrown font-medium">
                         {f.name}
                       </span>
                     </div>
@@ -165,7 +177,7 @@ function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="text-center text-gray-500 py-4">
+            <div className="py-4 text-center text-gray-500">
               No recent formulations
             </div>
           )}

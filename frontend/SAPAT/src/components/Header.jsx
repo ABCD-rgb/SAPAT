@@ -8,9 +8,7 @@ function Header() {
     <header className="bg-white p-2 shadow-sm">
       <div className="text-darkbrown flex items-center justify-between">
         <div className="items-left border-darkbrown ml-6 flex flex-col">
-          <p className="text-lg font-bold text-darkbrown">
-            SAPAT
-          </p>
+          <p className="text-darkbrown text-lg font-bold">SAPAT</p>
           <p className="text-sm">
             {' '}
             {new Date().toLocaleDateString('en-US', {

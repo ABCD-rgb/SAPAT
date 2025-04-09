@@ -2,7 +2,13 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 import axios from 'axios'
 
-function CreateFormulationModal({ formulations, owner, isOpen, onClose, onResult }) {
+function CreateFormulationModal({
+  formulations,
+  owner,
+  isOpen,
+  onClose,
+  onResult,
+}) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
@@ -18,16 +24,26 @@ function CreateFormulationModal({ formulations, owner, isOpen, onClose, onResult
     setIsDisabled(true)
 
     // client-side validation
-    if (formulations.some(formulation => formulation.code.toLowerCase() === formData.code.toLowerCase())) {
+    if (
+      formulations.some(
+        (formulation) =>
+          formulation.code.toLowerCase() === formData.code.toLowerCase()
+      )
+    ) {
       setCodeError('Code already exists ')
       setNameError('')
       setIsDisabled(false)
-      return;
-    } else if (formulations.some(formulation => formulation.name.toLowerCase() === formData.name.toLowerCase())) {
+      return
+    } else if (
+      formulations.some(
+        (formulation) =>
+          formulation.name.toLowerCase() === formData.name.toLowerCase()
+      )
+    ) {
       setNameError('Name already exists')
       setCodeError('')
       setIsDisabled(false)
-      return;
+      return
     } else {
       setNameError('')
     }
@@ -109,10 +125,10 @@ function CreateFormulationModal({ formulations, owner, isOpen, onClose, onResult
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter code"
-                className={`input input-bordered w-full rounded-xl ${codeError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${codeError ? 'border-red-500' : ''}`}
               />
               {codeError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {codeError}
                 </p>
               )}
@@ -130,10 +146,10 @@ function CreateFormulationModal({ formulations, owner, isOpen, onClose, onResult
                 disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className={`input input-bordered w-full rounded-xl ${nameError ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full rounded-xl ${nameError ? 'border-red-500' : ''}`}
               />
               {nameError && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
+                <p className="mt-1 text-sm text-red-500" role="alert">
                   {nameError}
                 </p>
               )}
