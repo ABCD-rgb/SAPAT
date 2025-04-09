@@ -4,101 +4,109 @@ import * as XLSX from 'xlsx'
 import { readUsedSize } from 'chart.js/helpers'
 
 function ImportModal({ isOpen, onClose, onSubmit }) {
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null)
   const [fileDataInJSON, setFileDataInJSON] = useState([])
   const [fileValidationError, setFileValidationError] = useState('')
 
   const transformExcelData = (jsonData) => {
     // Assuming first row is headers and subsequent rows are data
-    const headers = jsonData[0];
+    const headers = jsonData[0]
 
     // Transform data starting from the second row (index 1)
-    return jsonData.slice(1).map(row => {
+    return jsonData.slice(1).map((row) => {
       // Create an array of nutrient objects, skipping the first 2 columns (Name, Price)
-      const nutrients = headers.slice(2).map((nutrientName, index) => {
-        const value = Number(row[index + 2]);
+      const nutrients = headers
+        .slice(2)
+        .map((nutrientName, index) => {
+          const value = Number(row[index + 2])
 
-        // Check if nutrient value is a valid number
-        if (isNaN(value)) {
-          return null;
-        }
+          // Check if nutrient value is a valid number
+          if (isNaN(value)) {
+            return null
+          }
 
-        return {
-          nutrient: nutrientName.trim(), // Remove any extra whitespace
-          value: value
-        };
-      }).filter(nutrient => nutrient !== null); // Remove null nutrients
+          return {
+            nutrient: nutrientName.trim(), // Remove any extra whitespace
+            value: value,
+          }
+        })
+        .filter((nutrient) => nutrient !== null) // Remove null nutrients
 
       // If any nutrient is invalid, return null
       if (nutrients.length !== headers.length - 2) {
-        return null;
+        return null
       }
 
       return {
         name: row[0],
         price: row[1],
-        nutrients: nutrients
-      };
-    });
-  };
+        nutrients: nutrients,
+      }
+    })
+  }
 
   const handleChange = (e) => {
     // clear error messages
-    setFileValidationError('');
-    setFileDataInJSON([]);
+    setFileValidationError('')
+    setFileDataInJSON([])
 
-    const file = e.target.files[0];  // Correct way to get the file
+    const file = e.target.files[0] // Correct way to get the file
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (e) => {
         // Read the file
-        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+        const workbook = XLSX.read(e.target.result, { type: 'binary' })
 
         // Get the first sheet name
-        const sheetName = workbook.SheetNames[0];
+        const sheetName = workbook.SheetNames[0]
 
         // Convert the sheet to JSON
-        const worksheet = workbook.Sheets[sheetName];
+        const worksheet = workbook.Sheets[sheetName]
         const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-          header: 1,  // Use this if you want to preserve the header row
-          defval: '',  // Default value for empty cells
-          blankrows: false  // Skip blank rows
-        });
-        console.log("jsonData: ",jsonData);
+          header: 1, // Use this if you want to preserve the header row
+          defval: '', // Default value for empty cells
+          blankrows: false, // Skip blank rows
+        })
 
         // validation
         if (jsonData.length === 0) {
-          setFileValidationError('Empty file uploaded.');
-          return;
-        } else if (jsonData[0][0].toLowerCase().trim() !== "name" || jsonData[0][1].toLowerCase().trim() !== "price") {
-          setFileValidationError("First column must be 'Name' and 'Price'");
-          return;
+          setFileValidationError('Empty file uploaded.')
+          return
+        } else if (
+          jsonData[0][0].toLowerCase().trim() !== 'name' ||
+          jsonData[0][1].toLowerCase().trim() !== 'price'
+        ) {
+          setFileValidationError("First column must be 'Name' and 'Price'")
+          return
         } else if (jsonData[0].length < 3) {
-          setFileValidationError("File must contain 'Name', 'Price', and at least one nutrient column.");
-          return;
+          setFileValidationError(
+            "File must contain 'Name', 'Price', and at least one nutrient column."
+          )
+          return
         }
 
-        const formattedData = transformExcelData(jsonData);
-        console.log("formatted: ",formattedData);
+        const formattedData = transformExcelData(jsonData)
+
         // validation
         if (formattedData[0] === null) {
-          setFileValidationError('Nutrient values must be a numeric value.');
-          setFileDataInJSON([]);
-          return;
-        } else if (formattedData.some(data => data.name === '') || formattedData.some(data => data.price === '')) {
+          setFileValidationError('Nutrient values must be a numeric value.')
+          setFileDataInJSON([])
+          return
+        } else if (
+          formattedData.some((data) => data.name === '') ||
+          formattedData.some((data) => data.price === '')
+        ) {
           setFileValidationError('Missing name or price.')
-          return;
+          return
         }
 
         setFileValidationError('')
-        setFileDataInJSON(formattedData);
-
-      };
+        setFileDataInJSON(formattedData)
+      }
       // Actually read the file as a binary string
-      reader.readAsArrayBuffer(file);
-
+      reader.readAsArrayBuffer(file)
     }
-  };
+  }
 
   return (
     <dialog id="import_modal" className={`modal ${isOpen ? 'modal-open' : ''}`}>
@@ -145,9 +153,9 @@ function ImportModal({ isOpen, onClose, onSubmit }) {
               onChange={handleChange}
             />
             {fileValidationError && (
-            <p className="mt-1 text-sm text-red-500" role="alert">
-              {fileValidationError}
-            </p>
+              <p className="mt-1 text-sm text-red-500" role="alert">
+                {fileValidationError}
+              </p>
             )}
           </fieldset>
         </div>
@@ -172,7 +180,9 @@ function ImportModal({ isOpen, onClose, onSubmit }) {
             data-tip="Attach a valid file first."
           >
             <button
-              disabled={fileDataInJSON.length === 0 || fileValidationError !== '' }
+              disabled={
+                fileDataInJSON.length === 0 || fileValidationError !== ''
+              }
               className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
               onClick={() => {
                 if (fileDataInJSON.length > 0 || fileValidationError !== '') {
@@ -193,4 +203,4 @@ function ImportModal({ isOpen, onClose, onSubmit }) {
   )
 }
 
-export default ImportModal;
+export default ImportModal

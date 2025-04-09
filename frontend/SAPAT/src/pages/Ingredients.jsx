@@ -118,9 +118,12 @@ function Ingredients() {
     setIsImportModalOpen(true)
   }
 
-  const handleImportSubmit = async(data) => {
+  const handleImportSubmit = async (data) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`, data);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`,
+        data
+      )
       // refetch ingredients to display updated table
       await fetchData()
       // toast instructions
