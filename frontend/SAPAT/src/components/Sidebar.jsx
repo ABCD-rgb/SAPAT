@@ -52,13 +52,17 @@ function Sidebar() {
         ))}
       </nav>
 
-      <button
-        onClick={handleLogout}
-        className="text-red-button flex items-center rounded-lg p-2 pb-10 pl-2 transition-colors hover:bg-white/50"
+      <div
+        className="pb-10 md:pl-2"
       >
-        <RiLogoutBoxLine className="h-6 w-6" />
-        <span className="ml-3 hidden md:block">Logout</span>
-      </button>
+        <button
+          onClick={handleLogout}
+          className="p-2 md:px-4 text-red-button flex items-center rounded-lg transition-colors hover:bg-white/50"
+        >
+          <RiLogoutBoxLine className="h-6 w-6" />
+          <span className="ml-3 hidden md:block">Logout</span>
+        </button>
+      </div>
     </div>
   )
 }
