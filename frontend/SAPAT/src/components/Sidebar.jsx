@@ -54,7 +54,7 @@ function Sidebar() {
 
       <button
         onClick={handleLogout}
-        className="text-red-button flex items-center rounded-lg p-2 transition-colors hover:bg-white/50"
+        className="text-red-button flex items-center rounded-lg p-2 pb-10 pl-2 transition-colors hover:bg-white/50"
       >
         <RiLogoutBoxLine className="h-6 w-6" />
         <span className="ml-3 hidden md:block">Logout</span>

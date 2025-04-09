@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RiPencilLine, RiDeleteBinLine } from 'react-icons/ri'
+import { RiPencilLine, RiDeleteBinLine, RiTableLine } from 'react-icons/ri'
 import { FaEye } from 'react-icons/fa'
 import Toast from '../components/Toast'
 
@@ -73,7 +73,8 @@ function Table({
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
+        {data && data.length > 0 ? (
+          data.map((row, rowIndex) => (
             <tr key={rowIndex} className="hover">
               {getRowData(row).map((cell, cellIndex) => (
                 <td key={cellIndex}>
@@ -152,7 +153,16 @@ function Table({
                 </td>
               )}
             </tr>
-          ))}
+          ))
+        ) : (
+          <tr>
+            <td colSpan={actions ? getRowData({}).length + 1 : getRowData({}).length} className="text-center py-8 text-gray-500">
+              <RiTableLine className="mx-auto mb-2 h-12 w-12 opacity-60" />
+              <p>No data to display yet. Click &apos;Add New&apos; to get started.</p>
+            </td>
+          </tr>
+        )
+        }
         </tbody>
       </table>
       {/*  Toasts */}
