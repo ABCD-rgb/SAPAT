@@ -523,23 +523,27 @@ function ViewFormulation({
   }
 
   const handleIngredientMinimumChange = (index, value) => {
-    const numericValue = value === '' ? null : Number(value)
-    updateIngredientProperty(index, 'minimum', numericValue)
+    (value === 'N/A' || value === '')
+      ? updateIngredientProperty(index, 'minimum', 0)
+      : updateIngredientProperty(index, 'minimum', value)
   }
 
   const handleIngredientMaximumChange = (index, value) => {
-    const numericValue = value === '' ? null : Number(value)
-    updateIngredientProperty(index, 'maximum', numericValue)
+    (value === 'N/A' || value === '')
+      ? updateIngredientProperty(index, 'maximum', 0)
+      : updateIngredientProperty(index, 'maximum', value)
   }
 
   const handleNutrientMinimumChange = (index, value) => {
-    const numericValue = value === '' ? null : Number(value)
-    updateNutrientProperty(index, 'minimum', numericValue)
+    (value === 'N/A' || value === '')
+      ? updateNutrientProperty(index, 'minimum', 0)
+      : updateNutrientProperty(index, 'minimum', value)
   }
 
   const handleNutrientMaximumChange = (index, value) => {
-    const numericValue = value === '' ? null : Number(value)
-    updateNutrientProperty(index, 'maximum', numericValue)
+    (value === 'N/A' || value === '')
+      ? updateNutrientProperty(index, 'maximum', 0)
+      : updateNutrientProperty(index, 'maximum', value)
   }
 
   // Render function for Ingredients table rows
@@ -551,16 +555,32 @@ function ViewFormulation({
           <td>
             <input
               id={`ingredient-${index}-minimum`}
-              type="number"
+              type="text"
               className="input input-bordered input-xs w-20"
               disabled={userAccess === 'view'}
-              value={ingredient.minimum ?? ''}
-              onChange={(e) =>
-                handleIngredientMinimumChange(index, e.target.value)
+              value={
+                ingredient.minimum !== 0
+                  ? ingredient.minimum
+                  : 'N/A'
               }
-              onFocus={() =>
-                updateMyPresence({ focusedId: `ingredient-${index}-minimum` })
-              }
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                // in consideration for 'N/A' values which means 0
+                if (
+                  /^N\/A(\d+|\.)/.test(inputValue) ||
+                  /^\d*\.?\d{0,2}$/.test(inputValue)
+                ) {
+                  // to allow rewriting of input if user types a number after clicking on input with 'N/A'
+                  const processedValue =
+                    /^N\/A\d*/.test(inputValue)
+                      ? inputValue.replace('N/A', '')
+                      : inputValue
+                  handleIngredientMinimumChange(index, processedValue);
+                }
+              }}
+              onFocus={() => {
+                  updateMyPresence({ focusedId: `ingredient-${index}-minimum` })
+              }}
               onBlur={() => updateMyPresence({ focusedId: null })}
             />
             <Selections id={`ingredient-${index}-minimum`} others={others} />
@@ -568,13 +588,29 @@ function ViewFormulation({
           <td>
             <input
               id={`ingredient-${index}-maximum`}
-              type="number"
+              type="text"
               className="input input-bordered input-xs w-20"
               disabled={userAccess === 'view'}
-              value={ingredient.maximum ?? ''}
-              onChange={(e) =>
-                handleIngredientMaximumChange(index, e.target.value)
+              value={
+                ingredient.maximum !== 0
+                  ? ingredient.maximum
+                  : 'N/A'
               }
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                // in consideration for 'N/A' values which means 0
+                if (
+                  /^N\/A(\d+|\.)/.test(inputValue) ||
+                  /^\d*\.?\d{0,2}$/.test(inputValue)
+                ) {
+                  // to allow rewriting of input if user types a number after clicking on input with 'N/A'
+                  const processedValue =
+                    /^N\/A\d*/.test(inputValue)
+                      ? inputValue.replace('N/A', '')
+                      : inputValue
+                  handleIngredientMaximumChange(index, processedValue);
+                }
+              }}
               onFocus={() =>
                 updateMyPresence({ focusedId: `ingredient-${index}-maximum` })
               }
@@ -605,13 +641,29 @@ function ViewFormulation({
           <td>{nutrient.name}</td>
           <td>
             <input
-              type="number"
+              type="text"
               className="input input-bordered input-xs w-20"
               disabled={userAccess === 'view'}
-              value={nutrient.minimum ?? ''}
-              onChange={(e) =>
-                handleNutrientMinimumChange(index, e.target.value)
+              value={
+                nutrient.minimum !== 0
+                  ? nutrient.minimum
+                  : 'N/A'
               }
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                // in consideration for 'N/A' values which means 0
+                if (
+                  /^N\/A(\d+|\.)/.test(inputValue) ||
+                  /^\d*\.?\d{0,2}$/.test(inputValue)
+                ) {
+                  // to allow rewriting of input if user types a number after clicking on input with 'N/A'
+                  const processedValue =
+                    /^N\/A\d*/.test(inputValue)
+                      ? inputValue.replace('N/A', '')
+                      : inputValue
+                  handleNutrientMinimumChange(index, processedValue);
+                }
+              }}
               onFocus={() =>
                 updateMyPresence({ focusedId: `nutrient-${index}-minimum` })
               }
@@ -621,13 +673,29 @@ function ViewFormulation({
           </td>
           <td>
             <input
-              type="number"
+              type="text"
               className="input input-bordered input-xs w-20"
               disabled={userAccess === 'view'}
-              value={nutrient.maximum ?? ''}
-              onChange={(e) =>
-                handleNutrientMaximumChange(index, e.target.value)
+              value={
+                nutrient.maximum !== 0
+                  ? nutrient.maximum
+                  : 'N/A'
               }
+              onChange={(e) => {
+                const inputValue = e.target.value;
+                // in consideration for 'N/A' values which means 0
+                if (
+                  /^N\/A(\d+|\.)/.test(inputValue) ||
+                  /^\d*\.?\d{0,2}$/.test(inputValue)
+                ) {
+                  // to allow rewriting of input if user types a number after clicking on input with 'N/A'
+                  const processedValue =
+                    /^N\/A\d*/.test(inputValue)
+                      ? inputValue.replace('N/A', '')
+                      : inputValue
+                  handleNutrientMaximumChange(index, processedValue);
+                }
+              }}
               onFocus={() =>
                 updateMyPresence({ focusedId: `nutrient-${index}-maximum` })
               }
