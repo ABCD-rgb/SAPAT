@@ -1,4 +1,4 @@
-import { RiAddLine, RiFileUploadLine } from 'react-icons/ri'
+import { RiAddLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
@@ -118,11 +118,22 @@ function Ingredients() {
     setIsImportModalOpen(true)
   }
 
-  const handleImportSubmit = () => {
-    // toast instructions
-    setShowToast(true)
-    setMessage('yey')
-    setToastAction('success')
+  const handleImportSubmit = async(data) => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`, data);
+      // refetch ingredients to display updated table
+      await fetchData()
+      // toast instructions
+      setShowToast(true)
+      setMessage('Ingredients successfully imported.')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Failed to import.')
+      setToastAction('error')
+    }
   }
 
   const handleExportSubmit = (message, action) => {
@@ -217,7 +228,7 @@ function Ingredients() {
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        onConfirm={handleImportSubmit}
+        onSubmit={handleImportSubmit}
       />
 
       {/*  Toasts */}
