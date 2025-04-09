@@ -1,4 +1,4 @@
-import { RiAddLine, RiFilterLine } from 'react-icons/ri'
+import { RiAddLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import CreateFormulationModal from '../components/modals/formulations/CreateFormulationModal'
 import EditFormulationModal from '../components/modals/formulations/EditFormulationModal'
@@ -9,6 +9,7 @@ import Toast from '../components/Toast'
 import { Navigate, useNavigate } from 'react-router-dom'
 import useAuth from '../hook/useAuth.js'
 import axios from 'axios'
+import Search from '../components/Search.jsx'
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -43,6 +44,10 @@ function Formulations() {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSearchQuery = (data) => {
+    setFormulations(data)
   }
 
   const handleEditClick = (formulation) => {
@@ -146,23 +151,17 @@ function Formulations() {
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
             </button>
           </div>
-          <div className="flex w-full gap-2 md:w-auto">
-            <input
-              type="text"
-              placeholder="Search"
-              className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
-            />
-            <button className="text-darkbrown hover:border-deepbrown flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-gray-50 active:bg-gray-100 md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFilterLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Filter</span>
-            </button>
-          </div>
+          <Search
+            userId={user._id}
+            handleSearchQuery={handleSearchQuery}
+            use="formulation"
+          />
         </div>
       </div>
 
@@ -180,12 +179,14 @@ function Formulations() {
 
       {/* Modals */}
       <CreateFormulationModal
+        formulations={formulations}
         owner={user._id}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditFormulationModal
+        formulations={formulations}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         formulation={selectedFormulation}
