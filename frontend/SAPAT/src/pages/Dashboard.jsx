@@ -20,11 +20,11 @@ function Dashboard() {
 
   const pieData = useMemo(
     () => ({
-      labels: ['Swine', 'Pig', 'Poultry'],
+      labels: ['Swine', 'Poultry', 'Water Buffalo'],
       datasets: [
         {
           data: formulationTypeCount,
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+          backgroundColor: ['#FF6384', '#FFCE56', '#36A2EB'],
           borderWidth: 0,
         },
       ],
@@ -67,11 +67,11 @@ function Dashboard() {
       setFormulationCount(formulations.length)
       // count formulation types
       const swine = formulations.filter((item) => item.animal_group === 'Swine')
-      const pig = formulations.filter((item) => item.animal_group === 'Pig')
       const poultry = formulations.filter(
         (item) => item.animal_group === 'Poultry'
       )
-      const typeCount = [swine.length, pig.length, poultry.length]
+      const waterBuffalo = formulations.filter((item) => item.animal_group === 'Water Buffalo')
+      const typeCount = [swine.length, waterBuffalo.length, poultry.length]
       setFormulationTypeCount(typeCount)
       // recent formulations
       const recent = formulations
@@ -144,41 +144,67 @@ function Dashboard() {
 
       <div className="rounded-lg bg-white p-4 shadow-sm">
         <h2 className="text-deepbrown mb-4 text-lg font-semibold">
-          Recently Created Formulations
+          Recent Formulations
         </h2>
         <div className="w-full">
           {recentFormulations.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {recentFormulations.map((f) => (
                 <div
                   key={f._id}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100"
+                  className="flex items-center justify-between rounded-lg bg-white p-3 shadow-sm transition-all hover:bg-gray-50"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="flex items-center space-x-4 md:min-w-[200px]">
-                      <span className="hidden pr-2 text-right font-mono text-gray-500 md:block md:min-w-[60px]">
+                    <div className="flex items-center space-x-3">
+                      <span className="hidden h-7 w-14 items-center justify-center rounded bg-gray-100 text-center font-mono text-sm text-gray-600 md:flex">
                         {f.code || '-'}
                       </span>
-                      <span className="hidden pr-2 text-right font-mono text-gray-500 md:block">
-                        |
+                      <div className="flex flex-col">
+                        <span className="text-deepbrown font-medium">
+                          {f.name}
+                        </span>
+                        <span
+                          className={`text-xs ${
+                            f.animal_group === 'Swine'
+                            ? 'text-[#FF6384]' 
+                            : f.animal_group === 'Poultry'
+                              ? 'text-[#FFCE56]'
+                              : 'text-[#36A2EB]'
+                          }`}
+                        >
+                          {f.animal_group || 'No group specified'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end">
+                      <span
+                        className={`text-xs font-medium ${
+                          f.access === 'owner'
+                          ?'text-gray-600'
+                          : f.access === 'edit'
+                            ? 'text-blue-600'
+                            : 'text-orange-600'
+                        }`}
+                      >
+                        {f.access === 'owner'
+                          ? 'Owner'
+                          : f.access === 'edit'
+                            ? 'Can Edit'
+                            : 'View Only'}
                       </span>
-                      <span className="text-deepbrown font-medium">
-                        {f.name}
+                      <span className="text-xs text-gray-500">
+                        {new Date(f.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    {/*<span className="badge badge-sm badge-outline badge-neutral text-gray-500">*/}
-                    {/*  {f.animal_group || '-'}*/}
-                    {/*</span>*/}
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {new Date(f.createdAt).toLocaleDateString()}
-                  </span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-4 text-center text-gray-500">
-              No recent formulations
+            <div className="rounded-lg bg-gray-50 p-4 text-center">
+              <p className="text-gray-500">No recent formulations</p>
             </div>
           )}
         </div>

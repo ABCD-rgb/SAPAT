@@ -168,8 +168,8 @@ function EditFormulationModal({
                   Select group
                 </option>
                 <option value="Swine">Swine</option>
-                <option value="Pig">Pig</option>
                 <option value="Poultry">Poultry</option>
+                <option value="Water Buffalo">Water Buffalo</option>
               </select>
             </div>
 
