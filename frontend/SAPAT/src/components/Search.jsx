@@ -1,18 +1,22 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { debounce } from 'lodash'
 import { RiSearchLine } from 'react-icons/ri'
 import axios from 'axios'
 
-export default function Search({ userId, handleSearchQuery, use }) {
+export default function Search({ userId, handleSearchQuery, use, page=1, limit=10 }) {
   const [searchQuery, setSearchQuery] = useState('')
 
+  useEffect(() => {
+    handleSearch(searchQuery, page)
+  }, [page])
+
   const handleSearch = useCallback(
-    debounce(async (query) => {
+    debounce(async (query, page=1) => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/${use}/filtered/search/${userId}?searchQuery=${query}`
+          `${import.meta.env.VITE_API_URL}/${use}/filtered/search/${userId}?searchQuery=${query}&skip=${(page - 1) * limit}&limit=${limit}`
         )
-        const fetchedData = res.data.fetched
+        const fetchedData = res.data
         handleSearchQuery(fetchedData)
       } catch (err) {
         console.log(err)

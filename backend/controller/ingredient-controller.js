@@ -75,7 +75,7 @@ const getIngredient = async (req, res) => {
 }
 
 const getIngredientsByName = async (req, res) => {
-  const { searchQuery } = req.query;
+  const { searchQuery, skip=0, limit=10 } = req.query;
   const { userId } = req.params;
   try {
     // user-created ingredients
@@ -85,7 +85,22 @@ const getIngredientsByName = async (req, res) => {
     const ingredients = [...globalIngredients, ...userIngredients];
     // partial matching
     const filteredIngredients = ingredients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    res.status(200).json({ message: 'success', fetched: filteredIngredients });
+
+    // pagination
+    const totalCount = filteredIngredients.length;
+    const paginatedIngredients = filteredIngredients.slice(skip, skip + limit);
+
+    res.status(200).json({
+      message: 'success',
+      fetched: paginatedIngredients,
+      pagination: {
+        hasMore: (skip + limit) < totalCount,
+        totalSize: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: paginatedIngredients.length,
+        page: Math.floor(skip / limit) + 1,
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
   }

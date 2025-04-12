@@ -38,12 +38,13 @@ function Ingredients() {
     pageSize: 5,
     page: 1,
   })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user, page])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
@@ -60,7 +61,9 @@ function Ingredients() {
   }
 
   const handleSearchQuery = (data) => {
-    setIngredients(data)
+    setIngredients(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
   }
 
   const handleEditClick = (ingredient) => {
@@ -206,6 +209,7 @@ function Ingredients() {
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="ingredient"
+            page={page}
           />
         </div>
       </div>
