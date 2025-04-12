@@ -13,6 +13,7 @@ import Search from '../components/Search.jsx'
 import Export from '../components/buttons/Export.jsx'
 import Import from '../components/Import.jsx'
 import ImportModal from '../components/modals/ImportModal.jsx'
+import Pagination from '../components/Pagination'
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -27,20 +28,31 @@ function Ingredients() {
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 10
+  const [paginationInfo, setPaginationInfo] = useState({
+    hasMore: true,
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
 
   useEffect(() => {
     if (user) {
       fetchData()
     }
-  }, [user])
+  }, [user, page])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?skip=${(page-1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.ingredients
-      setIngredients(fetchedData)
+      const fetchedData = res.data
+      setIngredients(fetchedData.ingredients)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
@@ -146,6 +158,10 @@ function Ingredients() {
     setToastAction(action)
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -166,7 +182,7 @@ function Ingredients() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-auto flex-col bg-gray-50 pb-15">
       {/* Fixed Header Section */}
       <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
         <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
@@ -204,6 +220,13 @@ function Ingredients() {
           onDelete={handleDeleteClick}
         />
       </div>
+
+      {ingredients.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       <AddIngredientModal
         ingredients={ingredients}
