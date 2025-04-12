@@ -52,7 +52,6 @@ function Formulations() {
       )
       const fetchedData = res.data
       setFormulations(fetchedData.formulations)
-      console.log("formulations: ", fetchedData.formulations)
       setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {

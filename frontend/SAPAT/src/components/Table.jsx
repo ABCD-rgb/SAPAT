@@ -59,7 +59,7 @@ function Table({
 
   return (
     <div className="max-h-9/10 overflow-auto rounded-lg bg-white shadow-sm">
-      <table className="table table-pin-rows w-full">
+      <table className="table-pin-rows table w-full">
         <thead className="bg-white shadow-sm">
           <tr>
             {headers.map((header, index) => (
@@ -107,7 +107,7 @@ function Table({
                         }`}
                         onClick={(e) => {
                           e.stopPropagation()
-                          console.log("row.access: ", row.access)
+                          console.log('row.access: ', row.access)
                           // non-owners should not be able to edit the basic data
                           if (row?.access && row.access !== 'owner') {
                             // toast instructions
