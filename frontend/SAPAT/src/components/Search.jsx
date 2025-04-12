@@ -23,7 +23,7 @@ export default function Search({
           `${import.meta.env.VITE_API_URL}/${use}/filtered/search/${userId}?searchQuery=${query}&skip=${(page - 1) * limit}&limit=${limit}`
         )
         const fetchedData = res.data
-        handleSearchQuery(fetchedData)
+        handleSearchQuery(fetchedData, page)
       } catch (err) {
         console.log(err)
       }

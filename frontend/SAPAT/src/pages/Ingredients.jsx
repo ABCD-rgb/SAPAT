@@ -60,10 +60,11 @@ function Ingredients() {
     }
   }
 
-  const handleSearchQuery = (data) => {
+  const handleSearchQuery = (data, page) => {
     setIngredients(data.fetched)
     setPaginationInfo(data.pagination)
     setHasSearchQuery(true)
+    setPage(page)
   }
 
   const handleEditClick = (ingredient) => {

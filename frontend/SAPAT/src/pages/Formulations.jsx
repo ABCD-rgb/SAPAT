@@ -59,10 +59,11 @@ function Formulations() {
     }
   }
 
-  const handleSearchQuery = (data) => {
+  const handleSearchQuery = (data, page) => {
     setFormulations(data.fetched)
     setPaginationInfo(data.pagination)
     setHasSearchQuery(true)
+    setPage(page)
   }
 
   const handleEditClick = (formulation) => {
