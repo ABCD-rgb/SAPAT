@@ -1,8 +1,4 @@
-
-function Pagination({
-  paginationInfo,
-  onPageChange
-}) {
+function Pagination({ paginationInfo, onPageChange }) {
   const { page, totalPages } = paginationInfo
   console.log(page, totalPages)
 
@@ -19,14 +15,14 @@ function Pagination({
   }
 
   const getPageNumbers = () => {
-    const pageNumbers = [];
+    const pageNumbers = []
 
     // For smaller number of pages, show all
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
+        pageNumbers.push(i)
       }
-      return pageNumbers;
+      return pageNumbers
     }
 
     // For larger number of pages, show with ellipsis
@@ -34,41 +30,41 @@ function Pagination({
     // Show current page and neighbors
 
     // First page
-    pageNumbers.push(1);
+    pageNumbers.push(1)
 
     // If current page is close to start, don't show ellipsis at beginning
     if (page <= 4) {
       for (let i = 2; i <= 5; i++) {
-        pageNumbers.push(i);
+        pageNumbers.push(i)
       }
-      pageNumbers.push('ellipsis');
+      pageNumbers.push('ellipsis')
     }
     // If current page is close to end, don't show ellipsis at end
     else if (page >= totalPages - 3) {
-      pageNumbers.push('ellipsis');
+      pageNumbers.push('ellipsis')
       for (let i = totalPages - 4; i <= totalPages - 1; i++) {
-        pageNumbers.push(i);
+        pageNumbers.push(i)
       }
     }
     // If current page is in middle, show ellipsis on both sides
     else {
-      pageNumbers.push('ellipsis');
+      pageNumbers.push('ellipsis')
       for (let i = page - 1; i <= page + 1; i++) {
-        pageNumbers.push(i);
+        pageNumbers.push(i)
       }
-      pageNumbers.push('ellipsis');
+      pageNumbers.push('ellipsis')
     }
 
     // Last page
-    pageNumbers.push(totalPages);
+    pageNumbers.push(totalPages)
 
-    return pageNumbers;
+    return pageNumbers
   }
 
   const pageNumbers = getPageNumbers()
 
   return (
-    <div className="fixed bottom-0 left-16 md:left-48 right-0 flex justify-center py-4">
+    <div className="fixed right-0 bottom-0 left-16 flex justify-center py-4 md:left-48">
       <div className="join">
         {/* prev button */}
         <button
@@ -110,4 +106,4 @@ function Pagination({
   )
 }
 
-export default Pagination;
+export default Pagination

@@ -3,7 +3,13 @@ import { debounce } from 'lodash'
 import { RiSearchLine } from 'react-icons/ri'
 import axios from 'axios'
 
-export default function Search({ userId, handleSearchQuery, use, page=1, limit=10 }) {
+export default function Search({
+  userId,
+  handleSearchQuery,
+  use,
+  page = 1,
+  limit = 10,
+}) {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -11,7 +17,7 @@ export default function Search({ userId, handleSearchQuery, use, page=1, limit=1
   }, [page])
 
   const handleSearch = useCallback(
-    debounce(async (query, page=1) => {
+    debounce(async (query, page = 1) => {
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_API_URL}/${use}/filtered/search/${userId}?searchQuery=${query}&skip=${(page - 1) * limit}&limit=${limit}`

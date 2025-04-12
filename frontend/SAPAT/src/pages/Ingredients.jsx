@@ -49,7 +49,7 @@ function Ingredients() {
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?skip=${(page-1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
       setIngredients(fetchedData.ingredients)

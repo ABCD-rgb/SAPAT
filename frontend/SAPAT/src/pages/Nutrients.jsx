@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
 import Search from '../components/Search.jsx'
+import Pagination from '../components/Pagination.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -23,20 +24,32 @@ function Nutrients() {
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 10
+  const [paginationInfo, setPaginationInfo] = useState({
+    hasMore: true,
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.nutrients
-      setNutrients(fetchedData)
+      const fetchedData = res.data
+      setNutrients(fetchedData.nutrients)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
@@ -44,7 +57,9 @@ function Nutrients() {
   }
 
   const handleSearchQuery = (data) => {
-    setNutrients(data)
+    setNutrients(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
   }
 
   const handleEditClick = (nutrient) => {
@@ -110,6 +125,10 @@ function Nutrients() {
     setToastAction(action)
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -130,7 +149,7 @@ function Nutrients() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-auto flex-col bg-gray-50 pb-15">
       {/* Fixed Header Section */}
       <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
         <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
@@ -160,6 +179,7 @@ function Nutrients() {
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="nutrient"
+            page={page}
           />
         </div>
       </div>
@@ -174,6 +194,13 @@ function Nutrients() {
           onDelete={handleDeleteClick}
         />
       </div>
+
+      {nutrients.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       {/* Modals */}
       <AddNutrientModal
