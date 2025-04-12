@@ -58,9 +58,9 @@ function Table({
   }
 
   return (
-    <div className="h-full overflow-auto rounded-lg bg-white shadow-sm">
-      <table className="table w-full">
-        <thead className="sticky top-0 bg-white shadow-sm">
+    <div className="max-h-9/10 overflow-auto rounded-lg bg-white shadow-sm">
+      <table className="table table-pin-rows w-full">
+        <thead className="bg-white shadow-sm">
           <tr>
             {headers.map((header, index) => (
               <th key={index} className="text-deepbrown bg-white">
@@ -75,7 +75,7 @@ function Table({
         <tbody>
           {data && data.length > 0 ? (
             data.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover">
+              <tr key={rowIndex} className="hover:bg-base-200">
                 {getRowData(row).map((cell, cellIndex) => (
                   <td key={cellIndex}>
                     {/* only the name column (index 1) is clickable to go to ViewFormulation */}
@@ -107,6 +107,7 @@ function Table({
                         }`}
                         onClick={(e) => {
                           e.stopPropagation()
+                          console.log("row.access: ", row.access)
                           // non-owners should not be able to edit the basic data
                           if (row?.access && row.access !== 'owner') {
                             // toast instructions

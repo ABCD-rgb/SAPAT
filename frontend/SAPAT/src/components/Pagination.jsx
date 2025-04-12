@@ -1,6 +1,5 @@
 function Pagination({ paginationInfo, onPageChange }) {
   const { page, totalPages } = paginationInfo
-  console.log(page, totalPages)
 
   const goToPrev = () => {
     if (page > 1) {
@@ -72,7 +71,7 @@ function Pagination({ paginationInfo, onPageChange }) {
           className="join-item btn btn-sm"
           onClick={goToPrev}
         >
-          «
+          « Prev
         </button>
 
         {/* page buttons */}
@@ -99,7 +98,7 @@ function Pagination({ paginationInfo, onPageChange }) {
           className="join-item btn btn-sm"
           onClick={goToNext}
         >
-          »
+          Next »
         </button>
       </div>
     </div>

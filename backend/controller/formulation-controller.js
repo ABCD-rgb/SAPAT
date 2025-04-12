@@ -32,7 +32,6 @@ const getAllFormulations = async (req, res) => {
         const formulations = await Formulation.find({'collaborators.userId': collaboratorId}).select('code name description animal_group collaborators createdAt');
         // aside from the basic details, return the access level of the user
         const filteredFormulations = formulations.map(formulation => {
-            console.log(formulation);
             const access = formulation.collaborators.find(c => c.userId.toString() === collaboratorId)?.access;
             return {
                 "_id": formulation._id,
@@ -90,9 +89,22 @@ const getFormulationByName = async (req, res) => {
         // partial matching
         const filteredFormulations = formulations.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
+        const formattedFormulations = filteredFormulations.map(formulation => {
+            const access = formulation.collaborators.find(c => c.userId.toString() === userId)?.access;
+            return {
+                "_id": formulation._id,
+                "code": formulation.code,
+                "name": formulation.name,
+                "description": formulation.description ? formulation.description : "",
+                "animal_group": formulation.animal_group ? formulation.animal_group : "",
+                "access": access,
+                "createdAt": formulation.createdAt
+            }
+        })
+
         // pagination
-        const totalCount = filteredFormulations.length;
-        const paginatedFormulations = filteredFormulations.slice(skip, skip + limit);
+        const totalCount = formattedFormulations.length;
+        const paginatedFormulations = formattedFormulations.slice(skip, skip + limit);
 
         res.status(200).json({
             message: 'success',
