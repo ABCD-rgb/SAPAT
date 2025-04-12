@@ -61,7 +61,7 @@ function Dashboard() {
   const fetchFormulationData = async () => {
     try {
       const formulationRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}?limit=1000`
       )
       const formulations = formulationRes.data.formulations
       setFormulationCount(formulations.length)
@@ -86,7 +86,7 @@ function Dashboard() {
   const fetchIngredientData = async () => {
     try {
       const ingredientRes = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?limit=1000`
       )
       const ingredients = ingredientRes.data.ingredients
       setIngredientCount(ingredients.length)
