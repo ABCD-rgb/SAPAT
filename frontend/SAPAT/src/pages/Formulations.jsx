@@ -10,6 +10,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import useAuth from '../hook/useAuth.js'
 import axios from 'axios'
 import Search from '../components/Search.jsx'
+import Pagination from '../components/Pagination.jsx'
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -26,20 +27,32 @@ function Formulations() {
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
   const navigateURL = useNavigate()
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 10
+  const [paginationInfo, setPaginationInfo] = useState({
+    hasMore: true,
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.formulations
-      setFormulations(fetchedData)
+      const fetchedData = res.data
+      setFormulations(fetchedData.formulations)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
@@ -47,7 +60,9 @@ function Formulations() {
   }
 
   const handleSearchQuery = (data) => {
-    setFormulations(data)
+    setFormulations(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
   }
 
   const handleEditClick = (formulation) => {
@@ -125,6 +140,10 @@ function Formulations() {
     setToastAction('')
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Permission']
 
   if (loading) {
@@ -139,7 +158,7 @@ function Formulations() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-auto flex-col bg-gray-50 pb-15">
       {/* Fixed Header Section */}
       <div className="sticky top-0 z-20 space-y-6 bg-gray-50 p-3 md:p-6">
         <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
@@ -161,6 +180,7 @@ function Formulations() {
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="formulation"
+            page={page}
           />
         </div>
       </div>
@@ -176,6 +196,13 @@ function Formulations() {
           onRowClick={handleRowClick}
         />
       </div>
+
+      {formulations.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       {/* Modals */}
       <CreateFormulationModal
