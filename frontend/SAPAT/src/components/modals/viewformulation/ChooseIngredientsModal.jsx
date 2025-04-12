@@ -1,8 +1,24 @@
-import { RiCloseLine } from 'react-icons/ri'
-import { useState } from 'react'
+import { RiCloseLine, RiSearchLine } from 'react-icons/ri'
+import { useState, useEffect } from 'react'
 
 function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   const [checkedIngredients, setCheckedIngredients] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredIngredients, setFilteredIngredients] = useState(ingredients)
+
+  // Update filtered ingredients whenever search term or ingredients list changes
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredIngredients(ingredients)
+    } else {
+      const term = searchTerm.toLowerCase().trim()
+      const filtered = ingredients.filter(ingredient =>
+        ingredient.name.toLowerCase().includes(term) ||
+        (ingredient.group && ingredient.group.toLowerCase().includes(term))
+      )
+      setFilteredIngredients(filtered)
+    }
+  }, [searchTerm, ingredients])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -28,6 +44,7 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
   }
 
   const handleCheckboxChange = (ingredient, e) => {
+    e.stopPropagation() // Prevent row click from firing
     const id = ingredient.ingredient_id ?? ingredient._id
     if (e.target.checked) {
       setCheckedIngredients([
@@ -38,6 +55,39 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
       setCheckedIngredients(
         checkedIngredients.filter((item) => item.ingredient_id !== id)
       )
+    }
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const isAllChecked = filteredIngredients.length > 0 &&
+    filteredIngredients.every(ingredient => {
+      const id = ingredient.ingredient_id ?? ingredient._id
+      return checkedIngredients.some(item => item.ingredient_id === id)
+    })
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      // Add all filtered ingredients that aren't already checked
+      const newChecked = [...checkedIngredients]
+      filteredIngredients.forEach(ingredient => {
+        const id = ingredient.ingredient_id ?? ingredient._id
+        if (!newChecked.some(item => item.ingredient_id === id)) {
+          newChecked.push({ ingredient_id: id, name: ingredient.name })
+        }
+      })
+      setCheckedIngredients(newChecked)
+    } else {
+      // Remove all filtered ingredients from checked list
+      const newChecked = checkedIngredients.filter(checkedItem => {
+        return !filteredIngredients.some(ingredient => {
+          const id = ingredient.ingredient_id ?? ingredient._id
+          return checkedItem.ingredient_id === id
+        })
+      })
+      setCheckedIngredients(newChecked)
     }
   }
 
@@ -60,48 +110,62 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
         </h3>
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
+        {/* Search input */}
+        <div className="mb-4 relative">
+          <div className="relative">
+            <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search ingredients..."
+              className="input input-bordered w-full pl-10 rounded-xl"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            {searchTerm && (
+              <button
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setSearchTerm('')}
+              >
+                <RiCloseLine className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Ingredients table */}
         <form onSubmit={handleSubmit}>
           <div className="max-h-64 overflow-hidden overflow-y-auto rounded-2xl border border-gray-200">
-            <table className="table-pin-rows table">
+            <table className="table-pin-rows table w-full">
               <thead className="bg-gray-50">
-                <tr>
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={(e) => {
-                        const isChecked = e.target.checked
-                        if (isChecked) {
-                          setCheckedIngredients(
-                            ingredients.map((ingredient) => {
-                              const id =
-                                ingredient.ingredient_id ?? ingredient._id
-                              return {
-                                ingredient_id: id,
-                                name: ingredient.name,
-                              }
-                            })
-                          )
-                        } else {
-                          setCheckedIngredients([])
-                        }
-                      }}
-                    />
-                  </th>
-                  <th className="font-semibold">Name</th>
-                  <th className="font-semibold">Price</th>
-                  <th className="font-semibold">Available</th>
-                  <th className="font-semibold">Group</th>
-                </tr>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    checked={isAllChecked && filteredIngredients.length > 0}
+                    onChange={handleSelectAll}
+                  />
+                </th>
+                <th className="font-semibold">Name</th>
+                <th className="font-semibold">Price</th>
+                <th className="font-semibold">Available</th>
+                <th className="font-semibold">Group</th>
+              </tr>
               </thead>
               <tbody>
-                {ingredients.map((ingredient, index) => (
+              {filteredIngredients.length > 0 ? (
+                filteredIngredients.map((ingredient, index) => (
                   <tr
                     key={index}
-                    className={`hover ${checkedIngredients.some((item) => (ingredient.ingredient_id ? item.ingredient_id === ingredient.ingredient_id : item.ingredient_id === ingredient._id)) ? 'bg-blue-100' : ''}`}
+                    className={`hover cursor-pointer ${
+                      checkedIngredients.some((item) =>
+                        (ingredient.ingredient_id
+                          ? item.ingredient_id === ingredient.ingredient_id
+                          : item.ingredient_id === ingredient._id)
+                      ) ? 'bg-blue-100' : ''
+                    }`}
                     onClick={() => handleRowClick(ingredient)}
                   >
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={checkedIngredients.some((item) =>
@@ -117,9 +181,23 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
                     <td>{ingredient.available}</td>
                     <td>{ingredient.group}</td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center py-4">
+                    No ingredients found. Try another search term.
+                  </td>
+                </tr>
+              )}
               </tbody>
             </table>
+          </div>
+
+          {/* Selected count */}
+          <div className="mt-4 text-sm text-gray-600">
+            {checkedIngredients.length > 0 && (
+              <span>{checkedIngredients.length} ingredient{checkedIngredients.length > 1 ? 's' : ''} selected</span>
+            )}
           </div>
 
           {/* Modal actions */}
@@ -134,6 +212,7 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
             <button
               type="submit"
               className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600"
+              disabled={checkedIngredients.length === 0}
             >
               Add
             </button>

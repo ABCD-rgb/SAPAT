@@ -105,7 +105,7 @@ function ViewFormulation({
   const fetchIngredients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}?limit=10000`
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
@@ -125,7 +125,7 @@ function ViewFormulation({
   const fetchNutrients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}?limit=10000`
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
