@@ -49,13 +49,13 @@ function Login() {
           </h1>
 
           <p className="mb-8 text-center text-gray-600">
-            Sign in or sign up with your Google account to continue
+            Sign in or sign up with your Google account to continue.
           </p>
 
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            className="cursor-pointer flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
           >
             <img
               className="mr-2 h-5 w-5"
