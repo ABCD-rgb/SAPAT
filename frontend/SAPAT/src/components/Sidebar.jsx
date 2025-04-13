@@ -26,12 +26,12 @@ function Sidebar() {
   }
 
   return (
-    <div className="bg-green-accent flex h-full w-16 flex-col p-3 md:w-48">
+    <div className="bg-green-accent flex h-full w-14 flex-col p-3 md:w-44">
       <div className="mb-8 flex justify-center">
         <img
           src="/assets/logo.png"
           alt="SAPAT Logo"
-          className="h-10 w-10 md:h-16 md:w-16"
+          className="h-8 w-8 md:h-16 md:w-16"
         />
       </div>
 
@@ -52,12 +52,10 @@ function Sidebar() {
         ))}
       </nav>
 
-      <div
-        className="pb-10 md:pl-2"
-      >
+      <div className="pb-10 md:pl-2">
         <button
           onClick={handleLogout}
-          className="p-2 md:px-4 text-red-button flex items-center rounded-lg transition-colors hover:bg-red-button hover:text-white"
+          className="text-darkbrown hover:bg-red-button flex cursor-pointer items-center rounded-lg p-1 transition-colors hover:text-white md:px-4"
         >
           <RiLogoutBoxLine className="h-6 w-6" />
           <span className="ml-3 hidden md:block">Logout</span>

@@ -2,6 +2,7 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState, useMemo } from 'react'
 import Loading from '../../Loading.jsx'
 import axios from 'axios'
+import Info from '../../icons/Info.jsx'
 
 function EditIngredientModal({
   ingredients,
@@ -156,10 +157,13 @@ function EditIngredientModal({
           <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="text-deepbrown mb-4 text-lg font-bold">
+        <h3 className="text-deepbrown mb-1 text-lg font-bold">
           Edit Ingredient
         </h3>
-        <p className="mb-4 text-sm text-gray-500">Description</p>
+        <p className="mb-8 flex text-sm text-gray-500">
+          <Info />
+          Modify ingredient information as needed.
+        </p>
 
         <form onSubmit={handleSubmit}>
           {/* Description section */}

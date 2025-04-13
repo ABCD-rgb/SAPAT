@@ -1,8 +1,27 @@
-import { RiCloseLine } from 'react-icons/ri'
-import { useState } from 'react'
+import { RiCloseLine, RiSearchLine } from 'react-icons/ri'
+import { useState, useEffect } from 'react'
 
 function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
   const [checkedNutrients, setCheckedNutrients] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filteredNutrients, setFilteredNutrients] = useState(nutrients)
+
+  // Update filtered nutrients whenever search term or nutrients list changes
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredNutrients(nutrients)
+    } else {
+      const term = searchTerm.toLowerCase().trim()
+      const filtered = nutrients.filter(
+        (nutrient) =>
+          nutrient.name.toLowerCase().includes(term) ||
+          (nutrient.abbreviation &&
+            nutrient.abbreviation.toLowerCase().includes(term)) ||
+          (nutrient.group && nutrient.group.toLowerCase().includes(term))
+      )
+      setFilteredNutrients(filtered)
+    }
+  }, [searchTerm, nutrients])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -26,6 +45,7 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
   }
 
   const handleCheckboxChange = (nutrient, e) => {
+    e.stopPropagation() // Prevent row click from firing
     const id = nutrient.nutrient_id ?? nutrient._id
     if (e.target.checked) {
       setCheckedNutrients([
@@ -36,6 +56,40 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
       setCheckedNutrients(
         checkedNutrients.filter((item) => item.nutrient_id !== id)
       )
+    }
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+  }
+
+  const isAllChecked =
+    filteredNutrients.length > 0 &&
+    filteredNutrients.every((nutrient) => {
+      const id = nutrient.nutrient_id ?? nutrient._id
+      return checkedNutrients.some((item) => item.nutrient_id === id)
+    })
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      // Add all filtered nutrients that aren't already checked
+      const newChecked = [...checkedNutrients]
+      filteredNutrients.forEach((nutrient) => {
+        const id = nutrient.nutrient_id ?? nutrient._id
+        if (!newChecked.some((item) => item.nutrient_id === id)) {
+          newChecked.push({ nutrient_id: id, name: nutrient.name })
+        }
+      })
+      setCheckedNutrients(newChecked)
+    } else {
+      // Remove all filtered nutrients from checked list
+      const newChecked = checkedNutrients.filter((checkedItem) => {
+        return !filteredNutrients.some((nutrient) => {
+          const id = nutrient.nutrient_id ?? nutrient._id
+          return checkedItem.nutrient_id === id
+        })
+      })
+      setCheckedNutrients(newChecked)
     }
   }
 
@@ -58,31 +112,39 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
         </h3>
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
+        {/* Search input */}
+        <div className="relative mb-4">
+          <div className="relative">
+            <RiSearchLine className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search nutrients..."
+              className="input input-bordered w-full rounded-xl pl-10"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            {searchTerm && (
+              <button
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
+                onClick={() => setSearchTerm('')}
+              >
+                <RiCloseLine className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Nutrients table */}
         <form onSubmit={handleSubmit}>
           <div className="max-h-64 overflow-y-auto rounded-2xl border border-gray-200">
-            <table className="table-pin-rows table">
+            <table className="table-pin-rows table w-full">
               <thead className="bg-gray-50">
                 <tr>
                   <th>
                     <input
                       type="checkbox"
-                      onChange={(e) => {
-                        const isChecked = e.target.checked
-                        if (isChecked) {
-                          setCheckedNutrients(
-                            nutrients.map((nutrient) => {
-                              const id = nutrient.nutrient_id ?? nutrient._id
-                              return {
-                                nutrient_id: id,
-                                name: nutrient.name,
-                              }
-                            })
-                          )
-                        } else {
-                          setCheckedNutrients([])
-                        }
-                      }}
+                      checked={isAllChecked && filteredNutrients.length > 0}
+                      onChange={handleSelectAll}
                     />
                   </th>
                   <th className="font-semibold">Abbreviation</th>
@@ -92,31 +154,57 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
                 </tr>
               </thead>
               <tbody>
-                {nutrients.map((nutrient, index) => (
-                  <tr
-                    key={index}
-                    className={`hover ${checkedNutrients.some((item) => (nutrient.nutrient_id ? item.nutrient_id === nutrient.nutrient_id : item.nutrient_id === nutrient._id)) ? 'bg-blue-100' : ''}`}
-                    onClick={() => handleRowClick(nutrient)}
-                  >
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={checkedNutrients.some((item) =>
+                {filteredNutrients.length > 0 ? (
+                  filteredNutrients.map((nutrient, index) => (
+                    <tr
+                      key={index}
+                      className={`hover cursor-pointer ${
+                        checkedNutrients.some((item) =>
                           nutrient.nutrient_id
                             ? item.nutrient_id === nutrient.nutrient_id
                             : item.nutrient_id === nutrient._id
-                        )}
-                        onChange={(e) => handleCheckboxChange(nutrient, e)}
-                      />
+                        )
+                          ? 'bg-blue-100'
+                          : ''
+                      }`}
+                      onClick={() => handleRowClick(nutrient)}
+                    >
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={checkedNutrients.some((item) =>
+                            nutrient.nutrient_id
+                              ? item.nutrient_id === nutrient.nutrient_id
+                              : item.nutrient_id === nutrient._id
+                          )}
+                          onChange={(e) => handleCheckboxChange(nutrient, e)}
+                        />
+                      </td>
+                      <td>{nutrient.abbreviation}</td>
+                      <td>{nutrient.name}</td>
+                      <td>{nutrient.unit}</td>
+                      <td>{nutrient.group}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-4 text-center">
+                      No nutrients found. Try another search term.
                     </td>
-                    <td>{nutrient.abbreviation}</td>
-                    <td>{nutrient.name}</td>
-                    <td>{nutrient.unit}</td>
-                    <td>{nutrient.group}</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
+          </div>
+
+          {/* Selected count */}
+          <div className="mt-4 text-sm text-gray-600">
+            {checkedNutrients.length > 0 && (
+              <span>
+                {checkedNutrients.length} nutrient
+                {checkedNutrients.length > 1 ? 's' : ''} selected
+              </span>
+            )}
           </div>
 
           {/* Modal actions */}
@@ -131,6 +219,7 @@ function ChooseNutrientsModal({ isOpen, onClose, nutrients, onResult }) {
             <button
               type="submit"
               className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600"
+              disabled={checkedNutrients.length === 0}
             >
               Add
             </button>
