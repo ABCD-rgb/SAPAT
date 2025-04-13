@@ -18,6 +18,7 @@ import Selection from '../../components/Selection.jsx'
 import ChooseIngredientsModal from '../../components/modals/viewformulation/ChooseIngredientsModal.jsx'
 import ChooseNutrientsModal from '../../components/modals/viewformulation/ChooseNutrientsModal.jsx'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import Warning from '../../components/icons/Warning.jsx'
 const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
 
 function ViewFormulation({
@@ -73,6 +74,9 @@ function ViewFormulation({
   const [selectedIngredients, setSelectedIngredients] = useState([])
   const [selectedNutrients, setSelectedNutrients] = useState([])
 
+  // un-updated ingredient/nutrient values (when user enters new min/max that has not been optimized yet)
+  const [isDirty, setIsDirty] = useState(false)
+
   useEffect(() => {
     if (formulation) {
       setSelectedIngredients(formulation.ingredients || [])
@@ -104,6 +108,21 @@ function ViewFormulation({
       console.log(err)
     }
   }
+
+  // Sync on saving using 'ctrl + s'
+  useEffect(() => {
+    console.log("dfasgasd0", isDirty)
+    const handleKeyPress = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault() // Prevent the default browser save action
+        handleSave(isDirty) // Call database update function
+      }
+    }
+    window.addEventListener('keydown', handleKeyPress)
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [isDirty])
 
   const fetchIngredients = async () => {
     try {
@@ -223,6 +242,7 @@ function ViewFormulation({
       optimizedNutrients.map((nut, index) => {
         updateNutrientProperty(index, 'value', Number(nut.value))
       })
+      setIsDirty(false)
     } catch (err) {
       if (err.response.data.status === 'No optimal solution') {
         // toast instructions
@@ -612,6 +632,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleIngredientMinimumChange(index, processedValue)
+                  setIsDirty(true)
                 }
               }}
               onFocus={() => {
@@ -640,6 +661,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleIngredientMaximumChange(index, processedValue)
+                  setIsDirty(true)
                 }
               }}
               onFocus={() =>
@@ -688,6 +710,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleNutrientMinimumChange(index, processedValue)
+                  setIsDirty(true)
                 }
               }}
               onFocus={() =>
@@ -715,6 +738,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleNutrientMaximumChange(index, processedValue)
+                  setIsDirty(true)
                 }
               }}
               onFocus={() =>
@@ -762,7 +786,7 @@ function ViewFormulation({
     <div className="flex h-full flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
       <div className="flex-1 p-4">
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* Header */}
           <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
             View Formulation
@@ -807,7 +831,7 @@ function ViewFormulation({
               <div>
                 <button
                   className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700"
-                  onClick={handleSave}
+                  onClick={() => handleSave(isDirty)}
                 >
                   <RiSave2Line className="h-4 w-4" /> Save
                 </button>
@@ -882,6 +906,14 @@ function ViewFormulation({
               <Selections id="input-animal_group" others={others} />
             </div>
           </div>
+
+          {/* Shown when values are not up-to-date */}
+          {isDirty && (
+            <div className="alert alert-warning alert-soft">
+              <Warning/>
+              <span>Formula constraints have changed. Click &quot;Optimize&quot; to update values.</span>
+            </div>
+          )}
 
           {/* Tables - Grid on desktop, Stack on mobile */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
