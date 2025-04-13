@@ -19,6 +19,7 @@ import ChooseIngredientsModal from '../../components/modals/viewformulation/Choo
 import ChooseNutrientsModal from '../../components/modals/viewformulation/ChooseNutrientsModal.jsx'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import Warning from '../../components/icons/Warning.jsx'
+import GenerateReport from '../../components/buttons/GenerateReport.jsx'
 const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
 
 function ViewFormulation({
@@ -309,126 +310,6 @@ function ViewFormulation({
     } catch (err) {
       console.log(err)
     }
-  }
-
-  const handleGenerateReport = async () => {
-    // Create a new PDFDocument
-    const pdfDoc = await PDFDocument.create()
-    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
-    const page = pdfDoc.addPage()
-
-    const { width, height } = page.getSize()
-    const titleFontSize = 24
-    const headerFontSize = 14
-    const bodyFontSize = 9
-    const space = 30
-
-    // Header Section (formulation.code, formulation.name, etc.)
-    const headerYPosition = height - 4 * titleFontSize
-    page.drawText(`Formulation: (${formulation.code}) ${formulation.name}`, {
-      x: 50,
-      y: headerYPosition,
-      size: titleFontSize,
-      font: timesRomanFont,
-      color: rgb(0.54296875, 0.26953125, 0.07421875),
-    })
-
-    // Description, Animal Group, and Cost Section
-    page.drawText(`description: ${formulation.description}`, {
-      x: 50,
-      y: headerYPosition - space,
-      size: headerFontSize,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0),
-    })
-
-    page.drawText(`Animal Group: ${formulation.animal_group}`, {
-      x: 50,
-      y: headerYPosition - 2 * space,
-      size: headerFontSize,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0),
-    })
-
-    page.drawText(`Cost: PHP ${formulation.cost}`, {
-      x: 50,
-      y: headerYPosition - 3 * space,
-      size: headerFontSize,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0),
-    })
-
-    // Draw a line to separate sections
-    page.drawLine({
-      start: { x: 50, y: headerYPosition - 4 * space },
-      end: { x: width - 50, y: headerYPosition - 4 * space },
-      color: rgb(0, 0, 0),
-      thickness: 1,
-    })
-
-    // Ingredients Section
-    const ingredientsYPosition = headerYPosition - 5 * space
-    page.drawText(`Ingredients (Ratio for 100 kg):`, {
-      x: 50,
-      y: ingredientsYPosition,
-      size: headerFontSize,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0),
-    })
-
-    let ingY = ingredientsYPosition - space
-    formulation.ingredients.map((ing) => {
-      page.drawText(`${ing.name}: ${ing.value}`, {
-        x: 50,
-        y: ingY,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: rgb(0, 0, 0),
-      })
-      ingY -= space
-    })
-
-    // Draw a line to separate sections
-    page.drawLine({
-      start: { x: 50, y: ingY },
-      end: { x: width - 50, y: ingY },
-      color: rgb(0, 0, 0),
-      thickness: 1,
-    })
-
-    // Nutrients Section
-    const nutrientsYPosition = ingY - space
-    page.drawText(`Nutrients:`, {
-      x: 50,
-      y: nutrientsYPosition,
-      size: headerFontSize,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0),
-    })
-
-    let nutY = nutrientsYPosition - space
-    formulation.nutrients.map((nutrient) => {
-      page.drawText(`${nutrient.name}: ${nutrient.value}`, {
-        x: 50,
-        y: nutY,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: rgb(0, 0, 0),
-      })
-      nutY -= space
-    })
-
-    // Serialize the PDFDocument to bytes (a Uint8Array)
-    const pdfBytes = await pdfDoc.save()
-
-    // Create a Blob from the PDF bytes
-    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
-
-    // Create a download link and trigger the download
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(pdfBlob)
-    link.download = `${formulation.name}  - generated_report.pdf`
-    link.click()
   }
 
   const handleAddIngredients = async (ingredientsToAdd) => {
@@ -1041,13 +922,10 @@ function ViewFormulation({
                 </li>
               </ul>
             </div>
-            <button
-              disabled={userAccess === 'view'}
-              className="btn btn-warning gap-2 rounded-lg"
-              onClick={handleGenerateReport}
-            >
-              <RiFileChartLine /> Generate report
-            </button>
+            <GenerateReport
+              userAccess={userAccess}
+              formulation={formulation}
+            />
           </div>
         </div>
       </div>
