@@ -147,7 +147,7 @@ function ViewFormulationEntry({ id }) {
     }
   }
 
-  const updateDatabase = async (isDirty=false) => {
+  const updateDatabase = async (isDirty = false) => {
     if (isDirty) {
       setShowToast(true) // Show success toast
       setMessage('Changes not saved! Click "Optimize" before saving changes.')

@@ -19,7 +19,7 @@ const createIngredient = async (req, res) => {
 
 const getAllIngredients = async (req, res) => {
   const { userId } = req.params;
-  const { skip=0, limit=10 } = req.query;
+  const { skip=0, limit=8 } = req.query;
 
   try {
     // user-created ingredients

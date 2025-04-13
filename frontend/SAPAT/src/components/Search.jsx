@@ -8,7 +8,7 @@ export default function Search({
   handleSearchQuery,
   use,
   page = 1,
-  limit = 10,
+  limit = 8,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
 

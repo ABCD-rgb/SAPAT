@@ -29,7 +29,7 @@ function Formulations() {
   const navigateURL = useNavigate()
   // pagination
   const [page, setPage] = useState(1)
-  const limit = 10
+  const limit = 8
   const [paginationInfo, setPaginationInfo] = useState({
     hasMore: true,
     totalSize: 0,
@@ -84,9 +84,13 @@ function Formulations() {
       )
       const messageData = res.data.message
       if (messageData === 'success') {
-        setFormulations(
-          formulations.filter((formulation) => formulation._id !== selectedId)
+        const filteredFormulations = formulations.filter(
+          (formulation) => formulation._id !== selectedId
         )
+        setFormulations(filteredFormulations)
+        if (filteredFormulations.length === 0) {
+          setPage(page - 1)
+        }
       }
       // toast instructions
       setShowToast(true)
@@ -107,7 +111,7 @@ function Formulations() {
 
   const handleCreateResult = (newFormulation, action, message) => {
     setIsCreateModalOpen(false)
-    setFormulations([...formulations, newFormulation])
+    setFormulations([newFormulation, ...formulations])
     // toast instructions
     setShowToast(true)
     setMessage(message)
