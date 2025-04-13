@@ -218,7 +218,18 @@ function ViewFormulation({
         updateNutrientProperty(index, 'value', Number(nut.value))
       })
     } catch (err) {
-      console.log(err)
+      if (err.response.data.status === 'No optimal solution') {
+        // toast instructions
+        setShowToast(true)
+        setMessage(`No feasible formula found. Please adjust your constraints.`)
+        setToastAction('error')
+        ingredients.map((ing, index) => {
+          updateIngredientProperty(index, 'value', 0)
+        })
+        nutrients.map((ing, index) => {
+          updateNutrientProperty(index, 'value', 0)
+        })
+      }
     }
   }
 
@@ -576,7 +587,7 @@ function ViewFormulation({
             <input
               id={`ingredient-${index}-minimum`}
               type="text"
-              className="input input-bordered input-xs w-20"
+              className="input input-bordered input-xs w-15"
               disabled={userAccess === 'view'}
               value={ingredient.minimum !== 0 ? ingredient.minimum : 'N/A'}
               onChange={(e) => {
@@ -604,7 +615,7 @@ function ViewFormulation({
             <input
               id={`ingredient-${index}-maximum`}
               type="text"
-              className="input input-bordered input-xs w-20"
+              className="input input-bordered input-xs w-15"
               disabled={userAccess === 'view'}
               value={ingredient.maximum !== 0 ? ingredient.maximum : 'N/A'}
               onChange={(e) => {
@@ -652,7 +663,7 @@ function ViewFormulation({
           <td>
             <input
               type="text"
-              className="input input-bordered input-xs w-20"
+              className="input input-bordered input-xs w-15"
               disabled={userAccess === 'view'}
               value={nutrient.minimum !== 0 ? nutrient.minimum : 'N/A'}
               onChange={(e) => {
@@ -679,7 +690,7 @@ function ViewFormulation({
           <td>
             <input
               type="text"
-              className="input input-bordered input-xs w-20"
+              className="input input-bordered input-xs w-15"
               disabled={userAccess === 'view'}
               value={nutrient.maximum !== 0 ? nutrient.maximum : 'N/A'}
               onChange={(e) => {
@@ -875,8 +886,8 @@ function ViewFormulation({
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th>Minimum</th>
-                      <th>Maximum</th>
+                      <th>Min</th>
+                      <th>Max</th>
                       <th>Value</th>
                       <th></th>
                     </tr>
@@ -906,8 +917,8 @@ function ViewFormulation({
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th>Minimum</th>
-                      <th>Maximum</th>
+                      <th>Min</th>
+                      <th>Max</th>
                       <th>Value</th>
                       <th></th>
                     </tr>
