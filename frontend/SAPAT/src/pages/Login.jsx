@@ -55,7 +55,7 @@ function Login() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="cursor-pointer flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
           >
             <img
               className="mr-2 h-5 w-5"

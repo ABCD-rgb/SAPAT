@@ -197,9 +197,9 @@ function ViewFormulation({
     }
   }
 
-  const handleOptimize = async (ingredientsData, ingredients, nutrients) => {
+  const handleOptimize = async (ingredientsData, ingredients, nutrients, type) => {
     try {
-      const res = await axios.post(`${VITE_API_URL}/optimize/simplex`, {
+      const res = await axios.post(`${VITE_API_URL}/optimize/${type}`, {
         ingredientsData,
         ingredients,
         nutrients,
@@ -909,19 +909,51 @@ function ViewFormulation({
                 ₱ {cost}
               </span>
             </div>
-            <button
-              className="btn btn-primary gap-2 rounded-lg"
-              disabled={userAccess === 'view'}
-              onClick={() => {
-                handleOptimize(
-                  listOfIngredients || [],
-                  ingredients || [],
-                  nutrients || []
-                )
-              }}
-            >
-              <RiCalculatorLine /> Optimize
-            </button>
+            <div className="dropdown dropdown-hover dropdown-top">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-primary btn-md gap-2rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
+                disabled={userAccess === 'view'}
+              >
+                <RiCalculatorLine className="text-lg" /> Optimize
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-200 rounded-box z-10 w-56 p-3 shadow-lg shadow-primary"
+              >
+                <li>
+                  <button
+                    className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                    onClick={() => {
+                      handleOptimize(
+                        listOfIngredients || [],
+                        ingredients || [],
+                        nutrients || [],
+                        "simplex"
+                      )
+                    }}
+                  >
+                    Simplex
+                  </button>
+                </li>
+                <li>
+                  <button
+                    className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                    onClick={() => {
+                      handleOptimize(
+                        listOfIngredients || [],
+                        ingredients || [],
+                        nutrients || [],
+                        "pso"
+                      )
+                    }}
+                  >
+                    Particle Swarm Optimization
+                  </button>
+                </li>
+              </ul>
+            </div>
             <button
               disabled={userAccess === 'view'}
               className="btn btn-warning gap-2 rounded-lg"

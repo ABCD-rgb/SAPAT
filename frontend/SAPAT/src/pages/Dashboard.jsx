@@ -70,7 +70,9 @@ function Dashboard() {
       const poultry = formulations.filter(
         (item) => item.animal_group === 'Poultry'
       )
-      const waterBuffalo = formulations.filter((item) => item.animal_group === 'Water Buffalo')
+      const waterBuffalo = formulations.filter(
+        (item) => item.animal_group === 'Water Buffalo'
+      )
       const typeCount = [swine.length, waterBuffalo.length, poultry.length]
       setFormulationTypeCount(typeCount)
       // recent formulations
@@ -166,10 +168,10 @@ function Dashboard() {
                         <span
                           className={`text-xs ${
                             f.animal_group === 'Swine'
-                            ? 'text-[#FF6384]' 
-                            : f.animal_group === 'Poultry'
-                              ? 'text-[#FFCE56]'
-                              : 'text-[#36A2EB]'
+                              ? 'text-[#FF6384]'
+                              : f.animal_group === 'Poultry'
+                                ? 'text-[#FFCE56]'
+                                : 'text-[#36A2EB]'
                           }`}
                         >
                           {f.animal_group || 'No group specified'}
@@ -182,10 +184,10 @@ function Dashboard() {
                       <span
                         className={`text-xs font-medium ${
                           f.access === 'owner'
-                          ?'text-gray-600'
-                          : f.access === 'edit'
-                            ? 'text-blue-600'
-                            : 'text-orange-600'
+                            ? 'text-gray-600'
+                            : f.access === 'edit'
+                              ? 'text-blue-600'
+                              : 'text-orange-600'
                         }`}
                       >
                         {f.access === 'owner'

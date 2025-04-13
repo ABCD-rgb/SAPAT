@@ -12,9 +12,10 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
       setFilteredIngredients(ingredients)
     } else {
       const term = searchTerm.toLowerCase().trim()
-      const filtered = ingredients.filter(ingredient =>
-        ingredient.name.toLowerCase().includes(term) ||
-        (ingredient.group && ingredient.group.toLowerCase().includes(term))
+      const filtered = ingredients.filter(
+        (ingredient) =>
+          ingredient.name.toLowerCase().includes(term) ||
+          (ingredient.group && ingredient.group.toLowerCase().includes(term))
       )
       setFilteredIngredients(filtered)
     }
@@ -62,27 +63,28 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
     setSearchTerm(e.target.value)
   }
 
-  const isAllChecked = filteredIngredients.length > 0 &&
-    filteredIngredients.every(ingredient => {
+  const isAllChecked =
+    filteredIngredients.length > 0 &&
+    filteredIngredients.every((ingredient) => {
       const id = ingredient.ingredient_id ?? ingredient._id
-      return checkedIngredients.some(item => item.ingredient_id === id)
+      return checkedIngredients.some((item) => item.ingredient_id === id)
     })
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       // Add all filtered ingredients that aren't already checked
       const newChecked = [...checkedIngredients]
-      filteredIngredients.forEach(ingredient => {
+      filteredIngredients.forEach((ingredient) => {
         const id = ingredient.ingredient_id ?? ingredient._id
-        if (!newChecked.some(item => item.ingredient_id === id)) {
+        if (!newChecked.some((item) => item.ingredient_id === id)) {
           newChecked.push({ ingredient_id: id, name: ingredient.name })
         }
       })
       setCheckedIngredients(newChecked)
     } else {
       // Remove all filtered ingredients from checked list
-      const newChecked = checkedIngredients.filter(checkedItem => {
-        return !filteredIngredients.some(ingredient => {
+      const newChecked = checkedIngredients.filter((checkedItem) => {
+        return !filteredIngredients.some((ingredient) => {
           const id = ingredient.ingredient_id ?? ingredient._id
           return checkedItem.ingredient_id === id
         })
@@ -111,19 +113,19 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
         <p className="mb-4 text-sm text-gray-500">Description</p>
 
         {/* Search input */}
-        <div className="mb-4 relative">
+        <div className="relative mb-4">
           <div className="relative">
-            <RiSearchLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <RiSearchLine className="absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-400" />
             <input
               type="text"
               placeholder="Search ingredients..."
-              className="input input-bordered w-full pl-10 rounded-xl"
+              className="input input-bordered w-full rounded-xl pl-10"
               value={searchTerm}
               onChange={handleSearchChange}
             />
             {searchTerm && (
               <button
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform text-gray-400 hover:text-gray-600"
                 onClick={() => setSearchTerm('')}
               >
                 <RiCloseLine className="h-5 w-5" />
@@ -137,58 +139,60 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
           <div className="max-h-64 overflow-hidden overflow-y-auto rounded-2xl border border-gray-200">
             <table className="table-pin-rows table w-full">
               <thead className="bg-gray-50">
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={isAllChecked && filteredIngredients.length > 0}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th className="font-semibold">Name</th>
-                <th className="font-semibold">Price</th>
-                <th className="font-semibold">Available</th>
-                <th className="font-semibold">Group</th>
-              </tr>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={isAllChecked && filteredIngredients.length > 0}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="font-semibold">Name</th>
+                  <th className="font-semibold">Price</th>
+                  <th className="font-semibold">Available</th>
+                  <th className="font-semibold">Group</th>
+                </tr>
               </thead>
               <tbody>
-              {filteredIngredients.length > 0 ? (
-                filteredIngredients.map((ingredient, index) => (
-                  <tr
-                    key={index}
-                    className={`hover cursor-pointer ${
-                      checkedIngredients.some((item) =>
-                        (ingredient.ingredient_id
-                          ? item.ingredient_id === ingredient.ingredient_id
-                          : item.ingredient_id === ingredient._id)
-                      ) ? 'bg-blue-100' : ''
-                    }`}
-                    onClick={() => handleRowClick(ingredient)}
-                  >
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={checkedIngredients.some((item) =>
+                {filteredIngredients.length > 0 ? (
+                  filteredIngredients.map((ingredient, index) => (
+                    <tr
+                      key={index}
+                      className={`hover cursor-pointer ${
+                        checkedIngredients.some((item) =>
                           ingredient.ingredient_id
                             ? item.ingredient_id === ingredient.ingredient_id
                             : item.ingredient_id === ingredient._id
-                        )}
-                        onChange={(e) => handleCheckboxChange(ingredient, e)}
-                      />
+                        )
+                          ? 'bg-blue-100'
+                          : ''
+                      }`}
+                      onClick={() => handleRowClick(ingredient)}
+                    >
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={checkedIngredients.some((item) =>
+                            ingredient.ingredient_id
+                              ? item.ingredient_id === ingredient.ingredient_id
+                              : item.ingredient_id === ingredient._id
+                          )}
+                          onChange={(e) => handleCheckboxChange(ingredient, e)}
+                        />
+                      </td>
+                      <td>{ingredient.name}</td>
+                      <td>{ingredient.price}</td>
+                      <td>{ingredient.available}</td>
+                      <td>{ingredient.group}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="py-4 text-center">
+                      No ingredients found. Try another search term.
                     </td>
-                    <td>{ingredient.name}</td>
-                    <td>{ingredient.price}</td>
-                    <td>{ingredient.available}</td>
-                    <td>{ingredient.group}</td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center py-4">
-                    No ingredients found. Try another search term.
-                  </td>
-                </tr>
-              )}
+                )}
               </tbody>
             </table>
           </div>
@@ -196,7 +200,10 @@ function ChooseIngredientsModal({ isOpen, onClose, ingredients, onResult }) {
           {/* Selected count */}
           <div className="mt-4 text-sm text-gray-600">
             {checkedIngredients.length > 0 && (
-              <span>{checkedIngredients.length} ingredient{checkedIngredients.length > 1 ? 's' : ''} selected</span>
+              <span>
+                {checkedIngredients.length} ingredient
+                {checkedIngredients.length > 1 ? 's' : ''} selected
+              </span>
             )}
           </div>
 
