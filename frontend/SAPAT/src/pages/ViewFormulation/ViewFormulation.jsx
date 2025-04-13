@@ -401,12 +401,21 @@ function ViewFormulation({
         { ingredients: ingredientsToAdd }
       )
       const newIngredients = res.data.addedIngredients
-      setSelectedIngredients([...selectedIngredients, ...newIngredients])
-      const arr2Ids = new Set(newIngredients.map((item) => item.ingredient_id))
+      const formattedIngredients = newIngredients.map(ingredient => {
+        // at initial add, all values are zero
+        return {
+          ...ingredient,
+          minimum: 0,
+          maximum: 0,
+          value: 0
+        }
+      })
+      setSelectedIngredients([...selectedIngredients, ...formattedIngredients])
+      const arr2Ids = new Set(formattedIngredients.map((item) => item.ingredient_id))
       setIngredientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.ingredient_id || item._id))
       )
-      updateIngredients([...selectedIngredients, ...newIngredients])
+      updateIngredients([...selectedIngredients, ...formattedIngredients])
       setIsChooseIngredientsModalOpen(false)
       // toast instructions
       setShowToast(true)
@@ -428,12 +437,21 @@ function ViewFormulation({
         { nutrients: nutrientsToAdd }
       )
       const newNutrients = res.data.addedNutrients
-      setSelectedNutrients([...selectedNutrients, ...newNutrients])
-      const arr2Ids = new Set(newNutrients.map((item) => item.nutrient_id))
+      // at initial add, all values are zero
+      const formattedNutrients = newNutrients.map(nutrient => {
+        return {
+          ...nutrient,
+          minimum: 0,
+          maximum: 0,
+          value: 0
+        }
+      })
+      setSelectedNutrients([...selectedNutrients, ...formattedNutrients])
+      const arr2Ids = new Set(formattedNutrients.map((item) => item.nutrient_id))
       setNutrientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.nutrient_id || item._id))
       )
-      updateNutrients([...selectedNutrients, ...newNutrients])
+      updateNutrients([...selectedNutrients, ...formattedNutrients])
       setIsChooseNutrientsModalOpen(false)
       // toast instructions
       setShowToast(true)
@@ -767,7 +785,7 @@ function ViewFormulation({
               </div>
               <div>
                 <button
-                  className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700 "
+                  className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700"
                   onClick={handleSave}
                 >
                   <RiSave2Line className="h-4 w-4"/> Save

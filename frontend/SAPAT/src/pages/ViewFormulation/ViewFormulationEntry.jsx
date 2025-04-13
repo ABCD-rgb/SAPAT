@@ -113,14 +113,6 @@ function ViewFormulationEntry({ id }) {
     }
   }, [user])
 
-  // Auto-sync on internal navigation (when the URL changes)
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("HERE!")
-  //     updateDatabase() // Sync before navigating away
-  //   }
-  // }, [location.pathname]) // Runs when the user changes the page within the app
-
   // Sync on saving using 'ctrl + s'
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -184,7 +176,7 @@ function ViewFormulationEntry({ id }) {
       })
       setToastAction('success')
       setShowToast(true) // Show success toast
-      setMessage('Formulation saved successfully!')
+      setMessage('Formulation saved to database!')
     } catch (error) {
       console.error('Error updating database:', error)
       setToastAction('error')
