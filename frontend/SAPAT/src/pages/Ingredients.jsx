@@ -1,9 +1,4 @@
-import {
-  RiAddLine,
-  RiFileDownloadLine,
-  RiFileUploadLine,
-  RiFilterLine,
-} from 'react-icons/ri'
+import { RiAddLine } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import AddIngredientModal from '../components/modals/ingredients/AddIngredientModal'
 import EditIngredientModal from '../components/modals/ingredients/EditIngredientModal'
@@ -14,6 +9,10 @@ import useAuth from '../hook/useAuth.js'
 import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
+import Search from '../components/Search.jsx'
+import Export from '../components/buttons/Export.jsx'
+import Import from '../components/Import.jsx'
+import ImportModal from '../components/modals/ImportModal.jsx'
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -21,6 +20,7 @@ function Ingredients() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
   const [selectedIngredient, setSelectedIngredient] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   // toast visibility
@@ -45,6 +45,10 @@ function Ingredients() {
     } catch (err) {
       console.log(err)
     }
+  }
+
+  const handleSearchQuery = (data) => {
+    setIngredients(data)
   }
 
   const handleEditClick = (ingredient) => {
@@ -110,6 +114,38 @@ function Ingredients() {
     setToastAction(action)
   }
 
+  const handleImportClick = () => {
+    setIsImportModalOpen(true)
+  }
+
+  const handleImportSubmit = async (data) => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`,
+        data
+      )
+      // refetch ingredients to display updated table
+      await fetchData()
+      // toast instructions
+      setShowToast(true)
+      setMessage('Ingredients successfully imported.')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Failed to import.')
+      setToastAction('error')
+    }
+  }
+
+  const handleExportSubmit = (message, action) => {
+    // toast instructions
+    setShowToast(true)
+    setMessage(message)
+    setToastAction(action)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -142,35 +178,23 @@ function Ingredients() {
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-button flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
             </button>
-            <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Import</span>
-            </button>
-            <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Export</span>
-            </button>
+            <Import onImport={handleImportClick} />
+            <Export ingredients={ingredients} onExport={handleExportSubmit} />
           </div>
-          <div className="flex w-full gap-2 md:w-auto">
-            <input
-              type="text"
-              placeholder="Search"
-              className="rounded-lg border border-gray-300 px-3 py-1 text-sm transition-colors focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none md:px-4 md:py-2 md:text-base"
-            />
-            <button className="text-darkbrown hover:border-deepbrown flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-1 text-sm whitespace-nowrap transition-colors hover:bg-gray-50 active:bg-gray-100 md:gap-2 md:px-4 md:py-2 md:text-base">
-              <RiFilterLine className="h-4 w-4 md:h-5 md:w-5" />
-              <span>Filter</span>
-            </button>
-          </div>
+          <Search
+            userId={user._id}
+            handleSearchQuery={handleSearchQuery}
+            use="ingredient"
+          />
         </div>
       </div>
 
-      {/* Table Section - Removed overflow from container */}
+      {/* Table Section */}
       <div className="flex-1 p-3 md:px-6">
         <Table
           headers={headers}
@@ -182,12 +206,14 @@ function Ingredients() {
       </div>
 
       <AddIngredientModal
+        ingredients={ingredients}
         user_id={user._id}
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onResult={handleCreateResult}
       />
       <EditIngredientModal
+        ingredients={ingredients}
         user_id={user._id}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -201,6 +227,11 @@ function Ingredients() {
         title="Delete Ingredient"
         description={`Are you sure you want to delete ${selectedIngredient?.name}? This action cannot be undone.`}
         type="delete"
+      />
+      <ImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSubmit={handleImportSubmit}
       />
 
       {/*  Toasts */}

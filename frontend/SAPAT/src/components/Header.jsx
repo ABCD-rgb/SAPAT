@@ -7,10 +7,8 @@ function Header() {
     //  header containing date (month, day, year) and time on the  leftmost side and a default profile icon on the rightmost side
     <header className="bg-white p-2 shadow-sm">
       <div className="text-darkbrown flex items-center justify-between">
-        <div className="items-left border-darkbrown ml-6 flex flex-col border-b pb-1">
-          <p className="text-base font-bold">
-            {new Date().toLocaleTimeString()}
-          </p>
+        <div className="items-left border-darkbrown ml-6 flex flex-col">
+          <p className="text-darkbrown text-lg font-bold">SAPAT</p>
           <p className="text-sm">
             {' '}
             {new Date().toLocaleDateString('en-US', {

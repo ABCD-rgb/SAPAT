@@ -3,8 +3,7 @@ import {
   RiAddLine,
   RiCalculatorLine,
   RiFileChartLine,
-  RiFileUploadLine,
-  RiFileDownloadLine,
+  RiDeleteBinLine,
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -16,6 +15,7 @@ import Avatar from '../../components/Avatar.jsx'
 import Selection from '../../components/Selection.jsx'
 import ChooseIngredientsModal from '../../components/modals/viewformulation/ChooseIngredientsModal.jsx'
 import ChooseNutrientsModal from '../../components/modals/viewformulation/ChooseNutrientsModal.jsx'
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
 
 function ViewFormulation({
@@ -31,6 +31,7 @@ function ViewFormulation({
   updateName,
   updateDescription,
   updateAnimalGroup,
+  updateCost,
   updateIngredients,
   updateNutrients,
   updateIngredientProperty,
@@ -52,10 +53,14 @@ function ViewFormulation({
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
 
-  // choosing ingredients and nutrients to create feeds
-  const [owner, setOwner] = useState()
+  // all available ingredients and nutrients of the owner
   const [listOfIngredients, setListOfIngredients] = useState([])
   const [listOfNutrients, setListOfNutrients] = useState([])
+
+  // choosing ingredients and nutrients to create feeds
+  const [owner, setOwner] = useState()
+  const [ingredientsMenu, setIngredientsMenu] = useState([])
+  const [nutrientsMenu, setNutrientsMenu] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
     useState(false)
   const [isChooseNutrientsModalOpen, setIsChooseNutrientsModalOpen] =
@@ -75,11 +80,11 @@ function ViewFormulation({
   useEffect(() => {
     fetchOwner()
     // make sure owner has been fetched before getting the ingredients and nutrients (these are for choosing in the 'add ingredients' and 'add nutrients')
-    if (owner) {
+    if (owner && formulation) {
       fetchIngredients()
       fetchNutrients()
     }
-  }, [owner])
+  }, [owner, formulation])
 
   useEffect(() => {
     fetchCollaboratorData()
@@ -104,6 +109,14 @@ function ViewFormulation({
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
+      // don't include already added ingredients to the ingredients menu
+      const arr2Ids = new Set(
+        formulation.ingredients.map((item) => item.ingredient_id)
+      ) // ingredients already in the formulation
+      const unusedIngredients = fetchedData.filter(
+        (item) => !arr2Ids.has(item.ingredient_id || item._id)
+      )
+      setIngredientsMenu(unusedIngredients)
     } catch (err) {
       console.log(err)
     }
@@ -116,6 +129,14 @@ function ViewFormulation({
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
+      // don't include already added nutrients to the nutrients menu
+      const arr2Ids = new Set(
+        formulation.nutrients.map((item) => item.nutrient_id)
+      ) // nutrients already in the formulation
+      const unusedNutrients = fetchedData.filter(
+        (item) => !arr2Ids.has(item.nutrient_id || item._id)
+      )
+      setNutrientsMenu(unusedNutrients)
     } catch (err) {
       console.log(err)
     }
@@ -175,6 +196,30 @@ function ViewFormulation({
       setIsAddCollaboratorModalOpen(true)
     }
   }
+
+  const handleOptimize = async (ingredientsData, ingredients, nutrients) => {
+    try {
+      const res = await axios.post(`${VITE_API_URL}/optimize/simplex`, {
+        ingredientsData,
+        ingredients,
+        nutrients,
+      })
+      const optimizedCost = res.data.optimizedCost
+      const optimizedIngredients = res.data.optimizedIngredients
+      const optimizedNutrients = res.data.optimizedNutrients
+
+      updateCost(optimizedCost)
+      optimizedIngredients.map((ing, index) => {
+        updateIngredientProperty(index, 'value', Number(ing.value))
+      })
+      optimizedNutrients.map((nut, index) => {
+        updateNutrientProperty(index, 'value', Number(nut.value))
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   const handleAddCollaborator = async () => {
     try {
       const res = await axios.put(
@@ -227,6 +272,126 @@ function ViewFormulation({
     }
   }
 
+  const handleGenerateReport = async () => {
+    // Create a new PDFDocument
+    const pdfDoc = await PDFDocument.create()
+    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman)
+    const page = pdfDoc.addPage()
+
+    const { width, height } = page.getSize()
+    const titleFontSize = 24
+    const headerFontSize = 14
+    const bodyFontSize = 9
+    const space = 30
+
+    // Header Section (formulation.code, formulation.name, etc.)
+    const headerYPosition = height - 4 * titleFontSize
+    page.drawText(`Formulation: (${formulation.code}) ${formulation.name}`, {
+      x: 50,
+      y: headerYPosition,
+      size: titleFontSize,
+      font: timesRomanFont,
+      color: rgb(0.54296875, 0.26953125, 0.07421875),
+    })
+
+    // Description, Animal Group, and Cost Section
+    page.drawText(`description: ${formulation.description}`, {
+      x: 50,
+      y: headerYPosition - space,
+      size: headerFontSize,
+      font: timesRomanFont,
+      color: rgb(0, 0, 0),
+    })
+
+    page.drawText(`Animal Group: ${formulation.animal_group}`, {
+      x: 50,
+      y: headerYPosition - 2 * space,
+      size: headerFontSize,
+      font: timesRomanFont,
+      color: rgb(0, 0, 0),
+    })
+
+    page.drawText(`Cost: PHP ${formulation.cost}`, {
+      x: 50,
+      y: headerYPosition - 3 * space,
+      size: headerFontSize,
+      font: timesRomanFont,
+      color: rgb(0, 0, 0),
+    })
+
+    // Draw a line to separate sections
+    page.drawLine({
+      start: { x: 50, y: headerYPosition - 4 * space },
+      end: { x: width - 50, y: headerYPosition - 4 * space },
+      color: rgb(0, 0, 0),
+      thickness: 1,
+    })
+
+    // Ingredients Section
+    const ingredientsYPosition = headerYPosition - 5 * space
+    page.drawText(`Ingredients (Ratio for 100 kg):`, {
+      x: 50,
+      y: ingredientsYPosition,
+      size: headerFontSize,
+      font: timesRomanFont,
+      color: rgb(0, 0, 0),
+    })
+
+    let ingY = ingredientsYPosition - space
+    formulation.ingredients.map((ing) => {
+      page.drawText(`${ing.name}: ${ing.value}`, {
+        x: 50,
+        y: ingY,
+        size: bodyFontSize,
+        font: timesRomanFont,
+        color: rgb(0, 0, 0),
+      })
+      ingY -= space
+    })
+
+    // Draw a line to separate sections
+    page.drawLine({
+      start: { x: 50, y: ingY },
+      end: { x: width - 50, y: ingY },
+      color: rgb(0, 0, 0),
+      thickness: 1,
+    })
+
+    // Nutrients Section
+    const nutrientsYPosition = ingY - space
+    page.drawText(`Nutrients:`, {
+      x: 50,
+      y: nutrientsYPosition,
+      size: headerFontSize,
+      font: timesRomanFont,
+      color: rgb(0, 0, 0),
+    })
+
+    let nutY = nutrientsYPosition - space
+    formulation.nutrients.map((nutrient) => {
+      page.drawText(`${nutrient.name}: ${nutrient.value}`, {
+        x: 50,
+        y: nutY,
+        size: bodyFontSize,
+        font: timesRomanFont,
+        color: rgb(0, 0, 0),
+      })
+      nutY -= space
+    })
+
+    // Serialize the PDFDocument to bytes (a Uint8Array)
+    const pdfBytes = await pdfDoc.save()
+
+    // Create a Blob from the PDF bytes
+    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
+
+    // Create a download link and trigger the download
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(pdfBlob)
+    link.download = `${formulation.name}  - generated_report.pdf`
+    link.click()
+  }
+
   const handleAddIngredients = async (ingredientsToAdd) => {
     try {
       const res = await axios.put(
@@ -235,6 +400,10 @@ function ViewFormulation({
       )
       const newIngredients = res.data.addedIngredients
       setSelectedIngredients([...selectedIngredients, ...newIngredients])
+      const arr2Ids = new Set(newIngredients.map((item) => item.ingredient_id))
+      setIngredientsMenu((prev) =>
+        prev.filter((item) => !arr2Ids.has(item.ingredient_id || item._id))
+      )
       updateIngredients([...selectedIngredients, ...newIngredients])
       setIsChooseIngredientsModalOpen(false)
       // toast instructions
@@ -258,6 +427,10 @@ function ViewFormulation({
       )
       const newNutrients = res.data.addedNutrients
       setSelectedNutrients([...selectedNutrients, ...newNutrients])
+      const arr2Ids = new Set(newNutrients.map((item) => item.nutrient_id))
+      setNutrientsMenu((prev) =>
+        prev.filter((item) => !arr2Ids.has(item.nutrient_id || item._id))
+      )
       updateNutrients([...selectedNutrients, ...newNutrients])
       setIsChooseNutrientsModalOpen(false)
       // toast instructions
@@ -269,6 +442,82 @@ function ViewFormulation({
       // toast instructions
       setShowToast(true)
       setMessage('Error adding nutrients')
+      setToastAction('error')
+    }
+  }
+
+  const handleRemoveIngredient = async (ingredientToRemove) => {
+    try {
+      const res = await axios.delete(
+        `${VITE_API_URL}/formulation/ingredients/${id}/${ingredientToRemove.ingredient_id}`
+      )
+      // remove ingredientToRemove from selected ingredients
+      setSelectedIngredients(
+        selectedIngredients.filter(
+          (item) => item.ingredient_id !== ingredientToRemove.ingredient_id
+        )
+      )
+      updateIngredients(
+        ingredients.filter(
+          (item) => item.ingredient_id !== ingredientToRemove.ingredient_id
+        )
+      )
+      // add ingredientToRemove to ingredients menu
+      const removedIngredient = listOfIngredients.find((item) =>
+        item.ingredient_id
+          ? item.ingredient_id === ingredientToRemove.ingredient_id
+          : item._id === ingredientToRemove.ingredient_id
+      )
+      if (removedIngredient) {
+        setIngredientsMenu([removedIngredient, ...ingredientsMenu])
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage('Ingredient removed successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Error removing ingredient')
+      setToastAction('error')
+    }
+  }
+
+  const handleRemoveNutrient = async (nutrientToRemove) => {
+    try {
+      const res = await axios.delete(
+        `${VITE_API_URL}/formulation/nutrients/${id}/${nutrientToRemove.nutrient_id}`
+      )
+      // remove nutrientToRemove from selected nutrients
+      setSelectedNutrients(
+        selectedNutrients.filter(
+          (item) => item.nutrient_id !== nutrientToRemove.nutrient_id
+        )
+      )
+      updateNutrients(
+        nutrients.filter(
+          (item) => item.nutrient_id !== nutrientToRemove.nutrient_id
+        )
+      )
+      // add nutrientToRemove to nutrients menu
+      const removedNutrient = listOfNutrients.find((item) =>
+        item.nutrient_id
+          ? item.nutrient_id === nutrientToRemove.nutrient_id
+          : item._id === nutrientToRemove.nutrient_id
+      )
+      if (removedNutrient) {
+        setNutrientsMenu([removedNutrient, ...nutrientsMenu])
+      }
+      // toast instructions
+      setShowToast(true)
+      setMessage('Nutrient removed successfully')
+      setToastAction('success')
+    } catch (err) {
+      console.log(err)
+      // toast instructions
+      setShowToast(true)
+      setMessage('Error removing nutrient')
       setToastAction('error')
     }
   }
@@ -304,6 +553,7 @@ function ViewFormulation({
               id={`ingredient-${index}-minimum`}
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === 'view'}
               value={ingredient.minimum ?? ''}
               onChange={(e) =>
                 handleIngredientMinimumChange(index, e.target.value)
@@ -320,6 +570,7 @@ function ViewFormulation({
               id={`ingredient-${index}-maximum`}
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === 'view'}
               value={ingredient.maximum ?? ''}
               onChange={(e) =>
                 handleIngredientMaximumChange(index, e.target.value)
@@ -333,7 +584,13 @@ function ViewFormulation({
           </td>
           <td>{ingredient.value}</td>
           <td>
-            <button className="btn btn-ghost btn-xs">×</button>
+            <button
+              disabled={userAccess === 'view'}
+              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              onClick={() => handleRemoveIngredient(ingredient)}
+            >
+              <RiDeleteBinLine />
+            </button>
           </td>
         </tr>
       ))
@@ -343,7 +600,6 @@ function ViewFormulation({
   // Render function for Nutrients table rows
   const renderNutrientsTableRows = () => {
     if (nutrients) {
-
       return nutrients.map((nutrient, index) => (
         <tr key={index}>
           <td>{nutrient.name}</td>
@@ -351,8 +607,11 @@ function ViewFormulation({
             <input
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === 'view'}
               value={nutrient.minimum ?? ''}
-              onChange={(e) => handleNutrientMinimumChange(index, e.target.value)}
+              onChange={(e) =>
+                handleNutrientMinimumChange(index, e.target.value)
+              }
               onFocus={() =>
                 updateMyPresence({ focusedId: `nutrient-${index}-minimum` })
               }
@@ -364,8 +623,11 @@ function ViewFormulation({
             <input
               type="number"
               className="input input-bordered input-xs w-20"
+              disabled={userAccess === 'view'}
               value={nutrient.maximum ?? ''}
-              onChange={(e) => handleNutrientMaximumChange(index, e.target.value)}
+              onChange={(e) =>
+                handleNutrientMaximumChange(index, e.target.value)
+              }
               onFocus={() =>
                 updateMyPresence({ focusedId: `nutrient-${index}-maximum` })
               }
@@ -375,7 +637,13 @@ function ViewFormulation({
           </td>
           <td>{nutrient.value}</td>
           <td>
-            <button className="btn btn-ghost btn-xs">×</button>
+            <button
+              disabled={userAccess === 'view'}
+              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              onClick={() => handleRemoveNutrient(nutrient)}
+            >
+              <RiDeleteBinLine />
+            </button>
           </td>
         </tr>
       ))
@@ -383,7 +651,7 @@ function ViewFormulation({
   }
 
   // loading due to api calls
-  if (isLoading) {
+  if (isLoading || formulation.length === 0 || !owner) {
     return <Loading />
   }
   // loading due to liveblocks storage
@@ -391,8 +659,16 @@ function ViewFormulation({
     return <Loading />
   }
 
-  const { code, name, description, animal_group, ingredients, nutrients } =
-    formulationRealTime
+  const {
+    code,
+    name,
+    description,
+    animal_group,
+    cost,
+    ingredients,
+    nutrients,
+  } = formulationRealTime
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
@@ -402,17 +678,20 @@ function ViewFormulation({
           <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
             View Formulation
           </h1>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-2">
-              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
-                <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />
-                <span>Import</span>
-              </button>
-              <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">
-                <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />
-                <span>Export</span>
-              </button>
-            </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+            {/*<div className="flex flex-wrap gap-2">*/}
+            {/*  <button*/}
+            {/*    disabled={userAccess === 'view'}*/}
+            {/*    className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white disabled:hidden"*/}
+            {/*  >*/}
+            {/*    <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
+            {/*    <span>Import</span>*/}
+            {/*  </button>*/}
+            {/*  <button className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white">*/}
+            {/*    <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
+            {/*    <span>Export</span>*/}
+            {/*  </button>*/}
+            {/*</div>*/}
             <div className="flex items-center gap-1">
               <div className="flex -space-x-1">
                 {others.map(({ connectionId, info }) => (
@@ -447,6 +726,7 @@ function ViewFormulation({
                 id="input-code"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={code}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -463,6 +743,7 @@ function ViewFormulation({
                 id="input-name"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={name}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -477,6 +758,7 @@ function ViewFormulation({
                 id="input-description"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 value={description}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -489,6 +771,7 @@ function ViewFormulation({
               <select
                 id="input-animal_group"
                 className="select select-bordered w-full rounded-xl"
+                disabled={userAccess === 'view'}
                 name="input-animal_group"
                 value={animal_group}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
@@ -527,8 +810,9 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
+                  disabled={userAccess === 'view'}
                   onClick={() => setIsChooseIngredientsModalOpen(true)}
-                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                   <RiAddLine /> Add ingredient
                 </button>
@@ -557,8 +841,9 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
+                  disabled={userAccess === 'view'}
                   onClick={() => setIsChooseNutrientsModalOpen(true)}
-                  className="bg-green-button flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700"
+                  className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
                   <RiAddLine /> Add nutrient
                 </button>
@@ -567,18 +852,33 @@ function ViewFormulation({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2">
-            <div className="flex items-center justify-end">
-              <span className="text-sm text-gray-500">Total cost (per kg)</span>
-              <input
-                type="number"
-                className="input input-bordered input-sm w-24 rounded-lg"
-              />
+          <div className="flex flex-wrap justify-end gap-2">
+            <div className="flex items-center justify-end gap-5">
+              <span className="text-sm text-gray-500">
+                Total cost (per 100 kg):
+              </span>
+              <span className="pr-10 text-lg font-semibold underline">
+                ₱ {cost}
+              </span>
             </div>
-            <button className="btn btn-primary gap-2 rounded-lg">
+            <button
+              className="btn btn-primary gap-2 rounded-lg"
+              disabled={userAccess === 'view'}
+              onClick={() => {
+                handleOptimize(
+                  listOfIngredients || [],
+                  ingredients || [],
+                  nutrients || []
+                )
+              }}
+            >
               <RiCalculatorLine /> Optimize
             </button>
-            <button className="btn btn-warning gap-2 rounded-lg">
+            <button
+              disabled={userAccess === 'view'}
+              className="btn btn-warning gap-2 rounded-lg"
+              onClick={handleGenerateReport}
+            >
               <RiFileChartLine /> Generate report
             </button>
           </div>
@@ -613,13 +913,13 @@ function ViewFormulation({
       <ChooseIngredientsModal
         isOpen={isChooseIngredientsModalOpen}
         onClose={() => setIsChooseIngredientsModalOpen(false)}
-        ingredients={listOfIngredients}
+        ingredients={ingredientsMenu}
         onResult={handleAddIngredients}
       />
       <ChooseNutrientsModal
         isOpen={isChooseNutrientsModalOpen}
         onClose={() => setIsChooseNutrientsModalOpen(false)}
-        nutrients={listOfNutrients}
+        nutrients={nutrientsMenu}
         onResult={handleAddNutrients}
       />
 

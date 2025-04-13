@@ -2,18 +2,52 @@ import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 import axios from 'axios'
 
-function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
+function CreateFormulationModal({
+  formulations,
+  owner,
+  isOpen,
+  onClose,
+  onResult,
+}) {
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     description: '',
     animal_group: '',
   })
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [codeError, setCodeError] = useState('')
+  const [nameError, setNameError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsDisabled(true)
+
+    // client-side validation
+    if (
+      formulations.some(
+        (formulation) =>
+          formulation.code.toLowerCase() === formData.code.toLowerCase()
+      )
+    ) {
+      setCodeError('Code already exists ')
+      setNameError('')
+      setIsDisabled(false)
+      return
+    } else if (
+      formulations.some(
+        (formulation) =>
+          formulation.name.toLowerCase() === formData.name.toLowerCase()
+      )
+    ) {
+      setNameError('Name already exists')
+      setCodeError('')
+      setIsDisabled(false)
+      return
+    } else {
+      setNameError('')
+    }
     const body = { ...formData, owner }
-    console.log('body:', body)
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/formulation`,
@@ -33,6 +67,10 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
     } catch (err) {
       console.log(err)
       onResult(null, 'error', 'Failed to create formulation.')
+    } finally {
+      setIsDisabled(false)
+      setCodeError('')
+      setNameError('')
     }
   }
 
@@ -84,10 +122,16 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
                 name="code"
                 value={formData.code}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter code"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${codeError ? 'border-red-500' : ''}`}
               />
+              {codeError && (
+                <p className="mt-1 text-sm text-red-500" role="alert">
+                  {codeError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">
@@ -99,10 +143,16 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
                 name="name"
                 value={formData.name}
                 required
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter name"
-                className="input input-bordered w-full rounded-xl"
+                className={`input input-bordered w-full rounded-xl ${nameError ? 'border-red-500' : ''}`}
               />
+              {nameError && (
+                <p className="mt-1 text-sm text-red-500" role="alert">
+                  {nameError}
+                </p>
+              )}
             </div>
 
             <div className="form-control w-full">
@@ -112,6 +162,7 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
               <select
                 name="animal_group"
                 value={formData.animal_group}
+                disabled={isDisabled}
                 onChange={handleChange}
                 className="select select-bordered w-full rounded-xl"
               >
@@ -131,6 +182,7 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
               <textarea
                 name="description"
                 value={formData.description}
+                disabled={isDisabled}
                 onChange={handleChange}
                 placeholder="Enter description"
                 className="textarea textarea-bordered w-full rounded-xl"
@@ -151,9 +203,9 @@ function CreateFormulationModal({ owner, isOpen, onClose, onResult }) {
             </button>
             <button
               type="submit"
-              className="btn bg-green-button rounded-xl px-8 text-white hover:bg-green-600"
+              className={`btn bg-green-button ${isDisabled ? 'disabled bg-red-100' : 'hover:bg-green-600'} rounded-xl px-8 text-white`}
             >
-              Create
+              {`${isDisabled ? 'Creating...' : 'Create'}`}
             </button>
           </div>
         </form>
