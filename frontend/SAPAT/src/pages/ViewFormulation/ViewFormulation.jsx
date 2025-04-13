@@ -4,8 +4,9 @@ import {
   RiCalculatorLine,
   RiFileChartLine,
   RiDeleteBinLine,
-  RiSave2Line
+  RiSave2Line,
 } from 'react-icons/ri'
+import Info from '../../components/icons/Info.jsx'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Loading from '../../components/Loading.jsx'
@@ -37,7 +38,7 @@ function ViewFormulation({
   updateNutrients,
   updateIngredientProperty,
   updateNutrientProperty,
-  handleSave
+  handleSave,
 }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL
 
@@ -199,7 +200,12 @@ function ViewFormulation({
     }
   }
 
-  const handleOptimize = async (ingredientsData, ingredients, nutrients, type) => {
+  const handleOptimize = async (
+    ingredientsData,
+    ingredients,
+    nutrients,
+    type
+  ) => {
     try {
       const res = await axios.post(`${VITE_API_URL}/optimize/${type}`, {
         ingredientsData,
@@ -412,17 +418,19 @@ function ViewFormulation({
         { ingredients: ingredientsToAdd }
       )
       const newIngredients = res.data.addedIngredients
-      const formattedIngredients = newIngredients.map(ingredient => {
+      const formattedIngredients = newIngredients.map((ingredient) => {
         // at initial add, all values are zero
         return {
           ...ingredient,
           minimum: 0,
           maximum: 0,
-          value: 0
+          value: 0,
         }
       })
       setSelectedIngredients([...selectedIngredients, ...formattedIngredients])
-      const arr2Ids = new Set(formattedIngredients.map((item) => item.ingredient_id))
+      const arr2Ids = new Set(
+        formattedIngredients.map((item) => item.ingredient_id)
+      )
       setIngredientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.ingredient_id || item._id))
       )
@@ -449,16 +457,18 @@ function ViewFormulation({
       )
       const newNutrients = res.data.addedNutrients
       // at initial add, all values are zero
-      const formattedNutrients = newNutrients.map(nutrient => {
+      const formattedNutrients = newNutrients.map((nutrient) => {
         return {
           ...nutrient,
           minimum: 0,
           maximum: 0,
-          value: 0
+          value: 0,
         }
       })
       setSelectedNutrients([...selectedNutrients, ...formattedNutrients])
-      const arr2Ids = new Set(formattedNutrients.map((item) => item.nutrient_id))
+      const arr2Ids = new Set(
+        formattedNutrients.map((item) => item.nutrient_id)
+      )
       setNutrientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.nutrient_id || item._id))
       )
@@ -581,7 +591,7 @@ function ViewFormulation({
   const renderIngredientsTableRows = () => {
     if (ingredients) {
       return ingredients.map((ingredient, index) => (
-        <tr key={index}>
+        <tr key={index} className="hover:bg-base-300">
           <td>{ingredient.name}</td>
           <td>
             <input
@@ -658,7 +668,7 @@ function ViewFormulation({
   const renderNutrientsTableRows = () => {
     if (nutrients) {
       return nutrients.map((nutrient, index) => (
-        <tr key={index}>
+        <tr key={index} className="hover:bg-base-300">
           <td>{nutrient.name}</td>
           <td>
             <input
@@ -799,7 +809,7 @@ function ViewFormulation({
                   className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700"
                   onClick={handleSave}
                 >
-                  <RiSave2Line className="h-4 w-4"/> Save
+                  <RiSave2Line className="h-4 w-4" /> Save
                 </button>
               </div>
             </div>
@@ -879,7 +889,10 @@ function ViewFormulation({
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
-                <p className="text-xs text-gray-500">description</p>
+                <p className="flex text-xs text-gray-500">
+                  <Info /> Ingredients used in your feed mix. Values show kg per
+                  100kg (ratio). Set min/max to control amounts.
+                </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
                 <table className="table-sm table-pin-rows table w-full">
@@ -910,7 +923,10 @@ function ViewFormulation({
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Nutrients</h3>
-                <p className="text-xs text-gray-500">description</p>
+                <p className="flex text-xs text-gray-500">
+                  <Info /> Nutritional content of your feed. Set min/max values
+                  to meet animal needs.
+                </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
                 <table className="table-sm table-pin-rows table w-full">
@@ -940,11 +956,11 @@ function ViewFormulation({
 
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-end gap-2">
-            <div className="flex items-center justify-end gap-5">
-              <span className="text-sm text-gray-500">
+            <div className="flex items-center justify-end gap-1 pr-2">
+              <span className="text-sm font-medium text-gray-600">
                 Total cost (per 100 kg):
               </span>
-              <span className="pr-10 text-lg font-semibold underline">
+              <span className="text-green-button text-lg font-bold underline">
                 ₱ {cost}
               </span>
             </div>
@@ -959,7 +975,7 @@ function ViewFormulation({
               </div>
               <ul
                 tabIndex={0}
-                className="dropdown-content menu bg-base-200 rounded-box z-10 w-56 p-3 shadow-lg shadow-primary"
+                className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-lg"
               >
                 <li>
                   <button
@@ -969,7 +985,7 @@ function ViewFormulation({
                         listOfIngredients || [],
                         ingredients || [],
                         nutrients || [],
-                        "simplex"
+                        'simplex'
                       )
                     }}
                   >
@@ -984,7 +1000,7 @@ function ViewFormulation({
                         listOfIngredients || [],
                         ingredients || [],
                         nutrients || [],
-                        "pso"
+                        'pso'
                       )
                     }}
                   >

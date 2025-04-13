@@ -1,6 +1,7 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 import axios from 'axios'
+import Info from '../../icons/Info.jsx'
 
 function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
   const [formData, setFormData] = useState({
@@ -97,7 +98,11 @@ function AddNutrientModal({ nutrients, user_id, isOpen, onClose, onResult }) {
           <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="text-deepbrown mb-4 text-lg font-bold">Add Nutrient</h3>
+        <h3 className="text-deepbrown mb-1 text-lg font-bold">Add Nutrient</h3>
+        <p className="mb-8 flex text-sm text-gray-500">
+          <Info />
+          Enter details to define new nutrient with its unit.
+        </p>
 
         <form onSubmit={handleSubmit}>
           {/* Form fields */}

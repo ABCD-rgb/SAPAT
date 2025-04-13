@@ -1,6 +1,7 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Info from '../../icons/Info.jsx'
 
 function EditFormulationModal({
   formulations,
@@ -104,9 +105,13 @@ function EditFormulationModal({
           <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="text-deepbrown mb-4 text-lg font-bold">
+        <h3 className="text-deepbrown mb-1 text-lg font-bold">
           Edit Formulation
         </h3>
+        <p className="mb-8 flex text-sm text-gray-500">
+          <Info />
+          Modify basic details of your feed formulation.
+        </p>
 
         {/* Form fields */}
         <form onSubmit={handleSubmit}>

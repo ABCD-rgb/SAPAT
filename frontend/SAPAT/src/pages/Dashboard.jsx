@@ -105,7 +105,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-2 md:p-4">
       <h1 className="text-deepbrown mb-6 text-2xl font-bold">
         Welcome, {user.displayName}!
       </h1>
