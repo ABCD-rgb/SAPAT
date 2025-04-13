@@ -26,7 +26,7 @@ function Nutrients() {
   const [toastAction, setToastAction] = useState('')
   // pagination
   const [page, setPage] = useState(1)
-  const limit = 10
+  const limit = 8
   const [paginationInfo, setPaginationInfo] = useState({
     hasMore: true,
     totalSize: 0,
@@ -81,9 +81,13 @@ function Nutrients() {
       )
       const messageData = res.data.message
       if (messageData === 'success') {
-        setNutrients(
-          nutrients.filter((nutrient) => nutrient._id !== selectedId)
+        const filteredNutrients = nutrients.filter(
+          (nutrient) => nutrient._id !== selectedId
         )
+        setNutrients(filteredNutrients)
+        if (filteredNutrients.length === 0) {
+          setPage(page - 1)
+        }
       }
       // toast instructions
       setShowToast(true)
@@ -103,7 +107,7 @@ function Nutrients() {
 
   const handleCreateResult = (newNutrient, action, message) => {
     setIsAddModalOpen(false)
-    setNutrients([...nutrients, newNutrient])
+    setNutrients([newNutrient, ...nutrients])
     // toast instructions
     setShowToast(true)
     setMessage(message)

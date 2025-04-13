@@ -13,6 +13,7 @@ ChartJS.register(ArcElement, Tooltip, Legend)
 function Dashboard() {
   const { user, loading } = useAuth()
 
+  const [isLoading, setIsLoading] = useState(true)
   const [formulationCount, setFormulationCount] = useState(0)
   const [ingredientCount, setIngredientCount] = useState(0)
   const [formulationTypeCount, setFormulationTypeCount] = useState([0, 0, 0])
@@ -92,6 +93,7 @@ function Dashboard() {
       )
       const ingredients = ingredientRes.data.ingredients
       setIngredientCount(ingredients.length)
+      setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
@@ -102,6 +104,10 @@ function Dashboard() {
   }
   if (!user) {
     return <Navigate to="/" />
+  }
+  // loading due to api calls
+  if (isLoading) {
+    return <Loading />
   }
 
   return (
