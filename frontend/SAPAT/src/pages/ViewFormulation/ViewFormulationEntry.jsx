@@ -127,9 +127,6 @@ function ViewFormulationEntry({ id }) {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault() // Prevent the default browser save action
         updateDatabase() // Call database update function
-        setShowToast(true) // Show success toast
-        setMessage('Formulation saved successfully!')
-        setToastAction('success')
       }
     }
     window.addEventListener('keydown', handleKeyPress)
@@ -185,8 +182,15 @@ function ViewFormulationEntry({ id }) {
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })
+      setToastAction('success')
+      setShowToast(true) // Show success toast
+      setMessage('Formulation saved successfully!')
     } catch (error) {
       console.error('Error updating database:', error)
+      setToastAction('error')
+      setShowToast(true) // Show success toast
+      setMessage('Changes not saved! Tap to retry.')
+      setToastAction('success')
     }
   }
 
@@ -220,6 +224,7 @@ function ViewFormulationEntry({ id }) {
         updateNutrients={updateNutrients}
         updateIngredientProperty={updateIngredientProperty}
         updateNutrientProperty={updateNutrientProperty}
+        handleSave={updateDatabase}
       />
       {/*  Toasts */}
       <Toast

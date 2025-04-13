@@ -4,6 +4,7 @@ import {
   RiCalculatorLine,
   RiFileChartLine,
   RiDeleteBinLine,
+  RiSave2Line
 } from 'react-icons/ri'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -36,6 +37,7 @@ function ViewFormulation({
   updateNutrients,
   updateIngredientProperty,
   updateNutrientProperty,
+  handleSave
 }) {
   const VITE_API_URL = import.meta.env.VITE_API_URL
 
@@ -718,12 +720,12 @@ function ViewFormulation({
   } = formulationRealTime
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
+    <div className="flex h-full flex-col bg-gray-50 md:flex-row">
       {/* Main Content */}
       <div className="flex-1 p-4">
         <div className="space-y-4">
-          {/* Header - Adjusted for mobile */}
-          <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+          {/* Header */}
+          <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
             View Formulation
           </h1>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
@@ -740,7 +742,7 @@ function ViewFormulation({
             {/*    <span>Export</span>*/}
             {/*  </button>*/}
             {/*</div>*/}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <div className="flex -space-x-1">
                 {others.map(({ connectionId, info }) => (
                   <Avatar
@@ -761,6 +763,14 @@ function ViewFormulation({
                   className="btn btn-sm gap-1 rounded-lg text-xs"
                 >
                   <RiShareLine /> Share ▼
+                </button>
+              </div>
+              <div>
+                <button
+                  className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700 "
+                  onClick={handleSave}
+                >
+                  <RiSave2Line className="h-4 w-4"/> Save
                 </button>
               </div>
             </div>
