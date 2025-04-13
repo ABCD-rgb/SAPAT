@@ -112,7 +112,7 @@ function ViewFormulation({
 
   // Sync on saving using 'ctrl + s'
   useEffect(() => {
-    console.log("dfasgasd0", isDirty)
+    console.log('dfasgasd0', isDirty)
     const handleKeyPress = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault() // Prevent the default browser save action
@@ -791,8 +791,11 @@ function ViewFormulation({
           {/* Shown when values are not up-to-date */}
           {isDirty && (
             <div className="alert alert-warning alert-soft">
-              <Warning/>
-              <span>Formula constraints have changed. Click &quot;Optimize&quot; to update values.</span>
+              <Warning />
+              <span>
+                Formula constraints have changed. Click &quot;Optimize&quot; to
+                update values.
+              </span>
             </div>
           )}
 
@@ -922,10 +925,7 @@ function ViewFormulation({
                 </li>
               </ul>
             </div>
-            <GenerateReport
-              userAccess={userAccess}
-              formulation={formulation}
-            />
+            <GenerateReport userAccess={userAccess} formulation={formulation} />
           </div>
         </div>
       </div>

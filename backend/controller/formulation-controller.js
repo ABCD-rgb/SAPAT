@@ -25,7 +25,7 @@ const createFormulation = async (req, res) => {
 
 const getAllFormulations = async (req, res) => {
     const { collaboratorId } = req.params;
-    const { skip=0, limit=10 } = req.query;
+    const { skip=0, limit=8 } = req.query;
 
     try {
         // only show formulations where the user is part of the collaborators

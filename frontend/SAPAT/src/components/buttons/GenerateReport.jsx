@@ -2,7 +2,6 @@ import { RiFileChartLine } from 'react-icons/ri'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 function GenerateReport({ userAccess, formulation }) {
-
   const handleGenerateReport = async () => {
     // Create a new PDFDocument
     const pdfDoc = await PDFDocument.create()
@@ -34,12 +33,12 @@ function GenerateReport({ userAccess, formulation }) {
     // Add logo image instead of placeholder rectangle
     try {
       // Fetch the logo image
-      const logoResponse = await fetch('/assets/logo.png');
-      const logoImageData = await logoResponse.arrayBuffer();
+      const logoResponse = await fetch('/assets/logo.png')
+      const logoImageData = await logoResponse.arrayBuffer()
 
       // Embed the image in the PDF
-      const logoImage = await pdfDoc.embedPng(logoImageData);
-      const logoDims = logoImage.scale(.075);
+      const logoImage = await pdfDoc.embedPng(logoImageData)
+      const logoDims = logoImage.scale(0.075)
 
       // Draw the logo
       page.drawImage(logoImage, {
@@ -47,9 +46,9 @@ function GenerateReport({ userAccess, formulation }) {
         y: height - margin - logoDims.height,
         width: logoDims.width,
         height: logoDims.height,
-      });
+      })
     } catch (error) {
-      console.error('Error adding logo:', error);
+      console.error('Error adding logo:', error)
 
       // Fallback to rectangle if image loading fails
       page.drawRectangle({
@@ -58,7 +57,7 @@ function GenerateReport({ userAccess, formulation }) {
         width: 30,
         height: 30,
         color: primaryColor,
-      });
+      })
     }
 
     // Add company name beside logo
@@ -72,11 +71,13 @@ function GenerateReport({ userAccess, formulation }) {
 
     // Add report generation date
     const today = new Date()
-    const formattedDate = today.toLocaleDateString('en-US', {
-      month: 'numeric',
-      day: 'numeric',
-      year: 'numeric'
-    }).replace(/\//g, '/');
+    const formattedDate = today
+      .toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
+      })
+      .replace(/\//g, '/')
 
     page.drawText(`Report generated on: ${formattedDate}`, {
       x: width - margin - 180,
@@ -116,26 +117,26 @@ function GenerateReport({ userAccess, formulation }) {
 
     // Draw info fields with clear alignment
     yPosition -= 25
-    const labelX = margin;
-    const detailX = margin + 120;
-    const fieldSpacing = 18;
+    const labelX = margin
+    const detailX = margin + 120
+    const fieldSpacing = 18
 
     const fieldData = [
       { label: 'Code:', value: formulation.code },
       { label: 'Name:', value: formulation.name },
       { label: 'Description:', value: formulation.description },
       { label: 'Animal Group:', value: formulation.animal_group },
-      { label: 'Total Cost:', value: `PHP ${formulation.cost} per 100kg` }
-    ];
+      { label: 'Total Cost:', value: `PHP ${formulation.cost} per 100kg` },
+    ]
 
-    fieldData.forEach(field => {
+    fieldData.forEach((field) => {
       page.drawText(field.label, {
         x: labelX,
         y: yPosition,
         size: subheaderFontSize,
         font: timesRomanBold,
         color: textColor,
-      });
+      })
 
       page.drawText(field.value, {
         x: detailX,
@@ -143,34 +144,34 @@ function GenerateReport({ userAccess, formulation }) {
         size: subheaderFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
-      yPosition -= fieldSpacing;
-    });
+      yPosition -= fieldSpacing
+    })
 
     // Ingredients Section
-    yPosition -= 15;
+    yPosition -= 15
     page.drawText(`Ingredients (Ratio for 100 kg)`, {
       x: margin,
       y: yPosition,
       size: headerFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
-    yPosition -= 25;
+    yPosition -= 25
 
     // Draw ingredients table with proper column alignment
-    const nameColWidth = 180;
-    const minColWidth = 50;
-    const maxColWidth = 50;
-    const valColWidth = 50;
+    const nameColWidth = 180
+    const minColWidth = 50
+    const maxColWidth = 50
+    const valColWidth = 50
 
     // Column positions
-    const nameX = margin;
-    const minX = nameX + nameColWidth;
-    const maxX = minX + minColWidth;
-    const valX = maxX + maxColWidth;
+    const nameX = margin
+    const minX = nameX + nameColWidth
+    const maxX = minX + minColWidth
+    const valX = maxX + maxColWidth
 
     // Draw header
     page.drawText('Ingredient Name', {
@@ -179,7 +180,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Min', {
       x: minX,
@@ -187,7 +188,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Max', {
       x: maxX,
@@ -195,7 +196,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Value', {
       x: valX,
@@ -203,29 +204,32 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
-    yPosition -= 15;
+    yPosition -= 15
 
     // Draw a line under headers
     page.drawLine({
       start: { x: margin, y: yPosition + 5 },
-      end: { x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth, y: yPosition + 5 },
+      end: {
+        x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth,
+        y: yPosition + 5,
+      },
       thickness: 0.5,
       color: lightGray,
-    });
+    })
 
-    yPosition -= 5;
+    yPosition -= 5
 
     // Draw ingredients rows
-    formulation.ingredients.forEach(ing => {
+    formulation.ingredients.forEach((ing) => {
       page.drawText(ing.name, {
         x: nameX,
         y: yPosition,
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(ing.min || 'N/A', {
         x: minX,
@@ -233,7 +237,7 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(ing.max || 'N/A', {
         x: maxX,
@@ -241,7 +245,7 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(ing.value.toString(), {
         x: valX,
@@ -249,28 +253,28 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
-      yPosition -= lineHeight;
+      yPosition -= lineHeight
 
       // Check if we need a new page
       if (yPosition < margin + 100) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        yPosition = height - margin - 50;
+        page = pdfDoc.addPage([595.28, 841.89])
+        yPosition = height - margin - 50
       }
-    });
+    })
 
     // Nutrients Section
-    yPosition -= 15;
+    yPosition -= 15
     page.drawText(`Nutrients`, {
       x: margin,
       y: yPosition,
       size: headerFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
-    yPosition -= 25;
+    yPosition -= 25
 
     // Draw nutrients table headers
     page.drawText('Nutrient', {
@@ -279,7 +283,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Min', {
       x: minX,
@@ -287,7 +291,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Max', {
       x: maxX,
@@ -295,7 +299,7 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
     page.drawText('Value', {
       x: valX,
@@ -303,29 +307,32 @@ function GenerateReport({ userAccess, formulation }) {
       size: subheaderFontSize,
       font: timesRomanBold,
       color: secondaryColor,
-    });
+    })
 
-    yPosition -= 15;
+    yPosition -= 15
 
     // Draw a line under headers
     page.drawLine({
       start: { x: margin, y: yPosition + 5 },
-      end: { x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth, y: yPosition + 5 },
+      end: {
+        x: margin + nameColWidth + minColWidth + maxColWidth + valColWidth,
+        y: yPosition + 5,
+      },
       thickness: 0.5,
       color: lightGray,
-    });
+    })
 
-    yPosition -= 5;
+    yPosition -= 5
 
     // Draw nutrients rows
-    formulation.nutrients.forEach(nutrient => {
+    formulation.nutrients.forEach((nutrient) => {
       page.drawText(nutrient.name, {
         x: nameX,
         y: yPosition,
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(nutrient.min || 'N/A', {
         x: minX,
@@ -333,7 +340,7 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(nutrient.max || 'N/A', {
         x: maxX,
@@ -341,7 +348,7 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
       page.drawText(nutrient.value.toString(), {
         x: valX,
@@ -349,21 +356,21 @@ function GenerateReport({ userAccess, formulation }) {
         size: bodyFontSize,
         font: timesRomanFont,
         color: textColor,
-      });
+      })
 
-      yPosition -= lineHeight;
+      yPosition -= lineHeight
 
       // Check if we need a new page
       if (yPosition < margin + 100) {
-        page = pdfDoc.addPage([595.28, 841.89]);
-        yPosition = height - margin - 50;
+        page = pdfDoc.addPage([595.28, 841.89])
+        yPosition = height - margin - 50
       }
-    });
+    })
 
     // Add footer with page number
-    const totalPages = pdfDoc.getPageCount();
+    const totalPages = pdfDoc.getPageCount()
     for (let i = 0; i < totalPages; i++) {
-      const page = pdfDoc.getPage(i);
+      const page = pdfDoc.getPage(i)
       // const { height } = page.getSize();
 
       page.drawText(`Page ${i + 1} of ${totalPages}`, {
@@ -372,7 +379,7 @@ function GenerateReport({ userAccess, formulation }) {
         size: smallFontSize,
         font: helvetica,
         color: textColor,
-      });
+      })
 
       // Add footer divider
       page.drawLine({
@@ -380,20 +387,20 @@ function GenerateReport({ userAccess, formulation }) {
         end: { x: width - margin, y: margin },
         thickness: 0.5,
         color: lightGray,
-      });
+      })
     }
 
     // Serialize the PDFDocument to bytes (a Uint8Array)
-    const pdfBytes = await pdfDoc.save();
+    const pdfBytes = await pdfDoc.save()
 
     // Create a Blob from the PDF bytes
-    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' })
 
     // Create a download link and trigger the download
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(pdfBlob);
-    link.download = `${formulation.name} - Feed Formulation Report.pdf`;
-    link.click();
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(pdfBlob)
+    link.download = `${formulation.name} - Feed Formulation Report.pdf`
+    link.click()
   }
 
   return (
@@ -407,4 +414,4 @@ function GenerateReport({ userAccess, formulation }) {
   )
 }
 
-export default GenerateReport;
+export default GenerateReport

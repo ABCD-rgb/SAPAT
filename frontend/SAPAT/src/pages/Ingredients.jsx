@@ -30,7 +30,7 @@ function Ingredients() {
   const [toastAction, setToastAction] = useState('')
   // pagination
   const [page, setPage] = useState(1)
-  const limit = 10
+  const limit = 8
   const [paginationInfo, setPaginationInfo] = useState({
     hasMore: true,
     totalSize: 0,
@@ -85,9 +85,14 @@ function Ingredients() {
       )
       const messageData = res.data.message
       if (messageData === 'success') {
-        setIngredients(
-          ingredients.filter((ingredient) => ingredient._id !== selectedId)
+        const filteredIngredients = ingredients.filter(
+          (ingredient) => ingredient._id !== selectedId
         )
+        setIngredients(filteredIngredients)
+        // when no ingredients on current page are left, go back one page
+        if (filteredIngredients.length === 0) {
+          setPage(page - 1)
+        }
       }
       // toast instructions
       setShowToast(true)
@@ -107,7 +112,7 @@ function Ingredients() {
 
   const handleCreateResult = (newIngredient, action, message) => {
     setIsAddModalOpen(false)
-    setIngredients([...ingredients, newIngredient])
+    setIngredients([newIngredient, ...ingredients])
     // toast instructions
     setShowToast(true)
     setMessage(message)
