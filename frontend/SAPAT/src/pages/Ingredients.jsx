@@ -13,6 +13,7 @@ import Search from '../components/Search.jsx'
 import Export from '../components/buttons/Export.jsx'
 import Import from '../components/Import.jsx'
 import ImportModal from '../components/modals/ImportModal.jsx'
+import Pagination from '../components/Pagination'
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -27,28 +28,43 @@ function Ingredients() {
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 10
+  const [paginationInfo, setPaginationInfo] = useState({
+    hasMore: true,
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.ingredients
-      setIngredients(fetchedData)
+      const fetchedData = res.data
+      setIngredients(fetchedData.ingredients)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
   }
 
-  const handleSearchQuery = (data) => {
-    setIngredients(data)
+  const handleSearchQuery = (data, page) => {
+    setIngredients(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
+    setPage(page)
   }
 
   const handleEditClick = (ingredient) => {
@@ -146,6 +162,10 @@ function Ingredients() {
     setToastAction(action)
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -166,19 +186,19 @@ function Ingredients() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-full flex-col bg-gray-50">
       {/* Fixed Header Section */}
-      <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
-        <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+      <div className="sticky top-0 z-10 bg-gray-50 p-2 md:p-4">
+        <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
           Ingredients
         </h1>
 
         {/* Action buttons and search */}
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-3 md:py-1.5 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
@@ -190,12 +210,13 @@ function Ingredients() {
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="ingredient"
+            page={page}
           />
         </div>
       </div>
 
       {/* Table Section */}
-      <div className="flex-1 p-3 md:px-6">
+      <div className="flex-grow overflow-auto p-2 md:px-4">
         <Table
           headers={headers}
           data={ingredients}
@@ -205,6 +226,15 @@ function Ingredients() {
         />
       </div>
 
+      {/* Pagination */}
+      {ingredients.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Modals */}
       <AddIngredientModal
         ingredients={ingredients}
         user_id={user._id}

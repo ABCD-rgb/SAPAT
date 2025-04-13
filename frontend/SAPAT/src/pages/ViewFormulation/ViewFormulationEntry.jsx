@@ -113,31 +113,6 @@ function ViewFormulationEntry({ id }) {
     }
   }, [user])
 
-  // Auto-sync on internal navigation (when the URL changes)
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("HERE!")
-  //     updateDatabase() // Sync before navigating away
-  //   }
-  // }, [location.pathname]) // Runs when the user changes the page within the app
-
-  // Sync on saving using 'ctrl + s'
-  useEffect(() => {
-    const handleKeyPress = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        event.preventDefault() // Prevent the default browser save action
-        updateDatabase() // Call database update function
-        setShowToast(true) // Show success toast
-        setMessage('Formulation saved successfully!')
-        setToastAction('success')
-      }
-    }
-    window.addEventListener('keydown', handleKeyPress)
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress)
-    }
-  }, [])
-
   const fetchFormulationData = async () => {
     try {
       const response = await axios.get(`${VITE_API_URL}/formulation/${id}`)
@@ -172,7 +147,13 @@ function ViewFormulationEntry({ id }) {
     }
   }
 
-  const updateDatabase = async () => {
+  const updateDatabase = async (isDirty=false) => {
+    if (isDirty) {
+      setShowToast(true) // Show success toast
+      setMessage('Changes not saved! Click "Optimize" before saving changes.')
+      setToastAction('error')
+      return
+    }
     try {
       const currentFormulation = formulationRef.current
       const VITE_API_URL = import.meta.env.VITE_API_URL
@@ -185,8 +166,14 @@ function ViewFormulationEntry({ id }) {
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })
+      setShowToast(true) // Show success toast
+      setMessage('Formulation saved to database!')
+      setToastAction('success')
     } catch (error) {
       console.error('Error updating database:', error)
+      setShowToast(true) // Show success toast
+      setMessage('Changes not saved! Tap to retry.')
+      setToastAction('error')
     }
   }
 
@@ -220,6 +207,7 @@ function ViewFormulationEntry({ id }) {
         updateNutrients={updateNutrients}
         updateIngredientProperty={updateIngredientProperty}
         updateNutrientProperty={updateNutrientProperty}
+        handleSave={updateDatabase}
       />
       {/*  Toasts */}
       <Toast

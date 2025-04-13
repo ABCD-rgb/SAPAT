@@ -35,11 +35,11 @@ function Table({
         'animal_group',
         'access',
       ]
-      const rowData = orderedFields.map((field) => row[field] || '')
+      const rowData = orderedFields.map((field) => row[field] || 'N/A')
       return rowData
     } else if (page === 'ingredients') {
       const orderedFields = ['name', 'price', 'available', 'group']
-      const rowData = orderedFields.map((field) => row[field] || '')
+      const rowData = orderedFields.map((field) => row[field] || 'N/A')
       rowData[2] = Number(rowData[2]) === 1 ? 'Yes' : 'No' // for 'available' field
       return rowData
     } else if (page === 'nutrients') {
@@ -50,7 +50,7 @@ function Table({
         'description',
         'group',
       ]
-      const rowData = orderedFields.map((field) => row[field] || '')
+      const rowData = orderedFields.map((field) => row[field] || 'N/A')
       return rowData
     }
     // for tables that shows all fields
@@ -58,9 +58,9 @@ function Table({
   }
 
   return (
-    <div className="h-full overflow-auto rounded-lg bg-white shadow-sm">
-      <table className="table w-full">
-        <thead className="sticky top-0 bg-white shadow-sm">
+    <div className="max-h-9/10 overflow-auto rounded-lg bg-white shadow-sm">
+      <table className="table-pin-rows table w-full">
+        <thead className="bg-white shadow-sm">
           <tr>
             {headers.map((header, index) => (
               <th key={index} className="text-deepbrown bg-white">
@@ -75,18 +75,20 @@ function Table({
         <tbody>
           {data && data.length > 0 ? (
             data.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover">
+              <tr key={rowIndex} className="hover:bg-base-200">
                 {getRowData(row).map((cell, cellIndex) => (
                   <td key={cellIndex}>
                     {/* only the name column (index 1) is clickable to go to ViewFormulation */}
                     {onRowClick && cellIndex === 1 ? (
-                      <span
-                        onClick={() => onRowClick && onRowClick(row)}
-                        className="group text-deepbrown hover:bg-deepbrown inline-flex cursor-pointer items-center gap-2 rounded px-2 py-1 font-medium hover:text-white/80 hover:underline"
-                      >
-                        {cell}
-                        <FaEye className="h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-                      </span>
+                      <div className="tooltip" data-tip="View">
+                        <span
+                          onClick={() => onRowClick && onRowClick(row)}
+                          className="group text-deepbrown hover:bg-green-button inline-flex cursor-pointer items-center gap-2 rounded px-2 py-1 font-medium hover:text-white/80 hover:underline"
+                        >
+                          {cell}
+                          <FaEye className="h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                        </span>
+                      </div>
                     ) : (
                       cell
                     )}
@@ -107,6 +109,7 @@ function Table({
                         }`}
                         onClick={(e) => {
                           e.stopPropagation()
+                          console.log('row.access: ', row.access)
                           // non-owners should not be able to edit the basic data
                           if (row?.access && row.access !== 'owner') {
                             // toast instructions
