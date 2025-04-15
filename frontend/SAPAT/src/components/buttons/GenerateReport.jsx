@@ -231,7 +231,7 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(ing.min || 'N/A', {
+      page.drawText(ing.minimum || 'N/A', {
         x: minX,
         y: yPosition,
         size: bodyFontSize,
@@ -239,7 +239,7 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(ing.max || 'N/A', {
+      page.drawText(ing.maximum || 'N/A', {
         x: maxX,
         y: yPosition,
         size: bodyFontSize,
@@ -334,7 +334,7 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(nutrient.min || 'N/A', {
+      page.drawText(nutrient.minimum || 'N/A', {
         x: minX,
         y: yPosition,
         size: bodyFontSize,
@@ -342,7 +342,7 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(nutrient.max || 'N/A', {
+      page.drawText(nutrient.maximum || 'N/A', {
         x: maxX,
         y: yPosition,
         size: bodyFontSize,
