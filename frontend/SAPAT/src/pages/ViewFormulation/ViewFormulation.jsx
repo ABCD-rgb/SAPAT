@@ -77,7 +77,7 @@ function ViewFormulation({
   // un-updated ingredient/nutrient values (when user enters new min/max that has not been optimized yet)
   const [isDirty, setIsDirty] = useState(false)
 
-  const isDisabled = userAccess === 'view';
+  const isDisabled = userAccess === 'view'
 
   useEffect(() => {
     if (formulation) {
@@ -686,13 +686,11 @@ function ViewFormulation({
           <h1 className="text-deepbrown mb-5 text-xl font-bold md:text-2xl">
             View Formulation
           </h1>
-          <div className="flex flex-col md:flex-row gap-2 md:items-center justify-between">
+          <div className="flex flex-col justify-between gap-2 md:flex-row md:items-center">
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2">
               {/* Optimize */}
-              <div
-                className={`${isDisabled ? '' : 'dropdown dropdown-hover '}`}
-              >
+              <div className={`${isDisabled ? '' : 'dropdown dropdown-hover'}`}>
                 <div
                   tabIndex={isDisabled ? -1 : 0}
                   role="button"
@@ -704,7 +702,7 @@ function ViewFormulation({
                 >
                   <RiCalculatorLine className="text-lg" /> Optimize
                 </div>
-                { !isDisabled && (
+                {!isDisabled && (
                   <ul
                     tabIndex={0}
                     className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-sm"
@@ -946,39 +944,40 @@ function ViewFormulation({
             </div>
           </div>
 
-
           <div className="flex flex-wrap justify-end gap-2 px-4">
-              {/* Target Amount */}
-              <div className="flex items-center justify-end gap-1 pr-2">
-                <span className="text-sm font-medium text-gray-600">
-                  Target amount (kg):
-                </span>
-                <span className="text-green-button text-lg font-bold underline">
-                  <div>
-                    <input
-                      id="input-weight"
-                      type="text"
-                      className="input input-bordered w-[60px] rounded-xl"
-                      disabled={isDisabled}
-                      value={weight}
-                      onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
-                      onBlur={() => updateMyPresence({ focusedId: null })}
-                      onChange={(e) => updateWeight(e.target.value)}
-                      maxLength={20}
-                    />
-                    <Selections id="input-code" others={others} />
-                  </div>
-                </span>
-              </div>
-              {/* Total Cost */}
-              <div className="flex items-center justify-end gap-1 pr-2">
-                <span className="text-sm font-medium text-gray-600">
-                  Total cost (per {weight} kg):
-                </span>
-                <span className="text-green-button text-lg font-bold underline">
-                  ₱ {cost}
-                </span>
-              </div>
+            {/* Target Amount */}
+            <div className="flex items-center justify-end gap-1 pr-2">
+              <span className="text-sm font-medium text-gray-600">
+                Target amount (kg):
+              </span>
+              <span className="text-green-button text-lg font-bold underline">
+                <div>
+                  <input
+                    id="input-weight"
+                    type="text"
+                    className="input input-bordered w-[60px] rounded-xl"
+                    disabled={isDisabled}
+                    value={weight}
+                    onFocus={(e) =>
+                      updateMyPresence({ focusedId: e.target.id })
+                    }
+                    onBlur={() => updateMyPresence({ focusedId: null })}
+                    onChange={(e) => updateWeight(e.target.value)}
+                    maxLength={20}
+                  />
+                  <Selections id="input-code" others={others} />
+                </div>
+              </span>
+            </div>
+            {/* Total Cost */}
+            <div className="flex items-center justify-end gap-1 pr-2">
+              <span className="text-sm font-medium text-gray-600">
+                Total cost (per {weight} kg):
+              </span>
+              <span className="text-green-button text-lg font-bold underline">
+                ₱ {cost}
+              </span>
+            </div>
           </div>
         </div>
       </div>
