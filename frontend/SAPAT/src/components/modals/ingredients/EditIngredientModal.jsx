@@ -108,6 +108,10 @@ function EditIngredientModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target
+    if (name === 'price') {
+      const validValue = value === '' || /^\d+(\.\d{0,2})?$/.test(value);
+      if (!validValue) return;
+    }
     setFormData((prev) => ({
       ...prev,
       [name]: value,
