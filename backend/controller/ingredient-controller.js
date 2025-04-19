@@ -43,7 +43,6 @@ const getAllIngredients = async (req, res) => {
       message: 'success',
       ingredients: paginatedIngredients,
       pagination: {
-        hasMore: (skip + limit) < totalCount,
         totalSize: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         pageSize: paginatedIngredients.length,
@@ -94,7 +93,6 @@ const getIngredientsByName = async (req, res) => {
       message: 'success',
       fetched: paginatedIngredients,
       pagination: {
-        hasMore: (skip + limit) < totalCount,
         totalSize: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         pageSize: paginatedIngredients.length,

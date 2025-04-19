@@ -99,6 +99,10 @@ function ViewFormulation({
     setIsLoading(false)
   }, [formulation.collaborators])
 
+  useEffect(() => {
+    isDirty && updateCost(0)
+  }, [isDirty])
+
   const fetchOwner = async () => {
     try {
       const res = await axios.get(
@@ -112,7 +116,6 @@ function ViewFormulation({
 
   // Sync on saving using 'ctrl + s'
   useEffect(() => {
-    console.log('dfasgasd0', isDirty)
     const handleKeyPress = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault() // Prevent the default browser save action
@@ -335,6 +338,7 @@ function ViewFormulation({
       setIngredientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.ingredient_id || item._id))
       )
+      updateCost(0)
       updateIngredients([...selectedIngredients, ...formattedIngredients])
       setIsChooseIngredientsModalOpen(false)
       // toast instructions
@@ -373,6 +377,7 @@ function ViewFormulation({
       setNutrientsMenu((prev) =>
         prev.filter((item) => !arr2Ids.has(item.nutrient_id || item._id))
       )
+      updateCost(0)
       updateNutrients([...selectedNutrients, ...formattedNutrients])
       setIsChooseNutrientsModalOpen(false)
       // toast instructions
@@ -413,6 +418,7 @@ function ViewFormulation({
       if (removedIngredient) {
         setIngredientsMenu([removedIngredient, ...ingredientsMenu])
       }
+      updateCost(0)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredient removed successfully')
@@ -451,6 +457,7 @@ function ViewFormulation({
       if (removedNutrient) {
         setNutrientsMenu([removedNutrient, ...nutrientsMenu])
       }
+      updateCost(0)
       // toast instructions
       setShowToast(true)
       setMessage('Nutrient removed successfully')
@@ -538,9 +545,14 @@ function ViewFormulation({
                   /^\d*\.?\d{0,2}$/.test(inputValue)
                 ) {
                   // to allow rewriting of input if user types a number after clicking on input with 'N/A'
-                  const processedValue = /^N\/A\d*/.test(inputValue)
+                  let processedValue = /^N\/A\d*/.test(inputValue)
                     ? inputValue.replace('N/A', '')
                     : inputValue
+                  // limit max constraint of ingredient to 100
+                  const numericValue = parseFloat(processedValue)
+                  if (!isNaN(numericValue) && numericValue > 100) {
+                    processedValue = '100'
+                  }
                   handleIngredientMaximumChange(index, processedValue)
                   setIsDirty(true)
                 }
@@ -925,7 +937,10 @@ function ViewFormulation({
                 </li>
               </ul>
             </div>
-            <GenerateReport userAccess={userAccess} formulation={formulation} />
+            <GenerateReport
+              userAccess={userAccess}
+              formulation={formulationRealTime}
+            />
           </div>
         </div>
       </div>

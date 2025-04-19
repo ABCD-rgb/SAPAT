@@ -52,7 +52,6 @@ const getAllFormulations = async (req, res) => {
             message: 'success',
             formulations: paginatedFormulations,
             pagination: {
-                hasMore: (skip + limit) < totalCount,
                 totalSize: totalCount,
                 totalPages: Math.ceil(totalCount / limit),
                 pageSize: paginatedFormulations.length,
@@ -110,7 +109,6 @@ const getFormulationByName = async (req, res) => {
             message: 'success',
             fetched: paginatedFormulations,
             pagination: {
-                hasMore: (skip + limit) < totalCount,
                 totalSize: totalCount,
                 totalPages: Math.ceil(totalCount / limit),
                 pageSize: paginatedFormulations.length,

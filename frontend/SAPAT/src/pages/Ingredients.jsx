@@ -32,7 +32,6 @@ function Ingredients() {
   const [page, setPage] = useState(1)
   const limit = 8
   const [paginationInfo, setPaginationInfo] = useState({
-    hasMore: true,
     totalSize: 0,
     totalPages: 0,
     pageSize: 5,

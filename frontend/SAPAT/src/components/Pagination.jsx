@@ -94,7 +94,10 @@ function Pagination({ paginationInfo, onPageChange }) {
 
         {/* next button */}
         <button
-          disabled={paginationInfo.hasMore === false}
+          disabled={
+            paginationInfo.page === paginationInfo.totalPages ||
+            paginationInfo.page > paginationInfo.totalPages
+          }
           className="join-item btn btn-sm"
           onClick={goToNext}
         >
