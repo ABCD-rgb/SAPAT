@@ -2,7 +2,6 @@ import {
   RiShareLine,
   RiAddLine,
   RiCalculatorLine,
-  RiFileChartLine,
   RiDeleteBinLine,
   RiSave2Line,
 } from 'react-icons/ri'
@@ -17,7 +16,6 @@ import Avatar from '../../components/Avatar.jsx'
 import Selection from '../../components/Selection.jsx'
 import ChooseIngredientsModal from '../../components/modals/viewformulation/ChooseIngredientsModal.jsx'
 import ChooseNutrientsModal from '../../components/modals/viewformulation/ChooseNutrientsModal.jsx'
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import Warning from '../../components/icons/Warning.jsx'
 import GenerateReport from '../../components/buttons/GenerateReport.jsx'
 const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
@@ -77,6 +75,8 @@ function ViewFormulation({
 
   // un-updated ingredient/nutrient values (when user enters new min/max that has not been optimized yet)
   const [isDirty, setIsDirty] = useState(false)
+
+  const isDisabled = userAccess === 'view';
 
   useEffect(() => {
     if (formulation) {
@@ -506,7 +506,7 @@ function ViewFormulation({
               id={`ingredient-${index}-minimum`}
               type="text"
               className="input input-bordered input-xs w-15"
-              disabled={userAccess === 'view'}
+              disabled={isDisabled}
               value={ingredient.minimum !== 0 ? ingredient.minimum : 'N/A'}
               onChange={(e) => {
                 const inputValue = e.target.value
@@ -535,7 +535,7 @@ function ViewFormulation({
               id={`ingredient-${index}-maximum`}
               type="text"
               className="input input-bordered input-xs w-15"
-              disabled={userAccess === 'view'}
+              disabled={isDisabled}
               value={ingredient.maximum !== 0 ? ingredient.maximum : 'N/A'}
               onChange={(e) => {
                 const inputValue = e.target.value
@@ -567,8 +567,8 @@ function ViewFormulation({
           <td>{ingredient.value}</td>
           <td>
             <button
-              disabled={userAccess === 'view'}
-              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              disabled={isDisabled}
+              className={`${isDisabled ? 'hidden' : ''} btn btn-ghost btn-xs text-red-500 hover:bg-red-200`}
               onClick={() => handleRemoveIngredient(ingredient)}
             >
               <RiDeleteBinLine />
@@ -589,7 +589,7 @@ function ViewFormulation({
             <input
               type="text"
               className="input input-bordered input-xs w-15"
-              disabled={userAccess === 'view'}
+              disabled={isDisabled}
               value={nutrient.minimum !== 0 ? nutrient.minimum : 'N/A'}
               onChange={(e) => {
                 const inputValue = e.target.value
@@ -617,7 +617,7 @@ function ViewFormulation({
             <input
               type="text"
               className="input input-bordered input-xs w-15"
-              disabled={userAccess === 'view'}
+              disabled={isDisabled}
               value={nutrient.maximum !== 0 ? nutrient.maximum : 'N/A'}
               onChange={(e) => {
                 const inputValue = e.target.value
@@ -644,8 +644,8 @@ function ViewFormulation({
           <td>{nutrient.value}</td>
           <td>
             <button
-              disabled={userAccess === 'view'}
-              className="btn btn-ghost btn-xs text-red-500 hover:bg-red-200"
+              disabled={isDisabled}
+              className={`${isDisabled ? 'hidden' : ''} btn btn-ghost btn-xs text-red-500 hover:bg-red-200`}
               onClick={() => handleRemoveNutrient(nutrient)}
             >
               <RiDeleteBinLine />
@@ -687,7 +687,7 @@ function ViewFormulation({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
             {/*<div className="flex flex-wrap gap-2">*/}
             {/*  <button*/}
-            {/*    disabled={userAccess === 'view'}*/}
+            {/*    disabled={isDisabled}*/}
             {/*    className="border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex cursor-pointer items-center gap-1 rounded-lg border px-2 py-1 text-xs transition-colors hover:text-white disabled:hidden"*/}
             {/*  >*/}
             {/*    <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
@@ -725,6 +725,7 @@ function ViewFormulation({
                 <button
                   className="btn bg-green-button btn-sm gap-1 rounded-lg text-xs text-white transition-colors hover:bg-green-600 active:bg-green-700"
                   onClick={() => handleSave(isDirty)}
+                  disabled={isDisabled}
                 >
                   <RiSave2Line className="h-4 w-4" /> Save
                 </button>
@@ -740,7 +741,7 @@ function ViewFormulation({
                 id="input-code"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
-                disabled={userAccess === 'view'}
+                disabled={isDisabled}
                 value={code}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -757,7 +758,7 @@ function ViewFormulation({
                 id="input-name"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
-                disabled={userAccess === 'view'}
+                disabled={isDisabled}
                 value={name}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -772,7 +773,7 @@ function ViewFormulation({
                 id="input-description"
                 type="text"
                 className="input input-bordered w-full rounded-xl"
-                disabled={userAccess === 'view'}
+                disabled={isDisabled}
                 value={description}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
                 onBlur={() => updateMyPresence({ focusedId: null })}
@@ -785,7 +786,7 @@ function ViewFormulation({
               <select
                 id="input-animal_group"
                 className="select select-bordered w-full rounded-xl"
-                disabled={userAccess === 'view'}
+                disabled={isDisabled}
                 name="input-animal_group"
                 value={animal_group}
                 onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
@@ -838,7 +839,7 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
-                  disabled={userAccess === 'view'}
+                  disabled={isDisabled}
                   onClick={() => setIsChooseIngredientsModalOpen(true)}
                   className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
@@ -872,7 +873,7 @@ function ViewFormulation({
               </div>
               <div className="p-4">
                 <button
-                  disabled={userAccess === 'view'}
+                  disabled={isDisabled}
                   onClick={() => setIsChooseNutrientsModalOpen(true)}
                   className="bg-green-button flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300"
                 >
@@ -892,50 +893,57 @@ function ViewFormulation({
                 ₱ {cost}
               </span>
             </div>
-            <div className="dropdown dropdown-hover dropdown-top">
+            <div
+              className={`${isDisabled ? '' : 'dropdown dropdown-hover dropdown-top'}`}
+            >
               <div
-                tabIndex={0}
+                tabIndex={isDisabled ? -1 : 0}
                 role="button"
-                className="btn btn-primary btn-md gap-2rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
-                disabled={userAccess === 'view'}
+                className={`btn btn-primary btn-md gap-2 rounded-lg shadow-md transition-all duration-300 ${
+                  isDisabled
+                    ? 'btn-disabled cursor-not-allowed opacity-50'
+                    : 'hover:shadow-lg'
+                }`}
               >
                 <RiCalculatorLine className="text-lg" /> Optimize
               </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-lg"
-              >
-                <li>
-                  <button
-                    className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
-                    onClick={() => {
-                      handleOptimize(
-                        listOfIngredients || [],
-                        ingredients || [],
-                        nutrients || [],
-                        'simplex'
-                      )
-                    }}
-                  >
-                    Simplex
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
-                    onClick={() => {
-                      handleOptimize(
-                        listOfIngredients || [],
-                        ingredients || [],
-                        nutrients || [],
-                        'pso'
-                      )
-                    }}
-                  >
-                    Particle Swarm Optimization
-                  </button>
-                </li>
-              </ul>
+              { !isDisabled && (
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-lg"
+                >
+                  <li>
+                    <button
+                      className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                      onClick={() => {
+                        handleOptimize(
+                          listOfIngredients || [],
+                          ingredients || [],
+                          nutrients || [],
+                          'simplex'
+                        )
+                      }}
+                    >
+                      Simplex
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                      onClick={() => {
+                        handleOptimize(
+                          listOfIngredients || [],
+                          ingredients || [],
+                          nutrients || [],
+                          'pso'
+                        )
+                      }}
+                    >
+                      Particle Swarm Optimization
+                    </button>
+                  </li>
+                </ul>
+              )}
             </div>
             <GenerateReport
               userAccess={userAccess}
