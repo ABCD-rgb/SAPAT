@@ -292,7 +292,8 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
           name: globalIngredient.name,
           price: globalIngredient.price,
           available: globalIngredient.available,
-          source: globalIngredient.source
+          source: globalIngredient.source,
+          group: globalIngredient.group
         });
       }
       // has an existing override (and not deleted as well)
@@ -325,7 +326,8 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
           name: globalIngredient.name,
           price: globalIngredient.price,
           available: globalIngredient.available,
-          source: globalIngredient.source
+          source: globalIngredient.source,
+          group: globalIngredient.group
         });
       }
       // has an existing override (and not deleted as well)
