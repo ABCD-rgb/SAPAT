@@ -14,6 +14,8 @@ import Export from '../components/buttons/Export.jsx'
 import Import from '../components/Import.jsx'
 import ImportModal from '../components/modals/ImportModal.jsx'
 import Pagination from '../components/Pagination'
+import SortBy from '../components/SortBy.jsx'
+import FilterBy from '../components/FilterBy.jsx'
 
 function Ingredients() {
   const { user, loading } = useAuth()
@@ -37,21 +39,25 @@ function Ingredients() {
     pageSize: 5,
     page: 1,
   })
-  const [hasSearchQuery, setHasSearchQuery] = useState(false)
+  // filters
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState('')
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('')
 
   useEffect(() => {
-    if (user && !hasSearchQuery) {
+    if (user) {
       fetchData()
     }
-  }, [user, hasSearchQuery])
+  }, [user, searchQuery, sortBy, sortOrder, filters, page])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
-      setIngredients(fetchedData.ingredients)
+      setIngredients(fetchedData.fetched)
       setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
@@ -59,11 +65,19 @@ function Ingredients() {
     }
   }
 
-  const handleSearchQuery = (data, page) => {
-    setIngredients(data.fetched)
-    setPaginationInfo(data.pagination)
-    setHasSearchQuery(true)
-    setPage(page)
+  const handleFilterQuery = (type, value) => {
+    type === 'query' && setSearchQuery(value)
+    type === 'filter' && setFilters(value)
+    if (type === 'sort') {
+      const [by, order] = value.split('-')
+      if (by === 'na') {
+        setSortBy('')
+        setSortOrder('')
+      } else {
+        setSortBy(by)
+        setSortOrder(order)
+      }
+    }
   }
 
   const handleEditClick = (ingredient) => {
@@ -145,6 +159,7 @@ function Ingredients() {
         data
       )
       // refetch ingredients to display updated table
+      setSearchQuery('')
       await fetchData()
       // toast instructions
       setShowToast(true)
@@ -177,6 +192,19 @@ function Ingredients() {
   }
 
   const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
+  const filterOptions = [
+    { value: 'Cereal grains', label: 'Cereal grains' },
+    { value: 'Protein', label: 'Protein' },
+    { value: 'Fats and oils', label: 'Fats and oils' },
+    { value: 'Minerals and vitamins', label: 'Minerals and vitamins' },
+  ]
+  const sortOptions = [
+    { value: 'na-default', label: 'Default' },
+    { value: 'name-asc', label: 'Name (A-Z)' },
+    { value: 'name-desc', label: 'Name (Z-A)' },
+    { value: 'group-asc', label: 'Group (A-Z)' },
+    { value: 'group-desc', label: 'Group (Z-A)' },
+  ]
 
   if (loading) {
     return <Loading />
@@ -210,12 +238,21 @@ function Ingredients() {
             <Import onImport={handleImportClick} />
             <Export ingredients={ingredients} onExport={handleExportSubmit} />
           </div>
-          <Search
-            userId={user._id}
-            handleSearchQuery={handleSearchQuery}
-            use="ingredient"
-            page={page}
-          />
+          <div className="flex flex-col gap-2 md:flex-row">
+            <div className="flex gap-2">
+              <SortBy
+                handleFilterQuery={handleFilterQuery}
+                options={sortOptions}
+              />
+              <FilterBy
+                handleFilterQuery={handleFilterQuery}
+                options={filterOptions}
+              />
+            </div>
+            <div>
+              <Search handleFilterQuery={handleFilterQuery} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -231,7 +268,7 @@ function Ingredients() {
       </div>
 
       {/* Pagination */}
-      {ingredients.length > 0 && (
+      {ingredients && ingredients?.length > 0 && (
         <Pagination
           paginationInfo={paginationInfo}
           onPageChange={handlePageChange}

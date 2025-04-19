@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { RiAddLine, RiFileUploadLine, RiFileDownloadLine } from 'react-icons/ri'
+import { RiAddLine } from 'react-icons/ri'
 import AddNutrientModal from '../components/modals/nutrients/AddNutrientModal'
 import EditNutrientModal from '../components/modals/nutrients/EditNutrientModal'
 import ConfirmationModal from '../components/modals/ConfirmationModal'
@@ -11,6 +11,8 @@ import axios from 'axios'
 import Toast from '../components/Toast.jsx'
 import Search from '../components/Search.jsx'
 import Pagination from '../components/Pagination.jsx'
+import SortBy from '../components/SortBy.jsx'
+import FilterBy from '../components/FilterBy.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -33,21 +35,25 @@ function Nutrients() {
     pageSize: 5,
     page: 1,
   })
-  const [hasSearchQuery, setHasSearchQuery] = useState(false)
+  // filters
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState('')
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('')
 
   useEffect(() => {
-    if (user && !hasSearchQuery) {
+    if (user) {
       fetchData()
     }
-  }, [user, hasSearchQuery])
+  }, [user, searchQuery, sortBy, sortOrder, filters, page])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
-      setNutrients(fetchedData.nutrients)
+      setNutrients(fetchedData.fetched)
       setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
@@ -55,11 +61,19 @@ function Nutrients() {
     }
   }
 
-  const handleSearchQuery = (data, page) => {
-    setNutrients(data.fetched)
-    setPaginationInfo(data.pagination)
-    setHasSearchQuery(true)
-    setPage(page)
+  const handleFilterQuery = (type, value) => {
+    type === 'query' && setSearchQuery(value)
+    type === 'filter' && setFilters(value)
+    if (type === 'sort') {
+      const [by, order] = value.split('-')
+      if (by === 'na') {
+        setSortBy('')
+        setSortOrder('')
+      } else {
+        setSortBy(by)
+        setSortOrder(order)
+      }
+    }
   }
 
   const handleEditClick = (nutrient) => {
@@ -140,6 +154,19 @@ function Nutrients() {
   }
 
   const headers = ['Abbreviation', 'Name', 'Unit', 'Description', 'Group']
+  const filterOptions = [
+    { value: 'Energy', label: 'Energy' },
+    { value: 'Composition', label: 'Composition' },
+    { value: 'Minerals', label: 'Minerals' },
+    { value: 'Amino acids', label: 'Amino acids' },
+  ]
+  const sortOptions = [
+    { value: 'na-default', label: 'Default' },
+    { value: 'name-asc', label: 'Name (A-Z)' },
+    { value: 'name-desc', label: 'Name (Z-A)' },
+    { value: 'group-asc', label: 'Group (A-Z)' },
+    { value: 'group-desc', label: 'Group (Z-A)' },
+  ]
 
   if (loading) {
     return <Loading />
@@ -171,12 +198,21 @@ function Nutrients() {
               <span>Add New</span>
             </button>
           </div>
-          <Search
-            userId={user._id}
-            handleSearchQuery={handleSearchQuery}
-            use="nutrient"
-            page={page}
-          />
+          <div className="flex flex-col gap-2 md:flex-row">
+            <div className="flex gap-2">
+              <SortBy
+                handleFilterQuery={handleFilterQuery}
+                options={sortOptions}
+              />
+              <FilterBy
+                handleFilterQuery={handleFilterQuery}
+                options={filterOptions}
+              />
+            </div>
+            <div>
+              <Search handleFilterQuery={handleFilterQuery} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -192,7 +228,7 @@ function Nutrients() {
       </div>
 
       {/* Pagination */}
-      {nutrients.length > 0 && (
+      {nutrients && nutrients.length > 0 && (
         <Pagination
           paginationInfo={paginationInfo}
           onPageChange={handlePageChange}

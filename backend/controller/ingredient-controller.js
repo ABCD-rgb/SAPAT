@@ -73,30 +73,72 @@ const getIngredient = async (req, res) => {
   }
 }
 
-const getIngredientsByName = async (req, res) => {
-  const { searchQuery, skip=0, limit=10 } = req.query;
+
+const getIngredientsByFilters = async (req, res) => {
+  const {
+    searchQuery = '',
+    skip = 0, limit = 10,
+    sortBy, sortOrder,
+    filterBy = 'group', filters
+  } = req.query;
   const { userId } = req.params;
   try {
     // user-created ingredients
     const userIngredients = await Ingredient.find({'user': userId});
     //  global ingredients (and overrides)
     const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
-    const ingredients = [...globalIngredients, ...userIngredients];
-    // partial matching
-    const filteredIngredients = ingredients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    let ingredients = [...globalIngredients, ...userIngredients];
+
+    // partial matching for search
+    if (searchQuery) {
+      ingredients = ingredients.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filter the results
+    if (filters) {
+      const filtersArr = filters.split(',')
+      ingredients = ingredients.filter(item => {
+        return filtersArr.includes(item.group)
+      })
+    }
+
+    // Sort the results
+    ingredients.sort((a, b) => {
+      if (sortBy === 'name') {
+        if (sortOrder === 'asc') {
+          return a?.name?.toString().localeCompare(b?.name?.toString() || '');
+        } else {
+          return b?.name?.toString().localeCompare(a?.name?.toString() || '');
+        }
+      } else if (sortBy === 'group') {
+        if (sortOrder === 'asc') {
+          return a?.group?.toString().localeCompare(b?.group?.toString() || '');
+        } else {
+          return b?.group?.toString().localeCompare(a?.group?.toString() || '');
+        }
+      } else if (sortBy === 'animal_group') {
+        if (sortOrder === 'asc') {
+          return a?.animal_group?.toString().localeCompare(b?.animal_group?.toString() || '');
+        } else {
+          return b?.animal_group?.toString().localeCompare(a?.animal_group?.toString() || '');
+        }
+      }
+    });
 
     // pagination
-    const totalCount = filteredIngredients.length;
-    const paginatedIngredients = filteredIngredients.slice(skip, skip + limit);
+    const totalCount = ingredients.length;
+    const paginatedIngredients = ingredients.slice(parseInt(skip), parseInt(skip) + parseInt(limit));
 
     res.status(200).json({
       message: 'success',
       fetched: paginatedIngredients,
       pagination: {
         totalSize: totalCount,
-        totalPages: Math.ceil(totalCount / limit),
+        totalPages: Math.ceil(totalCount / parseInt(limit)),
         pageSize: paginatedIngredients.length,
-        page: Math.floor(skip / limit) + 1,
+        page: Math.floor(parseInt(skip) / parseInt(limit)) + 1,
       }
     });
   } catch (err) {
@@ -395,7 +437,8 @@ const handleIngredientChanges = async (nutrient, user_id) => {
         name: globalIngredient.name,
         price: globalIngredient.price,
         available: globalIngredient.available,
-        source: globalIngredient.source
+        source: globalIngredient.source,
+        group: globalIngredient.group,
       });
     }
     // has an existing override (and not deleted as well)
@@ -411,7 +454,7 @@ export {
   createIngredient,
   getAllIngredients,
   getIngredient,
-  getIngredientsByName,
+  getIngredientsByFilters,
   updateIngredient,
   deleteIngredient,
   importIngredient,

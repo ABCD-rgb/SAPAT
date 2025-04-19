@@ -67,21 +67,58 @@ const getNutrient = async (req, res) => {
   }
 }
 
-const getNutrientsByName = async (req, res) => {
-  const { searchQuery, skip=0, limit=10 } = req.query;
+const getNutrientsByFilters = async (req, res) => {
+  const {
+    searchQuery = '',
+    skip = 0, limit = 10,
+    sortBy, sortOrder,
+    filterBy = 'group', filters
+  } = req.query;
   const { userId } = req.params;
   try {
     // user-created nutrients
     const userNutrients  = await Nutrient.find({'user': userId});
     //  global nutrients (and overrides)
     const globalNutrients  = await handleGetNutrientGlobalAndOverride(userId);
-    const nutrients = [...globalNutrients , ...userNutrients  ];
+    let nutrients = [...globalNutrients , ...userNutrients  ];
+
     // partial matching
-    const filteredNutrients  = nutrients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    nutrients  = nutrients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    // Filter the results
+    if (filters) {
+      const filtersArr = filters.split(',')
+      nutrients = nutrients.filter(item => {
+        return filtersArr.includes(item.group)
+      })
+    }
+
+    // Sort the results
+    nutrients.sort((a, b) => {
+      if (sortBy === 'name') {
+        if (sortOrder === 'asc') {
+          return a?.name?.toString().localeCompare(b?.name?.toString() || '');
+        } else {
+          return b?.name?.toString().localeCompare(a?.name?.toString() || '');
+        }
+      } else if (sortBy === 'group') {
+        if (sortOrder === 'asc') {
+          return a?.group?.toString().localeCompare(b?.group?.toString() || '');
+        } else {
+          return b?.group?.toString().localeCompare(a?.group?.toString() || '');
+        }
+      } else if (sortBy === 'animal_group') {
+        if (sortOrder === 'asc') {
+          return a?.animal_group?.toString().localeCompare(b?.animal_group?.toString() || '');
+        } else {
+          return b?.animal_group?.toString().localeCompare(a?.animal_group?.toString() || '');
+        }
+      }
+    });
 
     // pagination
-    const totalCount = filteredNutrients.length;
-    const paginatedNutrients = filteredNutrients.slice(skip, skip + limit);
+    const totalCount = nutrients.length;
+    const paginatedNutrients = nutrients.slice(skip, skip + limit);
 
     res.status(200).json({
       message: 'success',
@@ -300,74 +337,12 @@ const handleIngredientChanges = async (type, nutrient, user_id) => {
   }
 }
 
-// const handleIngredientChanges = async (type, nutrient, user_id) => {
-//   if (type === 'add') {
-//     // <user-created ingredients>
-//     const userIngredients = await Ingredient.find({ 'user': user_id });
-//     const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
-//       // insert the new nutrient to list of nutrients on each User Ingredient
-//       userIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
-//       await userIngredient.save();
-//     }));
-//     // <global overrides ingredients>
-//     const globalIngredients = await Ingredient.find({ 'source': 'global' });
-//     const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
-//
-//       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
-//       // no existing override
-//       if (override.length === 0) {
-//         const updatedIngredient = globalIngredient.toObject();  // convert Mongoose document to a plain Object
-//         updatedIngredient.nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
-//         const ingredientOverride = await UserIngredientOverride.create({
-//           ...updatedIngredient,
-//           ingredient_id: globalIngredient._id,
-//           user: user_id,
-//         })
-//       }
-//       // has an existing override (and not deleted as well)
-//       else if (override[0].deleted !== 1) {
-//         override[0].nutrients.push({ 'nutrient': nutrient._id, 'value': 0 });
-//         await override[0].save();
-//       }
-//     }));
-//
-//   } else if (type === 'remove') {
-//     // <user-created ingredients>
-//     const userIngredients = await Ingredient.find({ user: user_id });
-//     const updatedUserIngredients = await Promise.all(userIngredients.map(async userIngredient => {
-//       // remove the nutrient to be deleted on all User Ingredients
-//       userIngredient.nutrients = userIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
-//       await userIngredient.save();
-//     }))
-//     // <global overrides ingredients>
-//     const globalIngredients = await Ingredient.find({ 'source': 'global' });
-//     const updatedGlobalIngredients = await Promise.all(globalIngredients.map(async globalIngredient => {
-//       const override = await UserIngredientOverride.find({ 'ingredient_id': globalIngredient._id, 'user': user_id });
-//       // no existing override
-//       if (override.length === 0) {
-//         const updatedIngredient = globalIngredient.toObject();
-//         updatedIngredient.nutrients = updatedIngredient.nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
-//         const ingredientOverride = await UserIngredientOverride.create({
-//           ...updatedIngredient,
-//           ingredient_id: globalIngredient._id,
-//           user: user_id,
-//         })
-//       }
-//       // has an existing override (and not deleted as well)
-//       else if (override[0].deleted !== 1) {
-//         override[0].nutrients = override[0].nutrients.filter(item => String(item.nutrient) !== String(nutrient._id));
-//         await override[0].save();
-//       }
-//     }));
-//   }
-// }
-
 
 export {
   createNutrient,
   getAllNutrients,
   getNutrient,
-  getNutrientsByName,
+  getNutrientsByFilters,
   updateNutrient,
   deleteNutrient,
 };
