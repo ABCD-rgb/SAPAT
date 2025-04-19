@@ -36,7 +36,6 @@ const getAllNutrients = async (req, res) => {
       message: 'success',
       nutrients: paginatedNutrients,
       pagination: {
-        hasMore: (skip + limit) < totalCount,
         totalSize: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         pageSize: paginatedNutrients.length,
@@ -88,7 +87,6 @@ const getNutrientsByName = async (req, res) => {
       message: 'success',
       fetched: paginatedNutrients,
       pagination: {
-        hasMore: (skip + limit) < totalCount,
         totalSize: totalCount,
         totalPages: Math.ceil(totalCount / limit),
         pageSize: paginatedNutrients.length,
