@@ -55,7 +55,6 @@ function Formulations() {
         `${import.meta.env.VITE_API_URL}/formulation/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
-      console.log('fetchedData', fetchedData)
       setFormulations(fetchedData.fetched)
       setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
@@ -119,7 +118,6 @@ function Formulations() {
       setMessage('Failed to delete formulation.')
       setToastAction('error')
     }
-    console.log('Deleting formulation:', selectedFormulation)
   }
 
   const handleCreateResult = (newFormulation, action, message) => {

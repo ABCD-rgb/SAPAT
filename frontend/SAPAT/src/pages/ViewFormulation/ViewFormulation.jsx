@@ -29,6 +29,7 @@ function ViewFormulation({
   others,
   updateMyPresence,
   formulationRealTime,
+  updateWeight,
   updateCode,
   updateName,
   updateDescription,
@@ -666,6 +667,7 @@ function ViewFormulation({
   }
 
   const {
+    weight,
     code,
     name,
     description,
@@ -681,10 +683,71 @@ function ViewFormulation({
       <div className="flex-1 p-4">
         <div className="space-y-2">
           {/* Header */}
-          <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
+          <h1 className="text-deepbrown mb-5 text-xl font-bold md:text-2xl">
             View Formulation
           </h1>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex flex-col md:flex-row gap-2 md:items-center justify-between">
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {/* Optimize */}
+              <div
+                className={`${isDisabled ? '' : 'dropdown dropdown-hover '}`}
+              >
+                <div
+                  tabIndex={isDisabled ? -1 : 0}
+                  role="button"
+                  className={`btn btn-primary btn-sm gap-2 rounded-lg shadow-md transition-all duration-300 ${
+                    isDisabled
+                      ? 'btn-disabled cursor-not-allowed opacity-50'
+                      : 'hover:shadow-lg'
+                  }`}
+                >
+                  <RiCalculatorLine className="text-lg" /> Optimize
+                </div>
+                { !isDisabled && (
+                  <ul
+                    tabIndex={0}
+                    className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-sm"
+                  >
+                    <li>
+                      <button
+                        className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                        onClick={() => {
+                          handleOptimize(
+                            listOfIngredients || [],
+                            ingredients || [],
+                            nutrients || [],
+                            'simplex'
+                          )
+                        }}
+                      >
+                        Simplex
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
+                        onClick={() => {
+                          handleOptimize(
+                            listOfIngredients || [],
+                            ingredients || [],
+                            nutrients || [],
+                            'pso'
+                          )
+                        }}
+                      >
+                        Particle Swarm Optimization
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </div>
+              {/* Generate Report */}
+              <GenerateReport
+                userAccess={userAccess}
+                formulation={formulationRealTime}
+              />
+            </div>
             {/*<div className="flex flex-wrap gap-2">*/}
             {/*  <button*/}
             {/*    disabled={isDisabled}*/}
@@ -883,72 +946,39 @@ function ViewFormulation({
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap justify-end gap-2">
-            <div className="flex items-center justify-end gap-1 pr-2">
-              <span className="text-sm font-medium text-gray-600">
-                Total cost (per 100 kg):
-              </span>
-              <span className="text-green-button text-lg font-bold underline">
-                ₱ {cost}
-              </span>
-            </div>
-            <div
-              className={`${isDisabled ? '' : 'dropdown dropdown-hover dropdown-top'}`}
-            >
-              <div
-                tabIndex={isDisabled ? -1 : 0}
-                role="button"
-                className={`btn btn-primary btn-md gap-2 rounded-lg shadow-md transition-all duration-300 ${
-                  isDisabled
-                    ? 'btn-disabled cursor-not-allowed opacity-50'
-                    : 'hover:shadow-lg'
-                }`}
-              >
-                <RiCalculatorLine className="text-lg" /> Optimize
+
+          <div className="flex flex-wrap justify-end gap-2 px-4">
+              {/* Target Amount */}
+              <div className="flex items-center justify-end gap-1 pr-2">
+                <span className="text-sm font-medium text-gray-600">
+                  Target amount (kg):
+                </span>
+                <span className="text-green-button text-lg font-bold underline">
+                  <div>
+                    <input
+                      id="input-weight"
+                      type="text"
+                      className="input input-bordered w-[60px] rounded-xl"
+                      disabled={isDisabled}
+                      value={weight}
+                      onFocus={(e) => updateMyPresence({ focusedId: e.target.id })}
+                      onBlur={() => updateMyPresence({ focusedId: null })}
+                      onChange={(e) => updateWeight(e.target.value)}
+                      maxLength={20}
+                    />
+                    <Selections id="input-code" others={others} />
+                  </div>
+                </span>
               </div>
-              { !isDisabled && (
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu bg-base-200 rounded-box shadow-primary z-10 w-56 p-3 shadow-lg"
-                >
-                  <li>
-                    <button
-                      className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
-                      onClick={() => {
-                        handleOptimize(
-                          listOfIngredients || [],
-                          ingredients || [],
-                          nutrients || [],
-                          'simplex'
-                        )
-                      }}
-                    >
-                      Simplex
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
-                      onClick={() => {
-                        handleOptimize(
-                          listOfIngredients || [],
-                          ingredients || [],
-                          nutrients || [],
-                          'pso'
-                        )
-                      }}
-                    >
-                      Particle Swarm Optimization
-                    </button>
-                  </li>
-                </ul>
-              )}
-            </div>
-            <GenerateReport
-              userAccess={userAccess}
-              formulation={formulationRealTime}
-            />
+              {/* Total Cost */}
+              <div className="flex items-center justify-end gap-1 pr-2">
+                <span className="text-sm font-medium text-gray-600">
+                  Total cost (per {weight} kg):
+                </span>
+                <span className="text-green-button text-lg font-bold underline">
+                  ₱ {cost}
+                </span>
+              </div>
           </div>
         </div>
       </div>

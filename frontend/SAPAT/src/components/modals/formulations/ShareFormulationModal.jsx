@@ -30,7 +30,6 @@ function ShareFormulationModal({
         (collaborator) => collaborator.email === newCollaborator.newEmail
       )
       if (isExistingCollaborator) {
-        console.log('isExistingCollaborator:')
         onAdd('error', newCollaborator, 'This user is already a collaborator.')
         clearInput()
         return
@@ -40,7 +39,6 @@ function ShareFormulationModal({
       const userData = await fetchNewCollaboratorDataByEmail()
       // only call this if success
       if (userData) {
-        console.log('userData:', userData)
         const formattedCollaborator = {
           newId: userData._id,
           newDisplayName: userData.displayName,

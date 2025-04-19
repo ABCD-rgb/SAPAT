@@ -406,7 +406,7 @@ function GenerateReport({ userAccess, formulation }) {
   return (
     <button
       disabled={userAccess === 'view'}
-      className="btn btn-warning gap-2 rounded-lg disabled:cursor-not-allowed"
+      className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
       onClick={handleGenerateReport}
     >
       <RiFileChartLine /> Generate report
