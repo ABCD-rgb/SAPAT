@@ -31,7 +31,6 @@ function Export({ ingredients, onExport }) {
         const result = {
           Name: ingredient.name,
           Price: parseFloat(ingredient.price), // Convert string to number
-          Available: ingredient.available ? 'Yes' : 'No',
         }
         // Add all nutrients as separate columns
         ingredient.nutrients.forEach((nutrient) => {

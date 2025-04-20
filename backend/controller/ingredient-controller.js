@@ -73,30 +73,72 @@ const getIngredient = async (req, res) => {
   }
 }
 
-const getIngredientsByName = async (req, res) => {
-  const { searchQuery, skip=0, limit=10 } = req.query;
+
+const getIngredientsByFilters = async (req, res) => {
+  const {
+    searchQuery = '',
+    skip = 0, limit = 10,
+    sortBy, sortOrder,
+    filterBy = 'group', filters
+  } = req.query;
   const { userId } = req.params;
   try {
     // user-created ingredients
     const userIngredients = await Ingredient.find({'user': userId});
     //  global ingredients (and overrides)
     const globalIngredients = await handleGetIngredientGlobalAndOverride(userId);
-    const ingredients = [...globalIngredients, ...userIngredients];
-    // partial matching
-    const filteredIngredients = ingredients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    let ingredients = [...globalIngredients, ...userIngredients];
+
+    // partial matching for search
+    if (searchQuery) {
+      ingredients = ingredients.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Filter the results
+    if (filters) {
+      const filtersArr = filters.split(',')
+      ingredients = ingredients.filter(item => {
+        return filtersArr.includes(item.group)
+      })
+    }
+
+    // Sort the results
+    ingredients.sort((a, b) => {
+      if (sortBy === 'name') {
+        if (sortOrder === 'asc') {
+          return a?.name?.toString().localeCompare(b?.name?.toString() || '');
+        } else {
+          return b?.name?.toString().localeCompare(a?.name?.toString() || '');
+        }
+      } else if (sortBy === 'group') {
+        if (sortOrder === 'asc') {
+          return a?.group?.toString().localeCompare(b?.group?.toString() || '');
+        } else {
+          return b?.group?.toString().localeCompare(a?.group?.toString() || '');
+        }
+      } else if (sortBy === 'animal_group') {
+        if (sortOrder === 'asc') {
+          return a?.animal_group?.toString().localeCompare(b?.animal_group?.toString() || '');
+        } else {
+          return b?.animal_group?.toString().localeCompare(a?.animal_group?.toString() || '');
+        }
+      }
+    });
 
     // pagination
-    const totalCount = filteredIngredients.length;
-    const paginatedIngredients = filteredIngredients.slice(skip, skip + limit);
+    const totalCount = ingredients.length;
+    const paginatedIngredients = ingredients.slice(parseInt(skip), parseInt(skip) + parseInt(limit));
 
     res.status(200).json({
       message: 'success',
       fetched: paginatedIngredients,
       pagination: {
         totalSize: totalCount,
-        totalPages: Math.ceil(totalCount / limit),
+        totalPages: Math.ceil(totalCount / parseInt(limit)),
         pageSize: paginatedIngredients.length,
-        page: Math.floor(skip / limit) + 1,
+        page: Math.floor(parseInt(skip) / parseInt(limit)) + 1,
       }
     });
   } catch (err) {
@@ -197,6 +239,65 @@ const importIngredient = async (req, res) => {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     };
 
+    // First, collect all unique nutrient names across all ingredients
+    const allNutrientNames = new Set();
+    ingredientsData.forEach(ingredient => {
+      ingredient.nutrients.forEach(nutrient => {
+        allNutrientNames.add(nutrient.nutrient.trim());
+      });
+    });
+
+    // Create a nutrient lookup cache to avoid duplicate lookups/creations
+    const nutrientLookupCache = {};
+
+    // Process all nutrient names first to ensure they exist
+    for (const nutrientName of allNutrientNames) {
+      const existingNutrient = await Nutrient.findOne({
+        $or: [
+          { user: userId },
+          { source: 'global' }
+        ],
+        name: { $regex: new RegExp('^' + escapeRegex(nutrientName) + '$', 'i') }
+      });
+
+      console.log(`${nutrientName} existing? ${existingNutrient ? 'yes' : 'no'}`);
+
+      if (existingNutrient) {
+        nutrientLookupCache[nutrientName.toLowerCase()] = existingNutrient._id;
+      } else {
+        // Create a new nutrient
+        const newNutrient = await Nutrient.create({
+          name: nutrientName,
+          abbreviation: nutrientName.substring(0, 3).toUpperCase(),
+          unit: '',
+          description: '',
+          group: '',
+          source: 'user',
+          user: userId
+        });
+
+        // when nutrient is created, update all user ingredients
+        await handleIngredientChanges(newNutrient, userId);
+        nutrientLookupCache[nutrientName.toLowerCase()] = newNutrient._id;
+      }
+    }
+
+    // Get ALL existing nutrients for this user to ensure complete nutrient lists
+    const allNutrients = await Nutrient.find({
+      $or: [
+        { user: userId },
+        { source: 'global' }
+      ]
+    });
+
+    // Add all existing nutrients to the cache
+    allNutrients.forEach(nutrient => {
+      if (!nutrientLookupCache[nutrient.name.toLowerCase()]) {
+        nutrientLookupCache[nutrient.name.toLowerCase()] = nutrient._id;
+      }
+    });
+
+    // Check for existing ingredients
     const newIngredientsData = await Promise.all(
       ingredientsData.map(async (ingredient) => {
         const existingIngredient = await Ingredient.findOne({
@@ -211,61 +312,27 @@ const importIngredient = async (req, res) => {
       })
     ).then(results => results.filter(result => result !== null));
 
-    // Process all new ingredients and handle matching/creating nutrients
-    const processedIngredients = await Promise.all(newIngredientsData.map(async (ingredient) => {
+    // Process all new ingredients using the cache
+    const processedIngredients = newIngredientsData.map(ingredient => {
+      // Create a map of provided nutrient values by name (lowercase for case-insensitivity)
+      const providedNutrients = {};
+      ingredient.nutrients.forEach(nutrientData => {
+        providedNutrients[nutrientData.nutrient.trim().toLowerCase()] = nutrientData.value;
+      });
 
-      // Escape special regex characters
-      const escapeRegex = (string) => {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      };
-
-      // Process each nutrient in the ingredient
-      const processedNutrients = await Promise.all(ingredient.nutrients.map(async (nutrientData) => {
-        // Get the nutrient name from the nutrient field
-        const nutrientName = nutrientData.nutrient.trim();
-
-        // Escape special regex characters
-        const escapeRegex = (string) => {
-          return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        };
-
-        const existingNutrient = await Nutrient.findOne({
-          $or: [
-            { user: userId },
-            { source: 'global' }
-          ],
-          name: { $regex: new RegExp('^' + escapeRegex(nutrientName) + '$', 'i') }
-        });
-
-        let nutrientId;
-        if (existingNutrient) {
-          // Use existing nutrient's ID
-          nutrientId = existingNutrient._id;
-        } else {
-          // Create a new nutrient
-          const newNutrient = await Nutrient.create({
-            name: nutrientName,
-            abbreviation: nutrientName.substring(0, 3).toUpperCase(),
-            unit: '',
-            description: '',
-            group: '',
-            source: 'user',
-            user: userId
-          });
-
-          // when nutrient is created, update all user ingredients to add that nutrient
-          await handleIngredientChanges(newNutrient, userId);
-          nutrientId = newNutrient._id;
-        }
-
-        // Return nutrient with ID and value
+      // Process each nutrient, including all existing ones
+      const processedNutrients = allNutrients.map(nutrient => {
+        const nutrientNameLower = nutrient.name.toLowerCase();
         return {
-          nutrient: nutrientId,
-          value: nutrientData.value
+          nutrient: nutrient._id,
+          // Use provided value if it exists, otherwise default to 0
+          value: providedNutrients[nutrientNameLower] !== undefined
+            ? providedNutrients[nutrientNameLower]
+            : 0
         };
-      }));
+      });
 
-      // Create the ingredient with processed nutrients
+      // Create the ingredient with ALL nutrients
       return {
         name: ingredient.name,
         price: ingredient.price,
@@ -275,7 +342,7 @@ const importIngredient = async (req, res) => {
         user: userId,
         nutrients: processedNutrients
       };
-    }));
+    });
 
     // Insert all processed new ingredients
     const newIngredients = await Ingredient.insertMany(processedIngredients);
@@ -286,10 +353,10 @@ const importIngredient = async (req, res) => {
       skippedIngredients: ingredientsData.length - newIngredients.length
     });
   } catch (err) {
+    console.log("err heree: ", err)
     res.status(500).json({ error: err.message, message: 'error' });
   }
 };
-
 
 // helpers
 const handleGetIngredientGlobalAndOverride = async (userId) => {
@@ -395,7 +462,8 @@ const handleIngredientChanges = async (nutrient, user_id) => {
         name: globalIngredient.name,
         price: globalIngredient.price,
         available: globalIngredient.available,
-        source: globalIngredient.source
+        source: globalIngredient.source,
+        group: globalIngredient.group,
       });
     }
     // has an existing override (and not deleted as well)
@@ -411,7 +479,7 @@ export {
   createIngredient,
   getAllIngredients,
   getIngredient,
-  getIngredientsByName,
+  getIngredientsByFilters,
   updateIngredient,
   deleteIngredient,
   importIngredient,

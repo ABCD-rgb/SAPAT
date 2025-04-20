@@ -10,13 +10,12 @@ SAPAT is designed to streamline feed formulation optimization by integrating sec
 
 ### 🔒 Authentication & User Management
 - Login/Signup through Google account
-- User profile management
 
 ### 📊 Dashboard
 - Total active formulations overview
 - Total ingredients counter
 - Feed classifications summary
-- Logs of recent formulations activity
+- Logs of recent formulations
 
 ### 🌾 Ingredients Management
 - Add new ingredients
@@ -95,12 +94,4 @@ npm run dev
 SAPAT provides a comprehensive RESTful API for integrating with the platform or building custom applications. The full API documentation is available here:
 
 [SAPAT API Documentation](https://documenter.getpostman.com/view/36732971/2sB2ca5KNV)
-
-The API documentation includes:
-- Authentication endpoints
-- User management
-- Ingredient and nutrient operations
-- Formulation creation and optimization
-- Sharing and permission controls
-- Complete request/response examples
 

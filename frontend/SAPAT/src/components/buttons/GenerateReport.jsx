@@ -126,7 +126,7 @@ function GenerateReport({ userAccess, formulation }) {
       { label: 'Name:', value: formulation.name },
       { label: 'Description:', value: formulation.description },
       { label: 'Animal Group:', value: formulation.animal_group },
-      { label: 'Total Cost:', value: `PHP ${formulation.cost} per 100kg` },
+      { label: 'Total Cost:', value: `PHP ${formulation.cost} per ${formulation.weight}kg` },
     ]
 
     fieldData.forEach((field) => {
@@ -151,7 +151,7 @@ function GenerateReport({ userAccess, formulation }) {
 
     // Ingredients Section
     yPosition -= 15
-    page.drawText(`Ingredients (Ratio for 100 kg)`, {
+    page.drawText(`Ingredients (Ratio)`, {
       x: margin,
       y: yPosition,
       size: headerFontSize,
@@ -182,21 +182,21 @@ function GenerateReport({ userAccess, formulation }) {
       color: secondaryColor,
     })
 
-    page.drawText('Min', {
-      x: minX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
-
-    page.drawText('Max', {
-      x: maxX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
+    // page.drawText('Min', {
+    //   x: minX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
+    //
+    // page.drawText('Max', {
+    //   x: maxX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
 
     page.drawText('Value', {
       x: valX,
@@ -231,21 +231,21 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(ing.minimum?.toString() || 'N/A', {
-        x: minX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
-
-      page.drawText(ing.maximum.toString() || 'N/A', {
-        x: maxX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
+      // page.drawText(ing.minimum?.toString() || 'N/A', {
+      //   x: minX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
+      //
+      // page.drawText(ing.maximum.toString() || 'N/A', {
+      //   x: maxX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
 
       page.drawText(ing.value.toString(), {
         x: valX,
@@ -285,21 +285,21 @@ function GenerateReport({ userAccess, formulation }) {
       color: secondaryColor,
     })
 
-    page.drawText('Min', {
-      x: minX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
-
-    page.drawText('Max', {
-      x: maxX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
+    // page.drawText('Min', {
+    //   x: minX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
+    //
+    // page.drawText('Max', {
+    //   x: maxX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
 
     page.drawText('Value', {
       x: valX,
@@ -334,21 +334,21 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(nutrient.minimum.toString() || 'N/A', {
-        x: minX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
-
-      page.drawText(nutrient.maximum.toString() || 'N/A', {
-        x: maxX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
+      // page.drawText(nutrient.minimum.toString() || 'N/A', {
+      //   x: minX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
+      //
+      // page.drawText(nutrient.maximum.toString() || 'N/A', {
+      //   x: maxX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
 
       page.drawText(nutrient.value.toString(), {
         x: valX,
@@ -406,7 +406,7 @@ function GenerateReport({ userAccess, formulation }) {
   return (
     <button
       disabled={userAccess === 'view'}
-      className="btn btn-warning gap-2 rounded-lg"
+      className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
       onClick={handleGenerateReport}
     >
       <RiFileChartLine /> Generate report

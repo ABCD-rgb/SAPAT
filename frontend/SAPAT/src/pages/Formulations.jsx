@@ -11,6 +11,8 @@ import useAuth from '../hook/useAuth.js'
 import axios from 'axios'
 import Search from '../components/Search.jsx'
 import Pagination from '../components/Pagination.jsx'
+import SortBy from '../components/SortBy.jsx'
+import FilterBy from '../components/FilterBy.jsx'
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -19,7 +21,6 @@ function Formulations() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isCreatedModalOpen, setIsCreatedModalOpen] = useState(false)
   const [selectedFormulation, setSelectedFormulation] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   // toast visibility
@@ -36,21 +37,25 @@ function Formulations() {
     pageSize: 5,
     page: 1,
   })
-  const [hasSearchQuery, setHasSearchQuery] = useState(false)
+  // filters
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filters, setFilters] = useState('')
+  const [sortBy, setSortBy] = useState('')
+  const [sortOrder, setSortOrder] = useState('')
 
   useEffect(() => {
-    if (user && !hasSearchQuery) {
+    if (user) {
       fetchData()
     }
-  }, [user, hasSearchQuery])
+  }, [user, searchQuery, sortBy, sortOrder, filters, page])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/search/${user._id}?searchQuery=${searchQuery}&filters=${filters}&sortBy=${sortBy}&sortOrder=${sortOrder}&skip=${(page - 1) * limit}&limit=${limit}`
       )
       const fetchedData = res.data
-      setFormulations(fetchedData.formulations)
+      setFormulations(fetchedData.fetched)
       setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
@@ -58,11 +63,19 @@ function Formulations() {
     }
   }
 
-  const handleSearchQuery = (data, page) => {
-    setFormulations(data.fetched)
-    setPaginationInfo(data.pagination)
-    setHasSearchQuery(true)
-    setPage(page)
+  const handleFilterQuery = (type, value) => {
+    type === 'query' && setSearchQuery(value)
+    type === 'filter' && setFilters(value)
+    if (type === 'sort') {
+      const [by, order] = value.split('-')
+      if (by === 'na') {
+        setSortBy('')
+        setSortOrder('')
+      } else {
+        setSortBy(by)
+        setSortOrder(order)
+      }
+    }
   }
 
   const handleEditClick = (formulation) => {
@@ -105,7 +118,6 @@ function Formulations() {
       setMessage('Failed to delete formulation.')
       setToastAction('error')
     }
-    console.log('Deleting formulation:', selectedFormulation)
   }
 
   const handleCreateResult = (newFormulation, action, message) => {
@@ -149,6 +161,18 @@ function Formulations() {
   }
 
   const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Permission']
+  const filterOptions = [
+    { value: 'Swine', label: 'Swine' },
+    { value: 'Poultry', label: 'Poultry' },
+    { value: 'Water Buffalo', label: 'Water Buffalo' },
+  ]
+  const sortOptions = [
+    { value: 'na-default', label: 'Default' },
+    { value: 'name-asc', label: 'Name (A-Z)' },
+    { value: 'name-desc', label: 'Name (Z-A)' },
+    { value: 'animal_group-asc', label: 'Group (A-Z)' },
+    { value: 'animal_group-desc', label: 'Group (Z-A)' },
+  ]
 
   if (loading) {
     return <Loading />
@@ -180,12 +204,21 @@ function Formulations() {
               <span>Add New</span>
             </button>
           </div>
-          <Search
-            userId={user._id}
-            handleSearchQuery={handleSearchQuery}
-            use="formulation"
-            page={page}
-          />
+          <div className="flex flex-col flex-wrap gap-2 md:flex-row">
+            <div className="flex gap-2">
+              <SortBy
+                handleFilterQuery={handleFilterQuery}
+                options={sortOptions}
+              />
+              <FilterBy
+                handleFilterQuery={handleFilterQuery}
+                options={filterOptions}
+              />
+            </div>
+            <div>
+              <Search handleFilterQuery={handleFilterQuery} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -201,7 +234,7 @@ function Formulations() {
         />
       </div>
 
-      {formulations.length > 0 && (
+      {formulations && formulations.length > 0 && (
         <Pagination
           paginationInfo={paginationInfo}
           onPageChange={handlePageChange}
