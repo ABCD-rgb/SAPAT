@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Toast from '../components/Toast.jsx'
 import Search from '../components/Search.jsx'
+import Pagination from '../components/Pagination.jsx'
 
 function Nutrients() {
   const { user, loading } = useAuth()
@@ -23,28 +24,42 @@ function Nutrients() {
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 8
+  const [paginationInfo, setPaginationInfo] = useState({
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.nutrients
-      setNutrients(fetchedData)
+      const fetchedData = res.data
+      setNutrients(fetchedData.nutrients)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
   }
 
-  const handleSearchQuery = (data) => {
-    setNutrients(data)
+  const handleSearchQuery = (data, page) => {
+    setNutrients(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
+    setPage(page)
   }
 
   const handleEditClick = (nutrient) => {
@@ -65,9 +80,13 @@ function Nutrients() {
       )
       const messageData = res.data.message
       if (messageData === 'success') {
-        setNutrients(
-          nutrients.filter((nutrient) => nutrient._id !== selectedId)
+        const filteredNutrients = nutrients.filter(
+          (nutrient) => nutrient._id !== selectedId
         )
+        setNutrients(filteredNutrients)
+        if (filteredNutrients.length === 0) {
+          setPage(page - 1)
+        }
       }
       // toast instructions
       setShowToast(true)
@@ -87,7 +106,7 @@ function Nutrients() {
 
   const handleCreateResult = (newNutrient, action, message) => {
     setIsAddModalOpen(false)
-    setNutrients([...nutrients, newNutrient])
+    setNutrients([newNutrient, ...nutrients])
     // toast instructions
     setShowToast(true)
     setMessage(message)
@@ -110,6 +129,10 @@ function Nutrients() {
     setToastAction(action)
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const hideToast = () => {
     setShowToast(false)
     setMessage('')
@@ -130,42 +153,35 @@ function Nutrients() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-full flex-col bg-gray-50">
       {/* Fixed Header Section */}
-      <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-3 md:p-6">
-        <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+      <div className="sticky top-0 z-10 space-y-6 bg-gray-50 p-2 md:p-4">
+        <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
           Nutrients
         </h1>
 
         {/* Action buttons and search */}
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-3 md:py-1.5 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
             </button>
-            {/*<button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">*/}
-            {/*  <RiFileUploadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
-            {/*  <span>Import</span>*/}
-            {/*</button>*/}
-            {/*<button className="cursor-pointer border-deepbrown text-deepbrown hover:bg-deepbrown active:bg-deepbrown/80 flex items-center gap-1 rounded-lg border px-2 py-1 text-sm transition-colors hover:text-white md:gap-2 md:px-4 md:py-2 md:text-base">*/}
-            {/*  <RiFileDownloadLine className="h-4 w-4 md:h-5 md:w-5" />*/}
-            {/*  <span>Export</span>*/}
-            {/*</button>*/}
           </div>
           <Search
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="nutrient"
+            page={page}
           />
         </div>
       </div>
 
-      {/* Table Section - Removed overflow from container */}
-      <div className="flex-1 p-3 md:px-6">
+      {/* Table Section */}
+      <div className="flex-grow overflow-auto p-2 md:px-4">
         <Table
           headers={headers}
           data={nutrients}
@@ -174,6 +190,14 @@ function Nutrients() {
           onDelete={handleDeleteClick}
         />
       </div>
+
+      {/* Pagination */}
+      {nutrients.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       {/* Modals */}
       <AddNutrientModal

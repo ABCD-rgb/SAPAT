@@ -13,7 +13,7 @@ const nutrientConstraintSchema = new Schema({
     name: { type: String },
     minimum: { type: Number, default: 0 },
     maximum: { type: Number, default: 0 },
-    value: { type: Number, default:     0 },
+    value: { type: Number, default: 0 },
 })
 
 const userAccessSchema = new Schema({

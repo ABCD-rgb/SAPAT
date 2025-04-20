@@ -1,6 +1,7 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useState } from 'react'
 import axios from 'axios'
+import Info from '../../icons/Info.jsx'
 
 function CreateFormulationModal({
   formulations,
@@ -106,9 +107,13 @@ function CreateFormulationModal({
           <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="text-deepbrown mb-4 text-lg font-bold">
+        <h3 className="text-deepbrown mb-1 text-lg font-bold">
           Create Formulation
         </h3>
+        <p className="mb-8 flex text-sm text-gray-500">
+          <Info />
+          Set up initial details for your new formulation.
+        </p>
 
         <form onSubmit={handleSubmit}>
           {/* Form fields */}
@@ -170,8 +175,8 @@ function CreateFormulationModal({
                   Select group
                 </option>
                 <option value="Swine">Swine</option>
-                <option value="Pig">Pig</option>
                 <option value="Poultry">Poultry</option>
+                <option value="Water Buffalo">Water Buffalo</option>
               </select>
             </div>
 

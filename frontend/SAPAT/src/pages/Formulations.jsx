@@ -10,6 +10,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import useAuth from '../hook/useAuth.js'
 import axios from 'axios'
 import Search from '../components/Search.jsx'
+import Pagination from '../components/Pagination.jsx'
 
 function Formulations() {
   const { user, loading } = useAuth()
@@ -26,28 +27,42 @@ function Formulations() {
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
   const navigateURL = useNavigate()
+  // pagination
+  const [page, setPage] = useState(1)
+  const limit = 8
+  const [paginationInfo, setPaginationInfo] = useState({
+    totalSize: 0,
+    totalPages: 0,
+    pageSize: 5,
+    page: 1,
+  })
+  const [hasSearchQuery, setHasSearchQuery] = useState(false)
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasSearchQuery) {
       fetchData()
     }
-  }, [user])
+  }, [user, hasSearchQuery])
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}`
+        `${import.meta.env.VITE_API_URL}/formulation/filtered/${user._id}?skip=${(page - 1) * limit}&limit=${limit}`
       )
-      const fetchedData = res.data.formulations
-      setFormulations(fetchedData)
+      const fetchedData = res.data
+      setFormulations(fetchedData.formulations)
+      setPaginationInfo(fetchedData.pagination)
       setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
   }
 
-  const handleSearchQuery = (data) => {
-    setFormulations(data)
+  const handleSearchQuery = (data, page) => {
+    setFormulations(data.fetched)
+    setPaginationInfo(data.pagination)
+    setHasSearchQuery(true)
+    setPage(page)
   }
 
   const handleEditClick = (formulation) => {
@@ -68,9 +83,13 @@ function Formulations() {
       )
       const messageData = res.data.message
       if (messageData === 'success') {
-        setFormulations(
-          formulations.filter((formulation) => formulation._id !== selectedId)
+        const filteredFormulations = formulations.filter(
+          (formulation) => formulation._id !== selectedId
         )
+        setFormulations(filteredFormulations)
+        if (filteredFormulations.length === 0) {
+          setPage(page - 1)
+        }
       }
       // toast instructions
       setShowToast(true)
@@ -91,7 +110,7 @@ function Formulations() {
 
   const handleCreateResult = (newFormulation, action, message) => {
     setIsCreateModalOpen(false)
-    setFormulations([...formulations, newFormulation])
+    setFormulations([newFormulation, ...formulations])
     // toast instructions
     setShowToast(true)
     setMessage(message)
@@ -125,6 +144,10 @@ function Formulations() {
     setToastAction('')
   }
 
+  const handlePageChange = (page) => {
+    setPage(page)
+  }
+
   const headers = ['Code', 'Name', 'Description', 'Animal Group', 'Permission']
 
   if (loading) {
@@ -139,19 +162,19 @@ function Formulations() {
   }
 
   return (
-    <div className="flex h-auto flex-col bg-gray-50">
+    <div className="flex h-full flex-col bg-gray-50">
       {/* Fixed Header Section */}
-      <div className="sticky top-0 z-20 space-y-6 bg-gray-50 p-3 md:p-6">
-        <h1 className="text-deepbrown mb-6 text-xl font-bold md:text-2xl">
+      <div className="sticky top-0 z-20 space-y-6 bg-gray-50 p-2 md:p-4">
+        <h1 className="text-deepbrown mb-3 text-xl font-bold md:text-2xl">
           Formulations
         </h1>
 
         {/* Action buttons and search */}
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
           <div className="flex w-full flex-wrap gap-2 md:w-auto">
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-4 md:py-2 md:text-base"
+              className="bg-green-button flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 text-sm text-white transition-colors hover:bg-green-600 active:bg-green-700 md:gap-2 md:px-3 md:py-1.5 md:text-base"
             >
               <RiAddLine className="h-4 w-4 md:h-5 md:w-5" />
               <span>Add New</span>
@@ -161,12 +184,13 @@ function Formulations() {
             userId={user._id}
             handleSearchQuery={handleSearchQuery}
             use="formulation"
+            page={page}
           />
         </div>
       </div>
 
       {/* Table Section */}
-      <div className="flex-1 p-3 md:px-6">
+      <div className="flex-grow overflow-auto p-2 md:px-4">
         <Table
           headers={headers}
           data={formulations}
@@ -176,6 +200,13 @@ function Formulations() {
           onRowClick={handleRowClick}
         />
       </div>
+
+      {formulations.length > 0 && (
+        <Pagination
+          paginationInfo={paginationInfo}
+          onPageChange={handlePageChange}
+        />
+      )}
 
       {/* Modals */}
       <CreateFormulationModal

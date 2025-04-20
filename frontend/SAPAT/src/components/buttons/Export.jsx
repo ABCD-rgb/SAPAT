@@ -6,9 +6,9 @@ import { useState } from 'react'
 function Export({ ingredients, onExport }) {
   const [nutrientNames, setNutrientNames] = useState([])
 
-  // for export function
-  const fetchNutrients = async () => {
+  const transformIngredientsData = async (ingredients) => {
     try {
+      // Fetch nutrients
       const nutrientsFromDB = await Promise.all(
         ingredients[0].nutrients.map(async (nutrient) => {
           const nutrientId = nutrient.nutrient
@@ -21,34 +21,31 @@ function Export({ ingredients, onExport }) {
           }
         })
       )
-      // merge all objects to a single one
+
+      // Merge all objects to a single one
       const mergedNutrients = Object.assign({}, ...nutrientsFromDB)
       setNutrientNames(mergedNutrients)
+
+      // Transform the data to have ingredients as rows and nutrients as columns
+      return ingredients.map((ingredient) => {
+        const result = {
+          Name: ingredient.name,
+          Price: parseFloat(ingredient.price), // Convert string to number
+          Available: ingredient.available ? 'Yes' : 'No',
+        }
+        // Add all nutrients as separate columns
+        ingredient.nutrients.forEach((nutrient) => {
+          const nutrientId = nutrient.nutrient
+          const nutrientName = mergedNutrients[nutrientId]
+          result[nutrientName] = nutrient.value
+        })
+
+        return result
+      })
     } catch (err) {
       console.log(err)
+      return []
     }
-  }
-
-  const transformIngredientsData = async (ingredients) => {
-    // get nutrient names
-    await fetchNutrients()
-
-    // Transform the data to have ingredients as rows and nutrients as columns
-    return ingredients.map((ingredient) => {
-      const result = {
-        Name: ingredient.name,
-        Price: parseFloat(ingredient.price), // Convert string to number
-        Available: ingredient.available ? 'Yes' : 'No',
-      }
-      // Add all nutrients as separate columns
-      ingredient.nutrients.forEach((nutrient) => {
-        const nutrientId = nutrient.nutrient
-        const nutrientName = nutrientNames[nutrientId] || nutrientId
-        result[nutrientName] = nutrient.value
-      })
-
-      return result
-    })
   }
 
   const exportToExcel = async () => {

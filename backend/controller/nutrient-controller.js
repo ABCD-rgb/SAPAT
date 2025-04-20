@@ -19,13 +19,29 @@ const createNutrient = async (req, res) => {
 
 const getAllNutrients = async (req, res) => {
   const { userId } = req.params;
+  const { skip=0, limit=8 } = req.query;
+
   try {
     // user-created nutrients
     const userNutrients = await Nutrient.find({'user': userId});
     // global nutrients and overrides
     const globalNutrients = await handleGetNutrientGlobalAndOverride(userId);
     const nutrients = [...globalNutrients, ...userNutrients];
-    res.status(200).json({ message: 'success', nutrients: nutrients });
+
+    // pagination
+    const totalCount = nutrients.length;
+    const paginatedNutrients = nutrients.slice(skip, skip + limit);
+
+    res.status(200).json({
+      message: 'success',
+      nutrients: paginatedNutrients,
+      pagination: {
+        totalSize: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: paginatedNutrients.length,
+        page: Math.floor(skip / limit) + 1,
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' });
   }
@@ -52,7 +68,7 @@ const getNutrient = async (req, res) => {
 }
 
 const getNutrientsByName = async (req, res) => {
-  const { searchQuery } = req.query;
+  const { searchQuery, skip=0, limit=10 } = req.query;
   const { userId } = req.params;
   try {
     // user-created nutrients
@@ -62,7 +78,21 @@ const getNutrientsByName = async (req, res) => {
     const nutrients = [...globalNutrients , ...userNutrients  ];
     // partial matching
     const filteredNutrients  = nutrients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    res.status(200).json({ message: 'success', fetched: filteredNutrients  });
+
+    // pagination
+    const totalCount = filteredNutrients.length;
+    const paginatedNutrients = filteredNutrients.slice(skip, skip + limit);
+
+    res.status(200).json({
+      message: 'success',
+      fetched: paginatedNutrients,
+      pagination: {
+        totalSize: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: paginatedNutrients.length,
+        page: Math.floor(skip / limit) + 1,
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
   }
@@ -114,7 +144,6 @@ const deleteNutrient = async (req, res) => {
     else {
       await handleDeleteNutrientOverride(id, userId);
     }
-    // TODO: when nutrient is deleted, update all user ingredients to remove that nutrient
     await handleIngredientChanges('remove', nutrient, userId);
     res.status(200).json({ message: 'success' });
   } catch (err) {

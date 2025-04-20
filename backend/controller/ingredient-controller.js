@@ -19,6 +19,8 @@ const createIngredient = async (req, res) => {
 
 const getAllIngredients = async (req, res) => {
   const { userId } = req.params;
+  const { skip=0, limit=8 } = req.query;
+
   try {
     // user-created ingredients
     const userIngredients = await Ingredient.find({'user': userId});
@@ -32,7 +34,21 @@ const getAllIngredients = async (req, res) => {
         price: Number(data.price).toFixed(2)
       };
     })
-    res.status(200).json({ message: 'success', ingredients: formattedIngredients });
+
+    // pagination
+    const totalCount = formattedIngredients.length;
+    const paginatedIngredients = formattedIngredients.slice(skip, skip + limit);
+
+    res.status(200).json({
+      message: 'success',
+      ingredients: paginatedIngredients,
+      pagination: {
+        totalSize: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: paginatedIngredients.length,
+        page: Math.floor(skip / limit) + 1,
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
   }
@@ -58,7 +74,7 @@ const getIngredient = async (req, res) => {
 }
 
 const getIngredientsByName = async (req, res) => {
-  const { searchQuery } = req.query;
+  const { searchQuery, skip=0, limit=10 } = req.query;
   const { userId } = req.params;
   try {
     // user-created ingredients
@@ -68,7 +84,21 @@ const getIngredientsByName = async (req, res) => {
     const ingredients = [...globalIngredients, ...userIngredients];
     // partial matching
     const filteredIngredients = ingredients.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    res.status(200).json({ message: 'success', fetched: filteredIngredients });
+
+    // pagination
+    const totalCount = filteredIngredients.length;
+    const paginatedIngredients = filteredIngredients.slice(skip, skip + limit);
+
+    res.status(200).json({
+      message: 'success',
+      fetched: paginatedIngredients,
+      pagination: {
+        totalSize: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        pageSize: paginatedIngredients.length,
+        page: Math.floor(skip / limit) + 1,
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message, message: 'error' })
   }

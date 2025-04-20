@@ -1,6 +1,7 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Info from '../../icons/Info.jsx'
 
 function EditNutrientModal({
   nutrients,
@@ -108,7 +109,11 @@ function EditNutrientModal({
           <RiCloseLine className="h-5 w-5" />
         </button>
 
-        <h3 className="text-deepbrown mb-4 text-lg font-bold">Edit Nutrient</h3>
+        <h3 className="text-deepbrown mb-1 text-lg font-bold">Edit Nutrient</h3>
+        <p className="mb-8 flex text-sm text-gray-500">
+          <Info />
+          Modify nutrient information as needed.
+        </p>
 
         <form onSubmit={handleSubmit}>
           {/* Form fields */}
