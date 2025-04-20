@@ -148,7 +148,7 @@ function ImportModal({ isOpen, onClose, onSubmit }) {
             <input
               type="file"
               accept=".xlsx"
-              className={`file-input ${fileValidationError ? 'file-input-error' : 'file-input-ghost'}`}
+              className={`file-input ${fileValidationError ? 'file-input-error' : 'file-input-warning'}`}
               ref={fileInputRef}
               onChange={handleChange}
             />
@@ -176,14 +176,14 @@ function ImportModal({ isOpen, onClose, onSubmit }) {
             Cancel
           </button>
           <div
-            className={`${fileDataInJSON.length === 0 || fileValidationError !== ''} ? tooltip : ''`}
+            className={`${fileDataInJSON.length === 0 || fileValidationError !== '' ? 'tooltip' : ''}`}
             data-tip="Attach a valid file first."
           >
             <button
               disabled={
                 fileDataInJSON.length === 0 || fileValidationError !== ''
               }
-              className="btn rounded-xl bg-amber-500 px-8 text-white hover:bg-amber-600"
+              className="btn btn-warning rounded-xl px-8 text-white hover:bg-amber-600"
               onClick={() => {
                 if (fileDataInJSON.length > 0 || fileValidationError !== '') {
                   onSubmit(fileDataInJSON)

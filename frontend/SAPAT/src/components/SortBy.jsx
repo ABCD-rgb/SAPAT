@@ -14,7 +14,7 @@ export default function SortBy({ handleFilterQuery, options }) {
 
   // Find the current selected option label
   const currentLabel =
-    options.find((option) => option.value === sortOption)?.label || 'Sort By'
+    options.find((option) => option.value === sortOption)?.label || 'Sort'
 
   return (
     <div className="relative">

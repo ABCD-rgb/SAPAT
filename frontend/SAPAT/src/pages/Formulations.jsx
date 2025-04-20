@@ -204,7 +204,7 @@ function Formulations() {
               <span>Add New</span>
             </button>
           </div>
-          <div className="flex flex-col gap-2 md:flex-row">
+          <div className="flex flex-col flex-wrap gap-2 md:flex-row">
             <div className="flex gap-2">
               <SortBy
                 handleFilterQuery={handleFilterQuery}

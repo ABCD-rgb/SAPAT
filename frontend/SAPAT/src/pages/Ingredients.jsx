@@ -154,22 +154,27 @@ function Ingredients() {
 
   const handleImportSubmit = async (data) => {
     try {
+      setIsLoading(true)
       await axios.post(
         `${import.meta.env.VITE_API_URL}/ingredient/import/${user._id}`,
         data
       )
       // refetch ingredients to display updated table
       setSearchQuery('')
+      setFilters('')
+      setSortBy('')
+      setSortOrder('')
       await fetchData()
+      setIsLoading(false)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredients successfully imported.')
       setToastAction('success')
     } catch (err) {
-      console.log(err)
+      setIsLoading(false)
       // toast instructions
       setShowToast(true)
-      setMessage('Failed to import.')
+      setMessage("File too large. Please upload in smaller batches (10-50 ingredients).")
       setToastAction('error')
     }
   }
@@ -238,7 +243,7 @@ function Ingredients() {
             <Import onImport={handleImportClick} />
             <Export ingredients={ingredients} onExport={handleExportSubmit} />
           </div>
-          <div className="flex flex-col gap-2 md:flex-row">
+          <div className="flex flex-col flex-wrap gap-2 md:flex-row">
             <div className="flex gap-2">
               <SortBy
                 handleFilterQuery={handleFilterQuery}

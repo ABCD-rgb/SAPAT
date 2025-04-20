@@ -169,8 +169,7 @@ function Table({
               >
                 <RiTableLine className="mx-auto mb-2 h-12 w-12 opacity-60" />
                 <p>
-                  No data to display yet. Click &apos;Add New&apos; to get
-                  started.
+                  No results found. Adjust filters or add new data.
                 </p>
               </td>
             </tr>
