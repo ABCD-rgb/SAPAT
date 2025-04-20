@@ -3,7 +3,7 @@ import PSO from 'pso';
 
 
 const formatInput = (data) => {
-  const { ingredientsData, ingredients, nutrients } = data;
+  const { ingredientsData, ingredients, nutrients, weight } = data;
 
   // === objective function (minimize cost) ===
   const objectives = ingredients.map(ingredient => {
@@ -48,9 +48,9 @@ const formatInput = (data) => {
     }
   });
 
-  // === total weight constraint ===
-  const totalWeightConstraint = {
-    name: "Total Weight",
+  // === total ratio constraint ===
+  const totalRatioConstraint = {
+    name: "Total Ratio",
     vars: ingredients.map(ingredient => ({
       name: ingredient.name,
       coef: 1 // Coefficient of 1 for each ingredient to sum to 100
@@ -62,13 +62,13 @@ const formatInput = (data) => {
     }
   };
 
-  // Add the total weight constraint to the existing constraints
-  constraints.push(totalWeightConstraint);
+  // Add the total ratio constraint to the existing constraints
+  constraints.push(totalRatioConstraint);
 
   // console.log("objectives", objectives);
   // console.log("constraints", constraints);
   // console.log("variableBounds", variableBounds);
-  return { objectives, constraints, variableBounds };
+  return { objectives, constraints, variableBounds, weight };
 }
 
 const determineOptimizedNutrients = (optimizedIngredients, constraints) => {
@@ -100,9 +100,19 @@ const determineOptimizedNutrients = (optimizedIngredients, constraints) => {
   return finalNutrients;
 }
 
-const simplex = async (req, res) => {
-  const { objectives, constraints, variableBounds } = formatInput(req.body);
+const computeCost = (optimizedIngredients, objectives, weight) => {
+  // objectives are the ingredients and its prices
+  // optimizedIngredients contain the ratio for the ingredients
+  let cost = 0;
+  for (let i = 0; i<objectives.length; i++) {
+    let ingWeight = (optimizedIngredients[i].value/100) * weight; // value% * weight (e.g. 30% of 1000kg)
+    cost += objectives[i].coef * ingWeight;
+  }
+  return cost;
+}
 
+const simplex = async (req, res) => {
+  const { objectives, constraints, variableBounds, weight } = formatInput(req.body);
   try {
     const glpk = GLPK();
     const options = {
@@ -160,7 +170,6 @@ const simplex = async (req, res) => {
 
     // Check if the result has an optimal solution
     if (output.result.status == glpk.GLP_OPT) {
-
       // determine the optimized nutrients
       const optimizedNutrients = determineOptimizedNutrients(output.result.vars, constraints);
       // reformat ingredients to be used in the response (make it an array of objects)
@@ -172,13 +181,15 @@ const simplex = async (req, res) => {
         });
       });
 
+      const finalCost = computeCost(optimizedIngredients, objectives, weight);
+
       // Return the solution values
       res.status(200).json({
         status: 'Optimal solution found',
         // objectives: objectives,
         constraints: constraints,
         // variableBounds: variableBounds,
-        optimizedCost: output.result.z.toFixed(2),
+        optimizedCost: finalCost.toFixed(2), // output.result.z.toFixed(2),
         optimizedIngredients: optimizedIngredients,
         optimizedNutrients: optimizedNutrients
       });
@@ -197,136 +208,42 @@ const simplex = async (req, res) => {
 }
 
 
-// const pso = async (req, res) => {
-//   try {
-//     const { ingredients, nutrients } = req.body.formulations;
-//
-//     // Define the objective function for PSO
-//     const objectiveFunction = (particle) => {
-//       // Calculate total cost (placeholder - should use actual ingredient costs)
-//       const totalCost = particle.reduce((sum, value) => sum + value, 0);
-//
-//       // Check constraints
-//       let penalty = 0;
-//
-//       // 1. Sum must equal 100%
-//       const sum = particle.reduce((a, b) => a + b, 0);
-//       penalty += Math.abs(sum - 100) * 1000;
-//
-//       // 2. Ingredient constraints
-//       particle.forEach((value, index) => {
-//         const ingredient = ingredients[index];
-//         if (ingredient.minimum !== null && ingredient.minimum !== undefined) {
-//           if (value < ingredient.minimum) {
-//             penalty += (ingredient.minimum - value) * 1000;
-//           }
-//         }
-//         if (ingredient.maximum !== null && ingredient.maximum !== undefined) {
-//           if (value > ingredient.maximum) {
-//             penalty += (value - ingredient.maximum) * 1000;
-//           }
-//         }
-//       });
-//
-//       // 3. Nutrient constraints
-//       nutrients.forEach((nutrient, nutrientIndex) => {
-//         // Calculate nutrient value (placeholder - should use actual nutrient composition)
-//         const nutrientValue = particle.reduce((sum, value) => sum + value, 0);
-//
-//         if (nutrient.minimum !== null && nutrient.minimum !== undefined) {
-//           if (nutrientValue < nutrient.minimum) {
-//             penalty += (nutrient.minimum - nutrientValue) * 1000;
-//           }
-//         }
-//         if (nutrient.maximum !== null && nutrient.maximum !== undefined) {
-//           if (nutrientValue > nutrient.maximum) {
-//             penalty += (nutrientValue - nutrient.maximum) * 1000;
-//           }
-//         }
-//       });
-//
-//       return totalCost + penalty;
-//     };
-//
-//     // Define bounds for each dimension (ingredient)
-//     const bounds = ingredients.map(ingredient => ({
-//       min: ingredient.minimum !== null ? ingredient.minimum : 0,
-//       max: ingredient.maximum !== null ? ingredient.maximum : 100
-//     }));
-//
-//     // Configure PSO
-//     const options = {
-//       particles: 50,
-//       dimensions: ingredients.length,
-//       bounds: bounds,
-//       maxIterations: 1000,
-//       learningRate: 0.1,
-//       inertia: 0.8,
-//       tolerance: 1e-6
-//     };
-//
-//     // Create and run PSO
-//     const pso = new PSO(objectiveFunction, options);
-//     const result = pso.optimize();
-//
-//     // Process the results
-//     const solution = {
-//       status: result.converged ? 'converged' : 'not_converged',
-//       objective: result.bestFitness,
-//       variables: result.bestPosition,
-//       iterations: result.iterations,
-//       message: result.converged ? 'Optimal solution found' : 'No optimal solution found'
-//     };
-//
-//     res.status(200).json({
-//       message: 'success',
-//       solution
-//     });
-//
-//   } catch (err) {
-//     res.status(500).json({
-//       error: err.message,
-//       message: 'error'
-//     });
-//   }
-// };
+
 
 // PSO (Particle Swarm Optimization) implementation for diet formulation
 // This handles the same optimization problem as the simplex method
 
-
-
-const determineOptimizedNutrientsPSO = (optimizedIngredients, constraints) => {
-  const total = Object.values(optimizedIngredients).reduce((sum, value) => sum + value, 0);
-  const ratios = {};
-  for (const [ingredient, value] of Object.entries(optimizedIngredients)) {
-    ratios[ingredient] = total > 0 ? (value / total).toFixed(2) : "0.00";
-  }
-  const finalNutrients = constraints.map(constraint => {
-    const nutrientName = constraint.name;
-    var optimizedNutrientValue = 0;
-
-    Object.entries(optimizedIngredients).forEach(([ingredient, value]) => {
-      const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
-      if (involvedIngredient) {
-        const nutrientValue = involvedIngredient.coef * value;
-        optimizedNutrientValue += nutrientValue;
-      }
-    })
-    return {
-      name: nutrientName,
-      value: optimizedNutrientValue.toFixed(2)
-    }
-  })
-  return finalNutrients;
-}
+// const determineOptimizedNutrientsPSO = (optimizedIngredients, constraints) => {
+//   const total = Object.values(optimizedIngredients).reduce((sum, value) => sum + value, 0);
+//   const ratios = {};
+//   for (const [ingredient, value] of Object.entries(optimizedIngredients)) {
+//     ratios[ingredient] = total > 0 ? (value / total).toFixed(2) : "0.00";
+//   }
+//   const finalNutrients = constraints.map(constraint => {
+//     const nutrientName = constraint.name;
+//     var optimizedNutrientValue = 0;
+//
+//     Object.entries(optimizedIngredients).forEach(([ingredient, value]) => {
+//       const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
+//       if (involvedIngredient) {
+//         const nutrientValue = involvedIngredient.coef * value;
+//         optimizedNutrientValue += nutrientValue;
+//       }
+//     })
+//     return {
+//       name: nutrientName,
+//       value: optimizedNutrientValue.toFixed(2)
+//     }
+//   })
+//   return finalNutrients;
+// }
 
 /**
  * PSO optimization function
  * @param {Object} options PSO algorithm parameters
  * @param {Number} options.iterations Maximum number of iterations
  * @param {Number} options.particles Number of particles in the swarm
- * @param {Number} options.inertia Inertia weight for velocity update
+ * @param {Number} options.inertia Inertia ratio for velocity update
  * @param {Number} options.social Social (global best) coefficient
  * @param {Number} options.personal Personal (particle best) coefficient
  * @param {Number} options.tolerance Convergence tolerance
@@ -365,18 +282,18 @@ const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
       return lb + Math.random() * (ub - lb);
     });
 
-    // Adjust to meet total weight constraint
-    let totalWeight = position.reduce((sum, val) => sum + val, 0);
-    if (totalWeight > 0) {
+    // Adjust to meet total ratio constraint
+    let totalRatio = position.reduce((sum, val) => sum + val, 0);
+    if (totalRatio > 0) {
       // Scale to sum to 100
       position.forEach((val, idx) => {
-        position[idx] = (val / totalWeight) * 100;
+        position[idx] = (val / totalRatio) * 100;
       });
     } else {
       // If all zeros, distribute evenly
-      const equalWeight = 100 / position.length;
+      const equalRatio = 100 / position.length;
       position.forEach((val, idx) => {
-        position[idx] = equalWeight;
+        position[idx] = equalRatio;
       });
     }
 
@@ -417,14 +334,14 @@ const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
     // Calculate constraint violations
     let penalty = 0;
 
-    // Check total weight constraint (should be exactly 100)
-    const totalWeight = position.reduce((sum, val) => sum + val, 0);
-    penalty += Math.abs(totalWeight - 100) * 1000; // Strong penalty for total weight deviation
+    // Check total ratio constraint (should be exactly 100)
+    const totalRatio = position.reduce((sum, val) => sum + val, 0);
+    penalty += Math.abs(totalRatio - 100) * 1000; // Strong penalty for total ratio deviation
 
     // Check other constraints
     constraints.forEach(constraint => {
-      // Skip the total weight constraint as we handled it separately
-      if (constraint.name === "Total Weight") return;
+      // Skip the total ratio constraint as we handled it separately
+      if (constraint.name === "Total Ratio") return;
 
       // Calculate the current value for this constraint
       let constraintValue = 0;
@@ -521,11 +438,11 @@ const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
         }
       });
 
-      // Enforce total weight constraint = 100
-      let totalWeight = particle.position.reduce((sum, val) => sum + val, 0);
-      if (totalWeight > 0) {
+      // Enforce total ratio constraint = 100
+      let totalRatio = particle.position.reduce((sum, val) => sum + val, 0);
+      if (totalRatio > 0) {
         particle.position.forEach((val, idx) => {
-          particle.position[idx] = (val / totalWeight) * 100;
+          particle.position[idx] = (val / totalRatio) * 100;
         });
       }
     });
@@ -551,7 +468,7 @@ const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
   });
 
   // Determine optimized nutrients
-  const optimizedNutrients = determineOptimizedNutrientsPSO(optimizedIngredients, constraints);
+  const optimizedNutrients = determineOptimizedNutrients(optimizedIngredients, constraints);
 
   // Format output
   const formattedOptimizedIngredients = ingredientNames.map((name, idx) => ({
@@ -571,7 +488,7 @@ const psoOptimize = (objectives, constraints, variableBounds, options = {}) => {
 };
 
 const pso = async (req, res) => {
-  const { objectives, constraints, variableBounds } = formatInput(req.body);
+  const { objectives, constraints, variableBounds, weight } = formatInput(req.body);
 
   try {
     console.log("Running PSO optimization...");
@@ -590,10 +507,11 @@ const pso = async (req, res) => {
     const output = psoOptimize(objectives, constraints, variableBounds, options);
 
     if (output.status === 'Optimal solution found') {
+      const finalCost = computeCost(output.optimizedIngredients, objectives, weight);
       res.status(200).json({
         status: 'Optimal solution found',
         constraints: constraints,
-        optimizedCost: output.optimizedCost,
+        optimizedCost: finalCost.toFixed(2), // output.optimizedCost,
         optimizedIngredients: output.optimizedIngredients,
         optimizedNutrients: output.optimizedNutrients
       });

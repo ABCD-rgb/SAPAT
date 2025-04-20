@@ -4,7 +4,7 @@ import {
   createFormulation,
   getAllFormulations,
   getFormulation,
-  getFormulationByName,
+  getFormulationByFilters,
   updateFormulation,
   deleteFormulation,
   getFormulationOwner,
@@ -17,10 +17,10 @@ import {
   removeCollaborator
 } from './controller/formulation-controller.js';
 import {
-  createIngredient, getAllIngredients, getIngredient, getIngredientsByName, updateIngredient, deleteIngredient, importIngredient
+  createIngredient, getAllIngredients, getIngredient, getIngredientsByFilters, updateIngredient, deleteIngredient, importIngredient
 } from './controller/ingredient-controller.js'
 import {
-  createNutrient, getAllNutrients, getNutrient, getNutrientsByName, updateNutrient, deleteNutrient
+  createNutrient, getAllNutrients, getNutrient, getNutrientsByFilters, updateNutrient, deleteNutrient
 } from './controller/nutrient-controller.js'
 import { simplex, pso } from './controller/optimize-controller.js'
 import handleLiveblocksAuth from './config/liveblocks-auth.js';
@@ -84,7 +84,7 @@ const handleRoutes = (app) => {
   app.post('/formulation', createFormulation);
   app.get('/formulation/filtered/:collaboratorId', getAllFormulations);
   app.get('/formulation/:id', getFormulation);
-  app.get('/formulation/filtered/search/:userId', getFormulationByName);
+  app.get('/formulation/filtered/search/:userId', getFormulationByFilters);
   app.put('/formulation/:id', updateFormulation);
   app.delete('/formulation/:id', deleteFormulation);
   app.get('/formulation/owner/:id', getFormulationOwner)
@@ -99,7 +99,7 @@ const handleRoutes = (app) => {
   app.post('/ingredient', createIngredient);
   app.get('/ingredient/filtered/:userId', getAllIngredients);
   app.get('/ingredient/:id/:userId', getIngredient);
-  app.get('/ingredient/filtered/search/:userId', getIngredientsByName);
+  app.get('/ingredient/filtered/search/:userId', getIngredientsByFilters);
   app.put('/ingredient/:id/:userId', updateIngredient);
   app.delete('/ingredient/:id/:userId', deleteIngredient);
   app.post('/ingredient/import/:userId', importIngredient);
@@ -107,7 +107,7 @@ const handleRoutes = (app) => {
   app.post('/nutrient', createNutrient);
   app.get('/nutrient/filtered/:userId', getAllNutrients);
   app.get('/nutrient/:id/:userId', getNutrient);
-  app.get('/nutrient/filtered/search/:userId', getNutrientsByName);
+  app.get('/nutrient/filtered/search/:userId', getNutrientsByFilters);
   app.put('/nutrient/:id/:userId', updateNutrient);
   app.delete('/nutrient/:id/:userId', deleteNutrient);
 

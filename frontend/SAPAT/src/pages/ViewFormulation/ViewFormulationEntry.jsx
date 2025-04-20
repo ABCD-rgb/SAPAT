@@ -25,6 +25,9 @@ function ViewFormulationEntry({ id }) {
 
   const formulationRealTime = useStorage((root) => root.formulation)
 
+  const updateWeight = useMutation(({ storage }, weight) => {
+    storage.get('formulation').set('weight', weight)
+  }, [])
   const updateCode = useMutation(({ storage }, code) => {
     storage.get('formulation').set('code', code)
   }, [])
@@ -163,6 +166,7 @@ function ViewFormulationEntry({ id }) {
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
         cost: currentFormulation.cost,
+        weight: currentFormulation.weight,
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })
@@ -198,6 +202,7 @@ function ViewFormulationEntry({ id }) {
         others={others}
         updateMyPresence={updateMyPresence}
         formulationRealTime={formulationRealTime}
+        updateWeight={updateWeight}
         updateCode={updateCode}
         updateName={updateName}
         updateDescription={updateDescription}

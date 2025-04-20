@@ -77,18 +77,60 @@ const getFormulation = async (req, res) => {
     }
 };
 
-const getFormulationByName = async (req, res) => {
-    const { searchQuery, skip=0, limit=10 } = req.query;
+const getFormulationByFilters = async (req, res) => {
+    const {
+        searchQuery = '',
+        skip = 0, limit = 10,
+        sortBy, sortOrder,
+        filterBy = 'animal_group', filters
+    } = req.query;
     const { userId } = req.params;
     try {
-        const formulations = await Formulation.find({'collaborators.userId': userId})
+        let formulations = await Formulation.find({'collaborators.userId': userId})
         if (!formulations) {
             return res.status(404).json({ message: 'No formulations', fetched: [] });
         }
         // partial matching
-        const filteredFormulations = formulations.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        formulations = formulations.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        const formattedFormulations = filteredFormulations.map(formulation => {
+        // Filter the results
+        if (filters) {
+            const filtersArr = filters.split(',')
+            if (filterBy === 'group') {
+                formulations = formulations.filter(item => {
+                    return filtersArr.includes(item.group)
+                })
+            } else {
+                formulations = formulations.filter(item => {
+                    return filtersArr.includes(item.animal_group)
+                })
+            }
+        }
+
+        // Sort the results
+        formulations.sort((a, b) => {
+            if (sortBy === 'name') {
+                if (sortOrder === 'asc') {
+                    return a?.name?.toString().localeCompare(b?.name?.toString() || '');
+                } else {
+                    return b?.name?.toString().localeCompare(a?.name?.toString() || '');
+                }
+            } else if (sortBy === 'group') {
+                if (sortOrder === 'asc') {
+                    return a?.group?.toString().localeCompare(b?.group?.toString() || '');
+                } else {
+                    return b?.group?.toString().localeCompare(a?.group?.toString() || '');
+                }
+            } else if (sortBy === 'animal_group') {
+                if (sortOrder === 'asc') {
+                    return a?.animal_group?.toString().localeCompare(b?.animal_group?.toString() || '');
+                } else {
+                    return b?.animal_group?.toString().localeCompare(a?.animal_group?.toString() || '');
+                }
+            }
+        });
+
+        const formattedFormulations = formulations.map(formulation => {
             const access = formulation.collaborators.find(c => c.userId.toString() === userId)?.access;
             return {
                 "_id": formulation._id,
@@ -123,14 +165,14 @@ const getFormulationByName = async (req, res) => {
 
 const updateFormulation = async (req, res) => {
     const { id } = req.params;
-    const { code, name, description, animal_group, cost, ingredients, nutrients } = req.body;
+    const { code, name, description, animal_group, cost, weight, ingredients, nutrients } = req.body;
     try {
         const formulation = await Formulation.findByIdAndUpdate(
           id,
           {
               $set:
                 {
-                    code, name, description, animal_group, cost, ingredients, nutrients
+                    code, name, description, animal_group, cost, weight, ingredients, nutrients
                 }
           },
           { new: true },
@@ -145,6 +187,7 @@ const updateFormulation = async (req, res) => {
             "description": description ? description : "",
             "animal_group": animal_group ? animal_group : "",
             "cost": cost,
+            "weight": weight ? weight : 100,
             "ingredients": ingredients ? ingredients : [],
             "nutrients": nutrients ? nutrients : [],
         }
@@ -375,7 +418,7 @@ export {
     createFormulation,
     getAllFormulations,
     getFormulation,
-    getFormulationByName,
+    getFormulationByFilters,
     updateFormulation,
     deleteFormulation,
     getFormulationOwner,
