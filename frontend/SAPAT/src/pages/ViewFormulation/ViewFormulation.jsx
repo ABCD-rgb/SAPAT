@@ -344,6 +344,7 @@ function ViewFormulation({
       updateCost(0)
       updateIngredients([...selectedIngredients, ...formattedIngredients])
       setIsChooseIngredientsModalOpen(false)
+      setIsDirty(true)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredients added successfully')
@@ -383,6 +384,7 @@ function ViewFormulation({
       updateCost(0)
       updateNutrients([...selectedNutrients, ...formattedNutrients])
       setIsChooseNutrientsModalOpen(false)
+      setIsDirty(true)
       // toast instructions
       setShowToast(true)
       setMessage('Nutrients added successfully')
@@ -422,6 +424,7 @@ function ViewFormulation({
         setIngredientsMenu([removedIngredient, ...ingredientsMenu])
       }
       updateCost(0)
+      setIsDirty(true)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredient removed successfully')
@@ -461,6 +464,7 @@ function ViewFormulation({
         setNutrientsMenu([removedNutrient, ...nutrientsMenu])
       }
       updateCost(0)
+      setIsDirty(true)
       // toast instructions
       setShowToast(true)
       setMessage('Nutrient removed successfully')
@@ -567,7 +571,7 @@ function ViewFormulation({
             />
             <Selections id={`ingredient-${index}-maximum`} others={others} />
           </td>
-          <td>{ingredient.value}</td>
+          <td>{(ingredient.value * weight).toFixed(2) }</td>
           <td>
             <button
               disabled={isDisabled}
@@ -644,7 +648,7 @@ function ViewFormulation({
             />
             <Selections id={`nutrient-${index}-maximum`} others={others} />
           </td>
-          <td>{nutrient.value}</td>
+          <td>{nutrient.value.toFixed(2)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -798,6 +802,17 @@ function ViewFormulation({
             </div>
           </div>
 
+          {/* Shown when values are not up-to-date */}
+          {isDirty && (
+            <div className="alert alert-error alert-soft text-sm">
+              <Warning />
+              <span>
+                Formula constraints have changed. Click &quot;Optimize&quot; to
+                update values and then save your changes.
+              </span>
+            </div>
+          )}
+
           {/* Form Fields - Grid on desktop, Stack on mobile */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
             <div>
@@ -866,17 +881,6 @@ function ViewFormulation({
             </div>
           </div>
 
-          {/* Shown when values are not up-to-date */}
-          {isDirty && (
-            <div className="alert alert-warning alert-soft">
-              <Warning />
-              <span>
-                Formula constraints have changed. Click &quot;Optimize&quot; to
-                update values.
-              </span>
-            </div>
-          )}
-
           {/* Tables - Grid on desktop, Stack on mobile */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* Ingredients Table */}
@@ -884,7 +888,7 @@ function ViewFormulation({
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="flex text-xs text-gray-500">
-                  <Info /> Ingredients used in your feed mix. Values show the ratio of the mix. Set min/max to control amounts.
+                  <Info /> Ingredients used in your feed mix. Values show the amount out of {weight} kg. Set min/max to control amounts.
                 </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
@@ -968,7 +972,7 @@ function ViewFormulation({
                     onChange={(e) => updateWeight(e.target.value)}
                     maxLength={20}
                   />
-                  <Selections id="input-code" others={others} />
+                  <Selections id="input-weight" others={others} />
                 </div>
               </span>
             </div>
@@ -978,7 +982,7 @@ function ViewFormulation({
                 Total cost (per {weight} kg):
               </span>
               <span className="text-green-button text-lg font-bold underline">
-                ₱ {cost}
+                ₱ {cost.toFixed(2)}
               </span>
             </div>
           </div>
