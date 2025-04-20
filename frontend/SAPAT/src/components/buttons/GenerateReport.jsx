@@ -1,11 +1,7 @@
 import { RiFileChartLine } from 'react-icons/ri'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import ReportOptionsModal from '../modals/viewformulation/ReportOptionsModal.jsx'
-import { useState } from 'react'
 
 function GenerateReport({ userAccess, formulation }) {
-  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
-
   const handleGenerateReport = async () => {
     // Create a new PDFDocument
     const pdfDoc = await PDFDocument.create()
@@ -130,7 +126,7 @@ function GenerateReport({ userAccess, formulation }) {
       { label: 'Name:', value: formulation.name },
       { label: 'Description:', value: formulation.description },
       { label: 'Animal Group:', value: formulation.animal_group },
-      { label: 'Total Cost:', value: `PHP ${formulation.cost} per 100kg` },
+      { label: 'Total Cost:', value: `PHP ${formulation.cost} per ${formulation.weight}kg` },
     ]
 
     fieldData.forEach((field) => {
@@ -155,7 +151,7 @@ function GenerateReport({ userAccess, formulation }) {
 
     // Ingredients Section
     yPosition -= 15
-    page.drawText(`Ingredients (Ratio for 100 kg)`, {
+    page.drawText(`Ingredients (Ratio)`, {
       x: margin,
       y: yPosition,
       size: headerFontSize,
@@ -408,21 +404,13 @@ function GenerateReport({ userAccess, formulation }) {
   }
 
   return (
-    <>
-      <button
-        disabled={userAccess === 'view'}
-        className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
-        onClick={handleGenerateReport}
-        // onClick={setIsOptionsOpen(true)}
-      >
-        <RiFileChartLine /> Generate report
-      </button>
-
-      {/*<ReportOptionsModal*/}
-      {/*  isOpen={isOptionsOpen}*/}
-      {/*  onClose={() => setIsOptionsOpen(false)}*/}
-      {/*/>*/}
-    </>
+    <button
+      disabled={userAccess === 'view'}
+      className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
+      onClick={handleGenerateReport}
+    >
+      <RiFileChartLine /> Generate report
+    </button>
   )
 }
 

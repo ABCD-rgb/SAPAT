@@ -884,8 +884,7 @@ function ViewFormulation({
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="flex text-xs text-gray-500">
-                  <Info /> Ingredients used in your feed mix. Values show kg per
-                  100kg (ratio). Set min/max to control amounts.
+                  <Info /> Ingredients used in your feed mix. Values show the ratio of the mix. Set min/max to control amounts.
                 </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
@@ -959,7 +958,7 @@ function ViewFormulation({
                   <input
                     id="input-weight"
                     type="text"
-                    className="input input-bordered w-[60px] rounded-xl"
+                    className="input input-bordered w-[80px] rounded-xl"
                     disabled={isDisabled}
                     value={weight}
                     onFocus={(e) =>
