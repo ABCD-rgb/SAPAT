@@ -166,6 +166,7 @@ function ViewFormulationEntry({ id }) {
         description: currentFormulation.description,
         animal_group: currentFormulation.animal_group,
         cost: currentFormulation.cost,
+        weight: currentFormulation.weight,
         ingredients: currentFormulation.ingredients,
         nutrients: currentFormulation.nutrients,
       })

@@ -27,6 +27,7 @@ const formulationSchema = new Schema({
     description: { type: String, default: '' },
     animal_group: { type: String, default: '' },
     cost: { type: Number, default: 0 },
+    weight: { type: Number, default: 100 },
     ingredients: {
         type: [ingredientConstraintSchema],
         default: []
@@ -39,7 +40,6 @@ const formulationSchema = new Schema({
         type: [userAccessSchema],
         default: []
     },
-    // TODO: include version control
     createdAt: {
         type: Date,
         default: Date.now

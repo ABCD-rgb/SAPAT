@@ -1,7 +1,11 @@
 import { RiFileChartLine } from 'react-icons/ri'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import ReportOptionsModal from '../modals/viewformulation/ReportOptionsModal.jsx'
+import { useState } from 'react'
 
 function GenerateReport({ userAccess, formulation }) {
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false)
+
   const handleGenerateReport = async () => {
     // Create a new PDFDocument
     const pdfDoc = await PDFDocument.create()
@@ -182,21 +186,21 @@ function GenerateReport({ userAccess, formulation }) {
       color: secondaryColor,
     })
 
-    page.drawText('Min', {
-      x: minX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
-
-    page.drawText('Max', {
-      x: maxX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
+    // page.drawText('Min', {
+    //   x: minX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
+    //
+    // page.drawText('Max', {
+    //   x: maxX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
 
     page.drawText('Value', {
       x: valX,
@@ -231,21 +235,21 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(ing.minimum?.toString() || 'N/A', {
-        x: minX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
-
-      page.drawText(ing.maximum.toString() || 'N/A', {
-        x: maxX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
+      // page.drawText(ing.minimum?.toString() || 'N/A', {
+      //   x: minX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
+      //
+      // page.drawText(ing.maximum.toString() || 'N/A', {
+      //   x: maxX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
 
       page.drawText(ing.value.toString(), {
         x: valX,
@@ -285,21 +289,21 @@ function GenerateReport({ userAccess, formulation }) {
       color: secondaryColor,
     })
 
-    page.drawText('Min', {
-      x: minX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
-
-    page.drawText('Max', {
-      x: maxX,
-      y: yPosition,
-      size: subheaderFontSize,
-      font: timesRomanBold,
-      color: secondaryColor,
-    })
+    // page.drawText('Min', {
+    //   x: minX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
+    //
+    // page.drawText('Max', {
+    //   x: maxX,
+    //   y: yPosition,
+    //   size: subheaderFontSize,
+    //   font: timesRomanBold,
+    //   color: secondaryColor,
+    // })
 
     page.drawText('Value', {
       x: valX,
@@ -334,21 +338,21 @@ function GenerateReport({ userAccess, formulation }) {
         color: textColor,
       })
 
-      page.drawText(nutrient.minimum.toString() || 'N/A', {
-        x: minX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
-
-      page.drawText(nutrient.maximum.toString() || 'N/A', {
-        x: maxX,
-        y: yPosition,
-        size: bodyFontSize,
-        font: timesRomanFont,
-        color: textColor,
-      })
+      // page.drawText(nutrient.minimum.toString() || 'N/A', {
+      //   x: minX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
+      //
+      // page.drawText(nutrient.maximum.toString() || 'N/A', {
+      //   x: maxX,
+      //   y: yPosition,
+      //   size: bodyFontSize,
+      //   font: timesRomanFont,
+      //   color: textColor,
+      // })
 
       page.drawText(nutrient.value.toString(), {
         x: valX,
@@ -404,13 +408,21 @@ function GenerateReport({ userAccess, formulation }) {
   }
 
   return (
-    <button
-      disabled={userAccess === 'view'}
-      className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
-      onClick={handleGenerateReport}
-    >
-      <RiFileChartLine /> Generate report
-    </button>
+    <>
+      <button
+        disabled={userAccess === 'view'}
+        className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
+        onClick={handleGenerateReport}
+        // onClick={setIsOptionsOpen(true)}
+      >
+        <RiFileChartLine /> Generate report
+      </button>
+
+      {/*<ReportOptionsModal*/}
+      {/*  isOpen={isOptionsOpen}*/}
+      {/*  onClose={() => setIsOptionsOpen(false)}*/}
+      {/*/>*/}
+    </>
   )
 }
 

@@ -228,6 +228,7 @@ function ViewFormulation({
     ingredientsData,
     ingredients,
     nutrients,
+    weight,
     type
   ) => {
     try {
@@ -235,6 +236,7 @@ function ViewFormulation({
         ingredientsData,
         ingredients,
         nutrients,
+        weight
       })
       const optimizedCost = res.data.optimizedCost
       const optimizedIngredients = res.data.optimizedIngredients
@@ -715,6 +717,7 @@ function ViewFormulation({
                             listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
+                            weight,
                             'simplex'
                           )
                         }}
@@ -730,6 +733,7 @@ function ViewFormulation({
                             listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
+                            weight,
                             'pso'
                           )
                         }}

@@ -165,14 +165,14 @@ const getFormulationByFilters = async (req, res) => {
 
 const updateFormulation = async (req, res) => {
     const { id } = req.params;
-    const { code, name, description, animal_group, cost, ingredients, nutrients } = req.body;
+    const { code, name, description, animal_group, cost, weight, ingredients, nutrients } = req.body;
     try {
         const formulation = await Formulation.findByIdAndUpdate(
           id,
           {
               $set:
                 {
-                    code, name, description, animal_group, cost, ingredients, nutrients
+                    code, name, description, animal_group, cost, weight, ingredients, nutrients
                 }
           },
           { new: true },
@@ -187,6 +187,7 @@ const updateFormulation = async (req, res) => {
             "description": description ? description : "",
             "animal_group": animal_group ? animal_group : "",
             "cost": cost,
+            "weight": weight ? weight : 100,
             "ingredients": ingredients ? ingredients : [],
             "nutrients": nutrients ? nutrients : [],
         }
