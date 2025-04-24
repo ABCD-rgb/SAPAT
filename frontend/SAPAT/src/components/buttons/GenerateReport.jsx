@@ -126,7 +126,7 @@ function GenerateReport({ userAccess, formulation }) {
       { label: 'Name:', value: formulation.name },
       { label: 'Description:', value: formulation.description },
       { label: 'Animal Group:', value: formulation.animal_group },
-      { label: 'Total Cost:', value: `PHP ${formulation.cost} per ${formulation.weight}kg` },
+      { label: 'Total Cost:', value: `PHP ${formulation.cost && formulation.cost.toFixed(2)} per ${formulation.weight}kg` },
     ]
 
     fieldData.forEach((field) => {
@@ -247,7 +247,7 @@ function GenerateReport({ userAccess, formulation }) {
       //   color: textColor,
       // })
 
-      page.drawText(ing.value.toString(), {
+      page.drawText(ing.value.toFixed(2).toString(), {
         x: valX,
         y: yPosition,
         size: bodyFontSize,
@@ -350,7 +350,7 @@ function GenerateReport({ userAccess, formulation }) {
       //   color: textColor,
       // })
 
-      page.drawText(nutrient.value.toString(), {
+      page.drawText(nutrient.value.toFixed(2).toString(), {
         x: valX,
         y: yPosition,
         size: bodyFontSize,
