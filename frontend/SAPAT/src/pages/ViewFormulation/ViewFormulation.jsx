@@ -344,7 +344,7 @@ function ViewFormulation({
       updateCost(0)
       updateIngredients([...selectedIngredients, ...formattedIngredients])
       setIsChooseIngredientsModalOpen(false)
-      setIsDirty(true)
+      setIsDirty(false)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredients added successfully')
@@ -384,7 +384,7 @@ function ViewFormulation({
       updateCost(0)
       updateNutrients([...selectedNutrients, ...formattedNutrients])
       setIsChooseNutrientsModalOpen(false)
-      setIsDirty(true)
+      setIsDirty(false)
       // toast instructions
       setShowToast(true)
       setMessage('Nutrients added successfully')
@@ -424,7 +424,7 @@ function ViewFormulation({
         setIngredientsMenu([removedIngredient, ...ingredientsMenu])
       }
       updateCost(0)
-      setIsDirty(true)
+      setIsDirty(false)
       // toast instructions
       setShowToast(true)
       setMessage('Ingredient removed successfully')
@@ -464,7 +464,7 @@ function ViewFormulation({
         setNutrientsMenu([removedNutrient, ...nutrientsMenu])
       }
       updateCost(0)
-      setIsDirty(true)
+      setIsDirty(false)
       // toast instructions
       setShowToast(true)
       setMessage('Nutrient removed successfully')
@@ -527,7 +527,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleIngredientMinimumChange(index, processedValue)
-                  setIsDirty(true)
+                  setIsDirty(false)
                 }
               }}
               onFocus={() => {
@@ -561,7 +561,7 @@ function ViewFormulation({
                     processedValue = '100'
                   }
                   handleIngredientMaximumChange(index, processedValue)
-                  setIsDirty(true)
+                  setIsDirty(false)
                 }
               }}
               onFocus={() =>
@@ -571,7 +571,7 @@ function ViewFormulation({
             />
             <Selections id={`ingredient-${index}-maximum`} others={others} />
           </td>
-          <td>{(ingredient.value * weight).toFixed(2) }</td>
+          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2) }</td>
           <td>
             <button
               disabled={isDisabled}
@@ -610,7 +610,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleNutrientMinimumChange(index, processedValue)
-                  setIsDirty(true)
+                  setIsDirty(false)
                 }
               }}
               onFocus={() =>
@@ -638,7 +638,7 @@ function ViewFormulation({
                     ? inputValue.replace('N/A', '')
                     : inputValue
                   handleNutrientMaximumChange(index, processedValue)
-                  setIsDirty(true)
+                  setIsDirty(false)
                 }
               }}
               onFocus={() =>
@@ -648,7 +648,7 @@ function ViewFormulation({
             />
             <Selections id={`nutrient-${index}-maximum`} others={others} />
           </td>
-          <td>{nutrient.value.toFixed(2)}</td>
+          <td>{nutrient && nutrient.value.toFixed(2)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -982,7 +982,7 @@ function ViewFormulation({
                 Total cost (per {weight} kg):
               </span>
               <span className="text-green-button text-lg font-bold underline">
-                ₱ {cost.toFixed(2)}
+                ₱ {cost && cost.toFixed(2)}
               </span>
             </div>
           </div>

@@ -18,7 +18,7 @@ const formatInput = (data) => {
 
   // === nutrient constraints === (e.g. 5x1 + 10x2 + 4x3 >= 15)
   const constraints = nutrients.map(nutrient => {
-    const bndType = nutrient.minimum && nutrient.maximum ? "GLP_DB" : nutrient.maximum ? "GLP_UP" : "GLP_LO";
+    const bndType = nutrient.maximum ? "GLP_DB" : "GLP_LO";
     return {
       name: nutrient.name,
       unit: nutrient.unit,
@@ -32,7 +32,7 @@ const formatInput = (data) => {
       }),
       bnds: {
         type: bndType,
-        lb: nutrient.minimum,
+        lb: nutrient.minimum ? nutrient.minimum : 0,
         ub: nutrient.maximum
       }
     }
@@ -40,7 +40,8 @@ const formatInput = (data) => {
 
   // === ingredient variable bounds === (e.g. 1 <= x1 <= 14)
   const variableBounds = ingredients.map(ingredient => {
-    const bndType = ingredient.minimum && ingredient.maximum ? "GLP_DB" : ingredient.maximum ? "GLP_UP" : "GLP_LO";
+    // const bndType = ingredient.minimum && ingredient.maximum ? "GLP_DB";
+    const bndType = ingredient.maximum ? "GLP_DB" : "GLP_LO";
     return {
       name: ingredient.name,
       type: bndType,
@@ -163,9 +164,10 @@ const simplex = async (req, res) => {
       ]
     }, options);
 
-
+    console.log(`optimal is ${glpk.GLP_OPT}; but it's ${output.result.status}`)
     // Check if the result has an optimal solution
     if (output.result.status == glpk.GLP_OPT) {
+      console.log("optimal found!")
       // determine the optimized nutrients
       const optimizedNutrients = determineOptimizedNutrients(output.result.vars, constraints);
       // reformat ingredients to be used in the response (make it an array of objects)
@@ -190,6 +192,7 @@ const simplex = async (req, res) => {
         optimizedNutrients: optimizedNutrients
       });
     } else {
+      console.log("optimal not found!");
       // If no optimal solution is found, send a message
       res.status(400).json({
         status: 'No optimal solution',
