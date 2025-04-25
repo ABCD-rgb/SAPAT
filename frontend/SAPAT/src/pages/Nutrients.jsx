@@ -131,7 +131,7 @@ function Nutrients() {
     setIsEditModalOpen(false)
     setNutrients((prevNutrient) => {
       const index = prevNutrient.findIndex(
-        (nutrient) => nutrient._id === updatedNutrient._id
+        (nutrient) => nutrient._id === updatedNutrient._id || nutrient._id === updatedNutrient.nutrient_id
       )
       const updated = [...prevNutrient]
       updated[index] = { ...updatedNutrient }

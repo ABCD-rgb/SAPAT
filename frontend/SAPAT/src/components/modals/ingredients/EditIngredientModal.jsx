@@ -108,10 +108,20 @@ function EditIngredientModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target
+
     if (name === 'price') {
-      const validValue = value === '' || /^\d+(\.\d{0,2})?$/.test(value)
-      if (!validValue) return
+      // Check if empty or a valid number
+      if (value === '') {
+        // Empty is valid
+      } else {
+        const num = parseFloat(value)
+        // Check if it's a valid number and has at most 2 decimal places
+        if (isNaN(num) || (value.includes('.') && value.split('.')[1].length > 2)) {
+          return // Invalid input, don't update state
+        }
+      }
     }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -198,10 +208,9 @@ function EditIngredientModal({
                   <span className="label-text">Price (PHP/kg)</span>
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   name="price"
                   value={formData.price}
-                  pattern="[0-9]*"
                   required
                   disabled={isDisabled}
                   onChange={handleChange}

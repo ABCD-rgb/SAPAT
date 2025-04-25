@@ -136,7 +136,7 @@ function Ingredients() {
     setIsEditModalOpen(false)
     setIngredients((prevIngredient) => {
       const index = prevIngredient.findIndex(
-        (ingredient) => ingredient._id === updatedIngredient._id
+        (ingredient) => ingredient._id === updatedIngredient._id || ingredient._id === updatedIngredient.ingredient_id
       )
       const updated = [...prevIngredient]
       updated[index] = { ...updatedIngredient }
