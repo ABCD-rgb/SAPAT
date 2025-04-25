@@ -225,7 +225,7 @@ function ViewFormulation({
   }
 
   const handleOptimize = async (
-    ingredientsData,
+    // ingredientsData,
     ingredients,
     nutrients,
     weight,
@@ -233,7 +233,8 @@ function ViewFormulation({
   ) => {
     try {
       const res = await axios.post(`${VITE_API_URL}/optimize/${type}`, {
-        ingredientsData,
+        // ingredientsData,
+        userId: owner,
         ingredients,
         nutrients,
         weight
@@ -571,7 +572,7 @@ function ViewFormulation({
             />
             <Selections id={`ingredient-${index}-maximum`} others={others} />
           </td>
-          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2) }</td>
+          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -700,11 +701,10 @@ function ViewFormulation({
                 <div
                   tabIndex={isDisabled ? -1 : 0}
                   role="button"
-                  className={`btn btn-primary btn-sm gap-2 rounded-lg shadow-md transition-all duration-300 ${
-                    isDisabled
-                      ? 'btn-disabled cursor-not-allowed opacity-50'
-                      : 'hover:shadow-lg'
-                  }`}
+                  className={`btn btn-primary btn-sm gap-2 rounded-lg shadow-md transition-all duration-300 ${isDisabled
+                    ? 'btn-disabled cursor-not-allowed opacity-50'
+                    : 'hover:shadow-lg'
+                    }`}
                 >
                   <RiCalculatorLine className="text-lg" /> Optimize
                 </div>
@@ -718,7 +718,7 @@ function ViewFormulation({
                         className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
                         onClick={() => {
                           handleOptimize(
-                            listOfIngredients || [],
+                            // listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
                             weight,
@@ -734,7 +734,7 @@ function ViewFormulation({
                         className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
                         onClick={() => {
                           handleOptimize(
-                            listOfIngredients || [],
+                            // listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
                             weight,

@@ -1,14 +1,48 @@
 import GLPK from 'glpk.js';
 import PSO from 'pso';
+import { getAllIngredients } from './ingredient-controller.js';
 
+const fetchIngredientsData = async (userId, skip = 0, limit = 10000) => {
+  try {
+    const mockReq = {
+      params: { userId: userId },
+      query: { skip, limit }
+    };
 
-const formatInput = (data) => {
-  const { ingredientsData, ingredients, nutrients, weight } = data;
+    let ingredientsData;
+    const mockRes = {
+      status: (code) => {
+        return {
+          json: (data) => {
+            if (code === 200) {
+              ingredientsData = data.ingredients;
+            }
+          }
+        };
+      }
+    };
+
+    await getAllIngredients(mockReq, mockRes);
+
+    if (ingredientsData) {
+      return ingredientsData;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.error('Error fetching ingredients data:', err);
+    throw err;
+  }
+}
+
+const formatInput = async (data) => {
+  const { userId, ingredients, nutrients, weight } = data;
+  const ingredientsData = await fetchIngredientsData(userId);
 
   // === objective function (minimize cost) ===
   const objectives = ingredients.map(ingredient => {
     // the copy of ingredient either comes from global or user-revised
-    const coef = ingredientsData.find(item => (item._id === ingredient.ingredient_id) || (item.ingredient_id === ingredient.ingredient_id)).price;
+    const coef = ingredientsData.find(item => (item._id?.toString() === ingredient.ingredient_id) || (item.ingredient_id?.toString() === ingredient.ingredient_id)).price;
 
     return {
       name: ingredient.name,
@@ -24,7 +58,7 @@ const formatInput = (data) => {
       unit: nutrient.unit,
       vars: ingredients.map(ingredient => {
         const nutrientData = ingredientsData.find(item => item.name === ingredient.name).nutrients;
-        const nutrientValue = nutrientData.find(n => n.nutrient === nutrient.nutrient_id)?.value || 0;
+        const nutrientValue = nutrientData.find(n => n.nutrient?.toString() === nutrient.nutrient_id)?.value || 0;
         return {
           name: ingredient.name,
           coef: nutrientValue
@@ -45,8 +79,8 @@ const formatInput = (data) => {
     return {
       name: ingredient.name,
       type: bndType,
-      lb: ingredient.minimum ? (ingredient.minimum)/weight : 0,
-      ub: ingredient.maximum ? (ingredient.maximum)/weight : 1
+      lb: ingredient.minimum ? (ingredient.minimum) / weight : 0,
+      ub: ingredient.maximum ? (ingredient.maximum) / weight : 1
     }
   });
 
@@ -67,9 +101,9 @@ const formatInput = (data) => {
   // Add the total ratio constraint to the existing constraints
   constraints.push(totalRatioConstraint);
 
-  console.log("objectives", objectives);
-  console.log("constraints", constraints);
-  console.log("variableBounds", variableBounds);
+  // console.log("objectives", objectives);
+  // console.log("constraints", constraints);
+  // console.log("variableBounds", variableBounds);
   return { objectives, constraints, variableBounds, weight };
 }
 
@@ -101,7 +135,7 @@ const computeCost = (optimizedIngredients, objectives, weight) => {
   // objectives are the ingredients and its prices
   // optimizedIngredients contain the ratio for the ingredients
   let cost = 0;
-  for (let i = 0; i<objectives.length; i++) {
+  for (let i = 0; i < objectives.length; i++) {
     let ingWeight = (optimizedIngredients[i].value) * weight; // value% * weight (e.g. 30% of 1000kg)
     cost += objectives[i].coef * ingWeight;
   }
@@ -109,7 +143,7 @@ const computeCost = (optimizedIngredients, objectives, weight) => {
 }
 
 const simplex = async (req, res) => {
-  const { objectives, constraints, variableBounds, weight } = formatInput(req.body);
+  const { objectives, constraints, variableBounds, weight } = await formatInput(req.body);
   try {
     const glpk = GLPK();
     const options = {
@@ -209,33 +243,6 @@ const simplex = async (req, res) => {
 
 
 
-// PSO (Particle Swarm Optimization) implementation for diet formulation
-// This handles the same optimization problem as the simplex method
-
-// const determineOptimizedNutrientsPSO = (optimizedIngredients, constraints) => {
-//   const total = Object.values(optimizedIngredients).reduce((sum, value) => sum + value, 0);
-//   const ratios = {};
-//   for (const [ingredient, value] of Object.entries(optimizedIngredients)) {
-//     ratios[ingredient] = total > 0 ? (value / total) : "0.00";
-//   }
-//   const finalNutrients = constraints.map(constraint => {
-//     const nutrientName = constraint.name;
-//     var optimizedNutrientValue = 0;
-//
-//     Object.entries(optimizedIngredients).forEach(([ingredient, value]) => {
-//       const involvedIngredient = constraint.vars.find(v => v.name === ingredient);
-//       if (involvedIngredient) {
-//         const nutrientValue = involvedIngredient.coef * value;
-//         optimizedNutrientValue += nutrientValue;
-//       }
-//     })
-//     return {
-//       name: nutrientName,
-//       value: optimizedNutrientValue
-//     }
-//   })
-//   return finalNutrients;
-// }
 
 /**
  * PSO optimization function
@@ -301,7 +308,7 @@ const psoOptimize = (objectives, constraints, variableBounds, weight, options = 
       const lb = bound.lb !== undefined ? bound.lb : 0;
       const ub = bound.ub !== undefined ? bound.ub : 1; // Changed from 100 to 1
       const range = ub - lb;
-      return -range/10 + Math.random() * range/5; // Velocity in range [-range/10, range/10]
+      return -range / 10 + Math.random() * range / 5; // Velocity in range [-range/10, range/10]
     });
 
     particles.push({
@@ -487,7 +494,7 @@ const psoOptimize = (objectives, constraints, variableBounds, weight, options = 
 };
 
 const pso = async (req, res) => {
-  const { objectives, constraints, variableBounds, weight } = formatInput(req.body);
+  const { objectives, constraints, variableBounds, weight } = await formatInput(req.body);
 
   try {
     console.log("Running PSO optimization...");
