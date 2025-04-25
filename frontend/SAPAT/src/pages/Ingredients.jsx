@@ -201,7 +201,7 @@ function Ingredients() {
     setToastAction('')
   }
 
-  const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
+  const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group', 'Description']
   const filterOptions = [
     { value: 'Cereal grains', label: 'Cereal grains' },
     { value: 'Protein', label: 'Protein' },

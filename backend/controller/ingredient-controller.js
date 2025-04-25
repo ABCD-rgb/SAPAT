@@ -4,12 +4,12 @@ import Nutrient from '../models/nutrient-model.js';
 
 const createIngredient = async (req, res) => {
   const {
-      name, price, available, group, source, nutrients, user,
+      name, price, available, group, description, source, nutrients, user,
   } = req.body;
 
   try {
     const newIngredient = await Ingredient.create({
-      name, price, available, group, source, nutrients, user
+      name, price, available, group, description, source, nutrients, user
     });
     res.status(200).json({ message: 'success', ingredients: newIngredient });
   } catch (err) {
@@ -148,7 +148,7 @@ const getIngredientsByFilters = async (req, res) => {
 
 const updateIngredient = async (req, res) => {
   const { id, userId } = req.params;
-  const { name, price, available, group, nutrients } = req.body;
+  const { name, price, available, group, description, nutrients } = req.body;
   try {
     const ingredient = await Ingredient.findById(id);
     if (!ingredient) {
@@ -161,6 +161,7 @@ const updateIngredient = async (req, res) => {
       if (price) ingredient.price = price;
       if (available) ingredient.available = available;
       if (group) ingredient.group = group;
+      if (description) ingredient.description = description;
       if (nutrients) ingredient.nutrients = nutrients;
       const updatedIngredient = await ingredient.save();
       res.status(200).json({ message: 'success', ingredients: updatedIngredient });
@@ -168,7 +169,7 @@ const updateIngredient = async (req, res) => {
     // global-created ingredient
     else {
       // revisions on the userIngredientOverride
-      const updatedIngredient = await handleUpdateIngredientOverride(ingredient, name, price, available, group, nutrients, id, userId);
+      const updatedIngredient = await handleUpdateIngredientOverride(ingredient, name, price, available, group, description, nutrients, id, userId);
       res.status(200).json({ message: 'success', ingredients: updatedIngredient });
     }
   } catch (err) {
@@ -270,8 +271,8 @@ const importIngredient = async (req, res) => {
           name: nutrientName,
           abbreviation: nutrientName.substring(0, 3).toUpperCase(),
           unit: '',
-          description: '',
           group: '',
+          description: '',
           source: 'user',
           user: userId
         });
@@ -381,7 +382,7 @@ const handleGetIngredientGlobalAndOverride = async (userId) => {
   }
 }
 
-const handleUpdateIngredientOverride = async (globalIngredient, name, price, available, group, nutrients, ingredient_id, user_id) => {
+const handleUpdateIngredientOverride = async (globalIngredient, name, price, available, group, description, nutrients, ingredient_id, user_id) => {
   try {
     const ingredient = await UserIngredientOverride.find({ 'ingredient_id': ingredient_id, "user": user_id });
     // there is no override yet
@@ -392,6 +393,7 @@ const handleUpdateIngredientOverride = async (globalIngredient, name, price, ava
         price: price ?? globalIngredient.price,
         available: available ?? globalIngredient.available,
         group: group ?? globalIngredient.group,
+        description: description ?? globalIngredient.description,
         nutrients: nutrients ?? globalIngredient.nutrients,
       }
       const ingredientOverride = await UserIngredientOverride.create({
@@ -408,6 +410,7 @@ const handleUpdateIngredientOverride = async (globalIngredient, name, price, ava
       if (price) ingredient[0].price = price;
       if (available) ingredient[0].available = available;
       if (group) ingredient[0].group = group;
+      if (description) ingredient[0].description = description;
       if (nutrients) ingredient[0].nutrients = nutrients;
       await ingredient[0].save();
       return ingredient[0];
@@ -464,6 +467,7 @@ const handleIngredientChanges = async (nutrient, user_id) => {
         available: globalIngredient.available,
         source: globalIngredient.source,
         group: globalIngredient.group,
+        description: globalIngredient.description,
       });
     }
     // has an existing override (and not deleted as well)

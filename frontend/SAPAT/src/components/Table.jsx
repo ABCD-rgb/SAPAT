@@ -38,7 +38,7 @@ function Table({
       const rowData = orderedFields.map((field) => row[field] || 'N/A')
       return rowData
     } else if (page === 'ingredients') {
-      const orderedFields = ['name', 'price', 'available', 'group']
+      const orderedFields = ['name', 'price', 'available', 'group', 'description']
       const rowData = orderedFields.map((field) => row[field] || 'N/A')
       rowData[2] = Number(rowData[2]) === 1 ? 'Yes' : 'No' // for 'available' field
       return rowData
