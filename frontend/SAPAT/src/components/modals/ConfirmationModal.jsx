@@ -27,7 +27,7 @@ function ConfirmationModal({
 
         {/* Modal actions */}
         <div className="modal-action">
-          <button className="btn rounded-xl px-8" onClick={onClose}>
+          <button className={`${type === 'save' ? 'hidden' : ''} btn rounded-xl px-8`} onClick={onClose}>
             Cancel
           </button>
           {type === 'delete' ? (
@@ -40,6 +40,18 @@ function ConfirmationModal({
             >
               Delete
             </button>
+          ) : (type === 'save') ? (
+            <div className={`tooltip`} data-tip={"This exits the page."}>
+              <button
+                className="btn btn-warning rounded-xl px-8 text-white"
+                onClick={() => {
+                  onConfirm()
+                  onClose()
+                }}
+              >
+                Yes, It’s Saved.
+              </button>
+            </div>
           ) : (
             <button
               className="btn rounded-xl bg-green-500 px-8 text-white hover:bg-green-600"

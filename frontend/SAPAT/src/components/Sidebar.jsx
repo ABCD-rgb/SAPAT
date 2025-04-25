@@ -7,11 +7,15 @@ import {
   RiLogoutBoxLine,
 } from 'react-icons/ri'
 import useAuth from '../hook/useAuth'
+import ConfirmationModal from './modals/ConfirmationModal.jsx'
+import { useState } from 'react'
 
 function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
   const { logout } = useAuth()
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false)
+  const [targetPath, setTargetPath] = useState(null)
 
   const menuItems = [
     { path: '/dashboard', icon: RiDashboardLine, label: 'Dashboard' },
@@ -24,6 +28,35 @@ function Sidebar() {
     await logout()
     navigate('/')
   }
+
+
+  const handleNavigation = (e, path) => {
+    e.preventDefault()
+
+    if (location.pathname === path) return
+
+    const isFormulationDetailPage = /^\/formulations\/[^\/]+$/.test(location.pathname)
+    if (isFormulationDetailPage) {
+      setTargetPath(path)
+      setIsConfirmationModalOpen(true)
+    } else {
+      navigate(path)
+    }
+  }
+
+  const handleConfirmNavigation = () => {
+    if (targetPath) {
+      navigate(targetPath)
+      setTargetPath(null)
+    }
+    setIsConfirmationModalOpen(false)
+  }
+
+  const handleCloseModal = () => {
+    setIsConfirmationModalOpen(false)
+    setTargetPath(null)
+  }
+
 
   return (
     <div className="bg-green-accent flex h-full w-14 flex-col p-3 md:w-44">
@@ -40,6 +73,7 @@ function Sidebar() {
           <Link
             key={item.path}
             to={item.path}
+            onClick={(e) => handleNavigation(e, item.path)}
             className={`flex items-center rounded-lg p-2 transition-colors ${
               location.pathname === item.path
                 ? 'text-deepbrown bg-white'
@@ -61,6 +95,15 @@ function Sidebar() {
           <span className="ml-3 hidden md:block">Logout</span>
         </button>
       </div>
+
+      <ConfirmationModal
+        isOpen={isConfirmationModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmNavigation}
+        title="Hold On!"
+        description={`Don’t forget to save! Go back or hit Ctrl + S if your formulation isn’t saved yet."`}
+        type="save"
+      />
     </div>
   )
 }
