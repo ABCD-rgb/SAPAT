@@ -701,10 +701,11 @@ function ViewFormulation({
                 <div
                   tabIndex={isDisabled ? -1 : 0}
                   role="button"
-                  className={`btn btn-primary btn-sm gap-2 rounded-lg shadow-md transition-all duration-300 ${isDisabled
-                    ? 'btn-disabled cursor-not-allowed opacity-50'
-                    : 'hover:shadow-lg'
-                    }`}
+                  className={`btn btn-primary btn-sm gap-2 rounded-lg shadow-md transition-all duration-300 ${
+                    isDisabled
+                      ? 'btn-disabled cursor-not-allowed opacity-50'
+                      : 'hover:shadow-lg'
+                  }`}
                 >
                   <RiCalculatorLine className="text-lg" /> Optimize
                 </div>
@@ -888,7 +889,7 @@ function ViewFormulation({
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="flex text-xs text-gray-500">
-                  <Info /> Ingredients used in your feed mix. Values show the amount out of {weight} kg. Set min/max to control amounts.
+                  <Info /> Ingredient distribution based on {weight} kg total weight. Use 100 kg as your target to convert values into percentages.
                 </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
@@ -969,7 +970,13 @@ function ViewFormulation({
                       updateMyPresence({ focusedId: e.target.id })
                     }
                     onBlur={() => updateMyPresence({ focusedId: null })}
-                    onChange={(e) => updateWeight(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value === '') {
+                        updateWeight(100)
+                      } else {
+                        updateWeight(e.target.value)
+                      }
+                    }}
                     maxLength={20}
                   />
                   <Selections id="input-weight" others={others} />
