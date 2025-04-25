@@ -102,9 +102,14 @@ function Ingredients() {
           (ingredient) => ingredient._id !== selectedId
         )
         setIngredients(filteredIngredients)
-        // when no ingredients on current page are left, go back one page
+        // when no ingredients on current page are left, go back to show the unfiltered data
         if (filteredIngredients.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions

@@ -99,7 +99,12 @@ function Nutrients() {
         )
         setNutrients(filteredNutrients)
         if (filteredNutrients.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions

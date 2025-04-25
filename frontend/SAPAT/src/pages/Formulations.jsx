@@ -101,7 +101,12 @@ function Formulations() {
         )
         setFormulations(filteredFormulations)
         if (filteredFormulations.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions
