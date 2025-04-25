@@ -556,10 +556,10 @@ function ViewFormulation({
                   let processedValue = /^N\/A\d*/.test(inputValue)
                     ? inputValue.replace('N/A', '')
                     : inputValue
-                  // limit max constraint of ingredient to 100
+                  // limit max constraint of ingredient to weight
                   const numericValue = parseFloat(processedValue)
-                  if (!isNaN(numericValue) && numericValue > 100) {
-                    processedValue = '100'
+                  if (!isNaN(numericValue) && numericValue > weight) {
+                    processedValue = weight
                   }
                   handleIngredientMaximumChange(index, processedValue)
                   setIsDirty(false)
