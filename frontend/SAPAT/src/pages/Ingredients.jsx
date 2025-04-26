@@ -102,9 +102,14 @@ function Ingredients() {
           (ingredient) => ingredient._id !== selectedId
         )
         setIngredients(filteredIngredients)
-        // when no ingredients on current page are left, go back one page
+        // when no ingredients on current page are left, go back to show the unfiltered data
         if (filteredIngredients.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions
@@ -136,7 +141,7 @@ function Ingredients() {
     setIsEditModalOpen(false)
     setIngredients((prevIngredient) => {
       const index = prevIngredient.findIndex(
-        (ingredient) => ingredient._id === updatedIngredient._id
+        (ingredient) => ingredient._id === updatedIngredient._id || ingredient._id === updatedIngredient.ingredient_id
       )
       const updated = [...prevIngredient]
       updated[index] = { ...updatedIngredient }
@@ -196,7 +201,7 @@ function Ingredients() {
     setToastAction('')
   }
 
-  const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group']
+  const headers = ['Name', 'Price (PHP/kg)', 'Available', 'Group', 'Description']
   const filterOptions = [
     { value: 'Cereal grains', label: 'Cereal grains' },
     { value: 'Protein', label: 'Protein' },

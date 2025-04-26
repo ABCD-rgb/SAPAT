@@ -101,7 +101,12 @@ function Formulations() {
         )
         setFormulations(filteredFormulations)
         if (filteredFormulations.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions
@@ -244,7 +249,8 @@ function Formulations() {
       {/* Modals */}
       <CreateFormulationModal
         formulations={formulations}
-        owner={user._id}
+        ownerId={user._id}
+        ownerName={user.displayName}
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onResult={handleCreateResult}

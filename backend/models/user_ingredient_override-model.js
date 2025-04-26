@@ -6,6 +6,7 @@ const userIngredientOverrideSchema = new Schema({
   price: { type: Number },
   available: {type: Number, default: 1},  // 1 -> true; 0 -> false
   group: {type: String },
+  description: { type: String, default: '' },
   nutrients: [{
     nutrient: { type: Schema.Types.ObjectId, ref: 'Nutrient' },
     value: { type: Number }

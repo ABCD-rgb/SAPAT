@@ -3,11 +3,11 @@ import Formulation from '../models/formulation-model.js';
 
 const createFormulation = async (req, res) => {
     const {
-        code, name, description, animal_group, owner
+        code, name, description, animal_group, ownerId, ownerName
     } = req.body;
     try {
         const newFormulation = await Formulation.create({
-            code, name, description, animal_group, collaborators: [{ userId: owner, access: 'owner' }],
+            code, name, description, animal_group, collaborators: [{ userId: ownerId, access: 'owner', displayName: ownerName }],
         });
         const filteredFormulation = {
             "_id": newFormulation._id,
@@ -219,7 +219,7 @@ const getFormulationOwner = async (req, res) => {
         if (owner.length === 0) {
             return res.status(404).json({ message: 'error' });
         }
-        res.status(200).json({ message: 'success', owner: owner[0].userId });
+        res.status(200).json({ message: 'success', owner: owner[0] });
     } catch (err) {
         res.status(500).json({ error: err.message, message: 'error' })
     }
@@ -339,7 +339,7 @@ const validateCollaborator = async (req, res) => {
 
 const updateCollaborator = async (req,res) => {
     const { id } = req.params;
-    const { updaterId, collaboratorId, access } = req.body;
+    const { updaterId, collaboratorId, access, displayName } = req.body;
     // there should only be one owner
     if (access === 'owner') return res.status(400).json({ message: 'error' })
     try {
@@ -354,7 +354,7 @@ const updateCollaborator = async (req,res) => {
         }
         const collaborator = formulation.collaborators.find(c => c.userId.toString() === collaboratorId);
         if (!collaborator) {
-            formulation.collaborators.push({ userId: collaboratorId, access: access });
+            formulation.collaborators.push({ userId: collaboratorId, access: access, displayName: displayName });
             await formulation.save();
             return res.status(200).json({ message: 'success' });
         }

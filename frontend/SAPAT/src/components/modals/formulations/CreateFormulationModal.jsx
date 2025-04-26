@@ -5,7 +5,8 @@ import Info from '../../icons/Info.jsx'
 
 function CreateFormulationModal({
   formulations,
-  owner,
+  ownerId,
+  ownerName,
   isOpen,
   onClose,
   onResult,
@@ -48,7 +49,7 @@ function CreateFormulationModal({
     } else {
       setNameError('')
     }
-    const body = { ...formData, owner }
+    const body = { ...formData, ownerId, ownerName }
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/formulation`,

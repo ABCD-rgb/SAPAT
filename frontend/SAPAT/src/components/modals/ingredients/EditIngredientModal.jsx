@@ -1,6 +1,5 @@
 import { RiCloseLine } from 'react-icons/ri'
 import { useEffect, useState, useMemo } from 'react'
-import Loading from '../../Loading.jsx'
 import axios from 'axios'
 import Info from '../../icons/Info.jsx'
 
@@ -16,6 +15,7 @@ function EditIngredientModal({
     name: '',
     price: '',
     group: '',
+    description: '',
     nutrients: [
       {
         name: '',
@@ -108,10 +108,20 @@ function EditIngredientModal({
 
   const handleChange = (e) => {
     const { name, value } = e.target
+
     if (name === 'price') {
-      const validValue = value === '' || /^\d+(\.\d{0,2})?$/.test(value)
-      if (!validValue) return
+      // Check if empty or a valid number
+      if (value === '') {
+        // Empty is valid
+      } else {
+        const num = parseFloat(value)
+        // Check if it's a valid number and has at most 2 decimal places
+        if (isNaN(num) || (value.includes('.') && value.split('.')[1].length > 2)) {
+          return // Invalid input, don't update state
+        }
+      }
     }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -164,14 +174,14 @@ function EditIngredientModal({
         <h3 className="text-deepbrown mb-1 text-lg font-bold">
           Edit Ingredient
         </h3>
-        <p className="mb-8 flex text-sm text-gray-500">
+        <p className="mb-4 flex text-sm text-gray-500">
           <Info />
           Modify ingredient information as needed.
         </p>
 
         <form onSubmit={handleSubmit}>
           {/* Description section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="form-control w-full">
                 <label className="label">
@@ -198,10 +208,9 @@ function EditIngredientModal({
                   <span className="label-text">Price (PHP/kg)</span>
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   name="price"
                   value={formData.price}
-                  pattern="[0-9]*"
                   required
                   disabled={isDisabled}
                   onChange={handleChange}
@@ -245,6 +254,21 @@ function EditIngredientModal({
                   </option>
                 </select>
               </div>
+
+            </div>
+            <div className="form-control w-full md:col-span-2">
+              <label className="label">
+                <span className="label-text">Description</span>
+              </label>
+              <textarea
+                disabled={isDisabled}
+                name="description"
+                value={ingredient?.description}
+                onChange={handleChange}
+                placeholder="Enter description"
+                className="textarea textarea-bordered w-full rounded-xl text-xs"
+                rows="1"
+              ></textarea>
             </div>
           </div>
 

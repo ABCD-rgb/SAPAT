@@ -99,7 +99,12 @@ function Nutrients() {
         )
         setNutrients(filteredNutrients)
         if (filteredNutrients.length === 0) {
-          setPage(page - 1)
+          setPage(1)
+          setSearchQuery('')
+          setFilters('')
+          setSortBy('')
+          setSortOrder('')
+          await fetchData()
         }
       }
       // toast instructions
@@ -131,7 +136,7 @@ function Nutrients() {
     setIsEditModalOpen(false)
     setNutrients((prevNutrient) => {
       const index = prevNutrient.findIndex(
-        (nutrient) => nutrient._id === updatedNutrient._id
+        (nutrient) => nutrient._id === updatedNutrient._id || nutrient._id === updatedNutrient.nutrient_id
       )
       const updated = [...prevNutrient]
       updated[index] = { ...updatedNutrient }

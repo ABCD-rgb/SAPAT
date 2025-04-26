@@ -14,6 +14,7 @@ function AddIngredientModal({
     name: '',
     price: '',
     group: '',
+    description: '',
     nutrients: [
       {
         name: '',
@@ -100,6 +101,7 @@ function AddIngredientModal({
         name: '',
         price: '',
         group: '',
+        description: '',
         nutrients: localNutrients,
       })
     } catch (err) {
@@ -143,14 +145,14 @@ function AddIngredientModal({
         <h3 className="text-deepbrown mb-1 text-lg font-bold">
           Add Ingredient
         </h3>
-        <p className="mb-8 flex text-sm text-gray-500">
+        <p className="mb-4 flex text-sm text-gray-500">
           <Info />
           Enter details for your new feed ingredient.
         </p>
 
         <form onSubmit={handleSubmit}>
           {/* Description section */}
-          <div className="mb-8">
+          <div className="mb-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div className="form-control w-full">
                 <label className="label">
@@ -225,6 +227,20 @@ function AddIngredientModal({
                   </option>
                 </select>
               </div>
+            </div>
+            <div className="form-control w-full md:col-span-2">
+              <label className="label">
+                <span className="label-text">Description</span>
+              </label>
+              <textarea
+                disabled={isDisabled}
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter description"
+                className="textarea textarea-bordered w-full rounded-xl text-xs"
+                rows="1"
+              ></textarea>
             </div>
           </div>
 

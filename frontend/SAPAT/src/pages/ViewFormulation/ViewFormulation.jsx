@@ -93,7 +93,7 @@ function ViewFormulation({
       fetchIngredients()
       fetchNutrients()
     }
-  }, [owner, formulation])
+  }, [formulation])
 
   useEffect(() => {
     fetchCollaboratorData()
@@ -132,38 +132,72 @@ function ViewFormulation({
   const fetchIngredients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}?limit=10000`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner?.userId}?limit=10000`
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
-      // don't include already added ingredients to the ingredients menu
+
+      // ingredients already in the formulation
       const arr2Ids = new Set(
         formulation.ingredients.map((item) => item.ingredient_id)
-      ) // ingredients already in the formulation
+      )
+      // don't include already added ingredients to the ingredients menu
       const unusedIngredients = fetchedData.filter(
         (item) => !arr2Ids.has(item.ingredient_id || item._id)
       )
       setIngredientsMenu(unusedIngredients)
+
+      // ingredients in the user's workspace
+      const listOfIngredientsIds = new Set(
+        fetchedData.map((item) => item.ingredient_id || item._id)
+      )
+      // remove ingredients in the formulation that are already deleted in the user's workspace
+      const nonExistingIngredients = formulation.ingredients.filter(
+        (item) => !listOfIngredientsIds.has(item.ingredient_id)
+      )
+      const nonExistingIngredientsIds = new Set(nonExistingIngredients.map((item) => item.ingredient_id))
+      updateIngredients(
+        ingredients.filter(
+          (item) => !nonExistingIngredientsIds.has(item.ingredient_id)
+        )
+      )
     } catch (err) {
       console.log(err)
     }
   }
 
+
   const fetchNutrients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}?limit=10000`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner?.userId}?limit=10000`
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
-      // don't include already added nutrients to the nutrients menu
+      // nutrients already in the formulation
       const arr2Ids = new Set(
         formulation.nutrients.map((item) => item.nutrient_id)
-      ) // nutrients already in the formulation
+      )
+      // don't include already added nutrients to the nutrients menu
       const unusedNutrients = fetchedData.filter(
         (item) => !arr2Ids.has(item.nutrient_id || item._id)
       )
       setNutrientsMenu(unusedNutrients)
+
+      // nutrients in the user's workspace
+      const listOfNutrientsIds = new Set(
+        fetchedData.map((item) => item.nutrient_id || item._id)
+      )
+      // remove nutrients in the formulation that are already deleted in the user's workspace
+      const nonExistingNutrients = formulation.nutrients.filter(
+        (item) => !listOfNutrientsIds.has(item.nutrient_id)
+      )
+      const nonExistingNutrientsIds = new Set(nonExistingNutrients.map((item) => item.nutrient_id))
+      updateNutrients(
+        nutrients.filter(
+          (item) => !nonExistingNutrientsIds.has(item.nutrient_id)
+        )
+      )
     } catch (err) {
       console.log(err)
     }
@@ -225,7 +259,7 @@ function ViewFormulation({
   }
 
   const handleOptimize = async (
-    ingredientsData,
+    // ingredientsData,
     ingredients,
     nutrients,
     weight,
@@ -233,7 +267,8 @@ function ViewFormulation({
   ) => {
     try {
       const res = await axios.post(`${VITE_API_URL}/optimize/${type}`, {
-        ingredientsData,
+        // ingredientsData,
+        userId: owner?.userId,
         ingredients,
         nutrients,
         weight
@@ -274,6 +309,7 @@ function ViewFormulation({
           updaterId: user._id,
           collaboratorId: newCollaborator.newId,
           access: newCollaborator.newAccess,
+          displayName: newCollaborator.newDisplayName,
         }
       )
 
@@ -555,10 +591,10 @@ function ViewFormulation({
                   let processedValue = /^N\/A\d*/.test(inputValue)
                     ? inputValue.replace('N/A', '')
                     : inputValue
-                  // limit max constraint of ingredient to 100
+                  // limit max constraint of ingredient to weight
                   const numericValue = parseFloat(processedValue)
-                  if (!isNaN(numericValue) && numericValue > 100) {
-                    processedValue = '100'
+                  if (!isNaN(numericValue) && numericValue > weight) {
+                    processedValue = weight
                   }
                   handleIngredientMaximumChange(index, processedValue)
                   setIsDirty(false)
@@ -571,7 +607,7 @@ function ViewFormulation({
             />
             <Selections id={`ingredient-${index}-maximum`} others={others} />
           </td>
-          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2) }</td>
+          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -718,7 +754,7 @@ function ViewFormulation({
                         className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
                         onClick={() => {
                           handleOptimize(
-                            listOfIngredients || [],
+                            // listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
                             weight,
@@ -734,7 +770,7 @@ function ViewFormulation({
                         className="hover:bg-primary hover:text-primary-content flex items-center rounded-lg py-2 transition-colors duration-200"
                         onClick={() => {
                           handleOptimize(
-                            listOfIngredients || [],
+                            // listOfIngredients || [],
                             ingredients || [],
                             nutrients || [],
                             weight,
@@ -752,6 +788,7 @@ function ViewFormulation({
               <GenerateReport
                 userAccess={userAccess}
                 formulation={formulationRealTime}
+                owner={owner}
               />
             </div>
             {/*<div className="flex flex-wrap gap-2">*/}
@@ -888,7 +925,7 @@ function ViewFormulation({
               <div className="p-4">
                 <h3 className="mb-2 text-sm font-semibold">Ingredients</h3>
                 <p className="flex text-xs text-gray-500">
-                  <Info /> Ingredients used in your feed mix. Values show the amount out of {weight} kg. Set min/max to control amounts.
+                  <Info /> Ingredient distribution based on {weight} kg total weight. Use 100 kg as your target to convert values into percentages.
                 </p>
               </div>
               <div className="max-h-64 overflow-x-auto overflow-y-auto">
@@ -969,7 +1006,13 @@ function ViewFormulation({
                       updateMyPresence({ focusedId: e.target.id })
                     }
                     onBlur={() => updateMyPresence({ focusedId: null })}
-                    onChange={(e) => updateWeight(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value === '') {
+                        updateWeight(100)
+                      } else {
+                        updateWeight(e.target.value)
+                      }
+                    }}
                     maxLength={20}
                   />
                   <Selections id="input-weight" others={others} />
