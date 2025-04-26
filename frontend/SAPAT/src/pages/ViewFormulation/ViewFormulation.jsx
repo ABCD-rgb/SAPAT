@@ -136,18 +136,36 @@ function ViewFormulation({
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
-      // don't include already added ingredients to the ingredients menu
+
+      // ingredients already in the formulation
       const arr2Ids = new Set(
         formulation.ingredients.map((item) => item.ingredient_id)
-      ) // ingredients already in the formulation
+      )
+      // don't include already added ingredients to the ingredients menu
       const unusedIngredients = fetchedData.filter(
         (item) => !arr2Ids.has(item.ingredient_id || item._id)
       )
       setIngredientsMenu(unusedIngredients)
+
+      // ingredients in the user's workspace
+      const listOfIngredientsIds = new Set(
+        fetchedData.map((item) => item.ingredient_id || item._id)
+      )
+      // remove ingredients in the formulation that are already deleted in the user's workspace
+      const nonExistingIngredients = formulation.ingredients.filter(
+        (item) => !listOfIngredientsIds.has(item.ingredient_id)
+      )
+      const nonExistingIngredientsIds = new Set(nonExistingIngredients.map((item) => item.ingredient_id))
+      updateIngredients(
+        ingredients.filter(
+          (item) => !nonExistingIngredientsIds.has(item.ingredient_id)
+        )
+      )
     } catch (err) {
       console.log(err)
     }
   }
+
 
   const fetchNutrients = async () => {
     try {
@@ -156,14 +174,30 @@ function ViewFormulation({
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
-      // don't include already added nutrients to the nutrients menu
+      // nutrients already in the formulation
       const arr2Ids = new Set(
         formulation.nutrients.map((item) => item.nutrient_id)
-      ) // nutrients already in the formulation
+      )
+      // don't include already added nutrients to the nutrients menu
       const unusedNutrients = fetchedData.filter(
         (item) => !arr2Ids.has(item.nutrient_id || item._id)
       )
       setNutrientsMenu(unusedNutrients)
+
+      // nutrients in the user's workspace
+      const listOfNutrientsIds = new Set(
+        fetchedData.map((item) => item.nutrient_id || item._id)
+      )
+      // remove nutrients in the formulation that are already deleted in the user's workspace
+      const nonExistingNutrients = formulation.nutrients.filter(
+        (item) => !listOfNutrientsIds.has(item.nutrient_id)
+      )
+      const nonExistingNutrientsIds = new Set(nonExistingNutrients.map((item) => item.nutrient_id))
+      updateNutrients(
+        nutrients.filter(
+          (item) => !nonExistingNutrientsIds.has(item.nutrient_id)
+        )
+      )
     } catch (err) {
       console.log(err)
     }
