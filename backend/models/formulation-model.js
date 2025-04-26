@@ -19,6 +19,7 @@ const nutrientConstraintSchema = new Schema({
 const userAccessSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     access: { type: String, enum: ['view', 'edit', 'owner'] },
+    displayName: {type: String, default: ''},
 });
 
 const formulationSchema = new Schema({

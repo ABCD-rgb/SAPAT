@@ -1,8 +1,12 @@
 import { RiFileChartLine } from 'react-icons/ri'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import UserCustomizationModal from '../modals/formulations/UserCustomizationModal.jsx'
+import { useState } from 'react'
 
-function GenerateReport({ userAccess, formulation }) {
-  const handleGenerateReport = async () => {
+function GenerateReport({ userAccess, formulation, owner }) {
+  const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false)
+
+  const handleGenerateReport = async (customization) => {
     // Create a new PDFDocument
     const pdfDoc = await PDFDocument.create()
 
@@ -29,6 +33,42 @@ function GenerateReport({ userAccess, formulation }) {
     const bodyFontSize = 10
     const smallFontSize = 9
     const lineHeight = 18
+
+    // Get customization values or use defaults
+    const roundingPrecision = parseInt(customization.roundingPrecision) || 2
+    const showEmptyValues = customization.showEmptyValues || false
+    const additionalCosts = customization.additionalCosts || []
+    const ingredientSorting = customization.ingredientSorting || 'alphabetical'
+    const remarks = customization.remarks || ''
+
+    // Sort ingredients according to customization
+    let sortedIngredients = [...formulation.ingredients]
+
+    switch (ingredientSorting) {
+      case 'alphabetical':
+        sortedIngredients.sort((a, b) => a.name.localeCompare(b.name))
+        break
+      case 'valueHighToLow':
+        sortedIngredients.sort((a, b) => b.value - a.value)
+        break
+      case 'valueLowToHigh':
+        sortedIngredients.sort((a, b) => a.value - b.value)
+        break
+      case 'costHighToLow':
+        sortedIngredients.sort((a, b) => (b.cost || 0) - (a.cost || 0))
+        break
+      case 'costLowToHigh':
+        sortedIngredients.sort((a, b) => (a.cost || 0) - (b.cost || 0))
+        break
+      default:
+        // Default to alphabetical
+        sortedIngredients.sort((a, b) => a.name.localeCompare(b.name))
+    }
+
+    // Filter out empty values if specified
+    if (!showEmptyValues) {
+      sortedIngredients = sortedIngredients.filter(ing => ing.value > 0)
+    }
 
     // Add logo image instead of placeholder rectangle
     try {
@@ -121,12 +161,19 @@ function GenerateReport({ userAccess, formulation }) {
     const detailX = margin + 120
     const fieldSpacing = 18
 
+    // Calculate total cost including additionalCosts
+    let totalCost = formulation.cost || 0
+    additionalCosts.forEach(cost => {
+      totalCost += cost.value
+    })
+
     const fieldData = [
       { label: 'Code:', value: formulation.code },
       { label: 'Name:', value: formulation.name },
       { label: 'Description:', value: formulation.description },
       { label: 'Animal Group:', value: formulation.animal_group },
-      { label: 'Total Cost:', value: `PHP ${formulation.cost && formulation.cost.toFixed(2)} per ${formulation.weight}kg` },
+      { label: 'Created by:', value: owner.displayName || 'N/A' },
+      { label: 'Total Cost:', value: `PHP ${totalCost.toFixed(roundingPrecision)} per ${formulation.weight}kg` },
     ]
 
     fieldData.forEach((field) => {
@@ -149,6 +196,40 @@ function GenerateReport({ userAccess, formulation }) {
       yPosition -= fieldSpacing
     })
 
+    // Additional Costs section (if any)
+    if (additionalCosts.length > 0) {
+      yPosition -= 10
+      page.drawText('Additional Costs:', {
+        x: labelX,
+        y: yPosition,
+        size: subheaderFontSize,
+        font: timesRomanBold,
+        color: textColor,
+      })
+
+      yPosition -= fieldSpacing
+
+      additionalCosts.forEach(cost => {
+        page.drawText(`${cost.name}:`, {
+          x: labelX + 20,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        })
+
+        page.drawText(`PHP ${cost.value.toFixed(roundingPrecision)}`, {
+          x: detailX,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        })
+
+        yPosition -= fieldSpacing
+      })
+    }
+
     // Ingredients Section
     yPosition -= 15
     page.drawText(`Ingredients (Ratio)`, {
@@ -157,6 +238,24 @@ function GenerateReport({ userAccess, formulation }) {
       size: headerFontSize,
       font: timesRomanBold,
       color: secondaryColor,
+    })
+
+    // Show ingredients sorting method
+    let sortingText = "Sorting: "
+    switch (ingredientSorting) {
+      case 'alphabetical': sortingText += "Alphabetical"; break;
+      case 'valueHighToLow': sortingText += "Value (High to Low)"; break;
+      case 'valueLowToHigh': sortingText += "Value (Low to High)"; break;
+      case 'costHighToLow': sortingText += "Cost (High to Low)"; break;
+      case 'costLowToHigh': sortingText += "Cost (Low to High)"; break;
+    }
+
+    page.drawText(sortingText, {
+      x: margin + 180,
+      y: yPosition,
+      size: smallFontSize,
+      font: helvetica,
+      color: textColor,
     })
 
     yPosition -= 25
@@ -221,8 +320,8 @@ function GenerateReport({ userAccess, formulation }) {
 
     yPosition -= 5
 
-    // Draw ingredients rows
-    formulation.ingredients.forEach((ing) => {
+    // Draw ingredients rows (using sorted ingredients)
+    sortedIngredients.forEach((ing) => {
       page.drawText(ing.name, {
         x: nameX,
         y: yPosition,
@@ -247,7 +346,7 @@ function GenerateReport({ userAccess, formulation }) {
       //   color: textColor,
       // })
 
-      page.drawText(ing.value.toFixed(2).toString(), {
+      page.drawText(ing.value.toFixed(roundingPrecision).toString(), {
         x: valX,
         y: yPosition,
         size: bodyFontSize,
@@ -324,8 +423,14 @@ function GenerateReport({ userAccess, formulation }) {
 
     yPosition -= 5
 
+    // Filter nutrients if needed
+    let displayNutrients = [...formulation.nutrients]
+    if (!showEmptyValues) {
+      displayNutrients = displayNutrients.filter(nutrient => nutrient.value > 0)
+    }
+
     // Draw nutrients rows
-    formulation.nutrients.forEach((nutrient) => {
+    displayNutrients.forEach((nutrient) => {
       page.drawText(nutrient.name, {
         x: nameX,
         y: yPosition,
@@ -350,7 +455,7 @@ function GenerateReport({ userAccess, formulation }) {
       //   color: textColor,
       // })
 
-      page.drawText(nutrient.value.toFixed(2).toString(), {
+      page.drawText(nutrient.value.toFixed(roundingPrecision).toString(), {
         x: valX,
         y: yPosition,
         size: bodyFontSize,
@@ -366,6 +471,52 @@ function GenerateReport({ userAccess, formulation }) {
         yPosition = height - margin - 50
       }
     })
+
+    // Add remarks if provided
+    if (remarks.trim()) {
+      // Check if we need a new page for remarks
+      if (yPosition < margin + 150) {
+        page = pdfDoc.addPage([595.28, 841.89])
+        yPosition = height - margin - 50
+      }
+
+      yPosition -= 25
+      page.drawText('Remarks:', {
+        x: margin,
+        y: yPosition,
+        size: headerFontSize,
+        font: timesRomanBold,
+        color: secondaryColor,
+      })
+
+      yPosition -= 20
+
+      // Split remarks into lines if too long
+      const maxCharsPerLine = 70
+      let remainingRemarks = remarks
+      while (remainingRemarks.length > 0) {
+        const currentLine = remainingRemarks.length > maxCharsPerLine
+          ? remainingRemarks.substring(0, maxCharsPerLine)
+          : remainingRemarks
+
+        page.drawText(currentLine, {
+          x: margin,
+          y: yPosition,
+          size: bodyFontSize,
+          font: timesRomanFont,
+          color: textColor,
+        })
+
+        yPosition -= lineHeight
+        remainingRemarks = remainingRemarks.substring(currentLine.length)
+
+        // Check if we need a new page
+        if (yPosition < margin + 50 && remainingRemarks.length > 0) {
+          page = pdfDoc.addPage([595.28, 841.89])
+          yPosition = height - margin - 50
+        }
+      }
+    }
 
     // Add footer with page number
     const totalPages = pdfDoc.getPageCount()
@@ -404,13 +555,22 @@ function GenerateReport({ userAccess, formulation }) {
   }
 
   return (
-    <button
-      disabled={userAccess === 'view'}
-      className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
-      onClick={handleGenerateReport}
-    >
-      <RiFileChartLine /> Generate report
-    </button>
+    <div>
+      <button
+        disabled={userAccess === 'view'}
+        className="btn btn-warning btn-sm gap-2 rounded-lg disabled:cursor-not-allowed"
+        // onClick={handleGenerateReport}
+        onClick={() => {setIsCustomizationModalOpen(true)}}
+      >
+        <RiFileChartLine /> Generate report
+      </button>
+
+      <UserCustomizationModal
+        isOpen={isCustomizationModalOpen}
+        onClose={() => setIsCustomizationModalOpen(false)}
+        onGenerate={handleGenerateReport}
+      />
+    </div>
   )
 }
 

@@ -93,7 +93,7 @@ function ViewFormulation({
       fetchIngredients()
       fetchNutrients()
     }
-  }, [owner, formulation])
+  }, [formulation])
 
   useEffect(() => {
     fetchCollaboratorData()
@@ -132,7 +132,7 @@ function ViewFormulation({
   const fetchIngredients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner}?limit=10000`
+        `${import.meta.env.VITE_API_URL}/ingredient/filtered/${owner?.userId}?limit=10000`
       )
       const fetchedData = res.data.ingredients
       setListOfIngredients(fetchedData)
@@ -152,7 +152,7 @@ function ViewFormulation({
   const fetchNutrients = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner}?limit=10000`
+        `${import.meta.env.VITE_API_URL}/nutrient/filtered/${owner?.userId}?limit=10000`
       )
       const fetchedData = res.data.nutrients
       setListOfNutrients(fetchedData)
@@ -234,7 +234,7 @@ function ViewFormulation({
     try {
       const res = await axios.post(`${VITE_API_URL}/optimize/${type}`, {
         // ingredientsData,
-        userId: owner,
+        userId: owner?.userId,
         ingredients,
         nutrients,
         weight
@@ -275,6 +275,7 @@ function ViewFormulation({
           updaterId: user._id,
           collaboratorId: newCollaborator.newId,
           access: newCollaborator.newAccess,
+          displayName: newCollaborator.newDisplayName,
         }
       )
 
@@ -753,6 +754,7 @@ function ViewFormulation({
               <GenerateReport
                 userAccess={userAccess}
                 formulation={formulationRealTime}
+                owner={owner}
               />
             </div>
             {/*<div className="flex flex-wrap gap-2">*/}
