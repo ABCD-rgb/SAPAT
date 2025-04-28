@@ -3,7 +3,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import UserCustomizationModal from '../modals/formulations/UserCustomizationModal.jsx'
 import { useState } from 'react'
 
-function GenerateReport({ userAccess, formulation, owner }) {
+function GenerateReport({ userAccess, formulation, owner, weight }) {
   const [isCustomizationModalOpen, setIsCustomizationModalOpen] = useState(false)
 
   const handleGenerateReport = async (customization) => {
@@ -232,7 +232,7 @@ function GenerateReport({ userAccess, formulation, owner }) {
 
     // Ingredients Section
     yPosition -= 15
-    page.drawText(`Ingredients (Ratio)`, {
+    page.drawText(`Ingredients`, {
       x: margin,
       y: yPosition,
       size: headerFontSize,
@@ -346,7 +346,7 @@ function GenerateReport({ userAccess, formulation, owner }) {
       //   color: textColor,
       // })
 
-      page.drawText(ing.value.toFixed(roundingPrecision).toString(), {
+      page.drawText((ing.value * weight).toFixed(roundingPrecision).toString(), {
         x: valX,
         y: yPosition,
         size: bodyFontSize,
