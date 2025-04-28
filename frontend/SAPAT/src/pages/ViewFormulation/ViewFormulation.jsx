@@ -607,7 +607,7 @@ function ViewFormulation({
             />
             <Selections id={`ingredient-${index}-maximum`} others={others} />
           </td>
-          <td>{ingredient && weight && (ingredient.value * weight).toFixed(2)}</td>
+          <td>{ingredient && weight && (ingredient.value * weight).toFixed(3)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -684,7 +684,7 @@ function ViewFormulation({
             />
             <Selections id={`nutrient-${index}-maximum`} others={others} />
           </td>
-          <td>{nutrient && nutrient.value.toFixed(2)}</td>
+          <td>{nutrient && nutrient.value.toFixed(3)}</td>
           <td>
             <button
               disabled={isDisabled}
@@ -789,6 +789,7 @@ function ViewFormulation({
                 userAccess={userAccess}
                 formulation={formulationRealTime}
                 owner={owner}
+                weight={weight}
               />
             </div>
             {/*<div className="flex flex-wrap gap-2">*/}

@@ -49,7 +49,7 @@ function ConfirmationModal({
                   onClose()
                 }}
               >
-                Yes, It’s Saved.
+                It’s Already Saved.
               </button>
             </div>
           ) : (
