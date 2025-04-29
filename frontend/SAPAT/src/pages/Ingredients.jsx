@@ -92,14 +92,15 @@ function Ingredients() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const selectedId = selectedIngredient._id
+      console.log("selectedIngredient", selectedIngredient)
+      const selectedId = selectedIngredient.ingredient_id || selectedIngredient._id
       const res = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/ingredient/${selectedIngredient._id}/${user._id}`
+        `${import.meta.env.VITE_API_URL}/ingredient/${selectedId}/${user._id}`
       )
       const messageData = res.data.message
       if (messageData === 'success') {
         const filteredIngredients = ingredients.filter(
-          (ingredient) => ingredient._id !== selectedId
+          (ingredient) => ingredient.ingredient_id !== selectedId && ingredient._id !== selectedId
         )
         setIngredients(filteredIngredients)
         // when no ingredients on current page are left, go back to show the unfiltered data

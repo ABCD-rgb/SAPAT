@@ -88,14 +88,14 @@ function Nutrients() {
 
   const handleDeleteConfirm = async () => {
     try {
-      const selectedId = selectedNutrient._id
+      const selectedId = selectedNutrient.nutrient_id || selectedNutrient._id
       const res = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/nutrient/${selectedNutrient._id}/${user._id}`
+        `${import.meta.env.VITE_API_URL}/nutrient/${selectedId}/${user._id}`
       )
       const messageData = res.data.message
       if (messageData === 'success') {
         const filteredNutrients = nutrients.filter(
-          (nutrient) => nutrient._id !== selectedId
+          (nutrient) => nutrient.nutrient_id !== selectedId && nutrient._id !== selectedId
         )
         setNutrients(filteredNutrients)
         if (filteredNutrients.length === 0) {
