@@ -87,15 +87,18 @@ function ViewFormulation({
   }, [formulation])
 
   useEffect(() => {
+    setIsLoading(true)
     fetchOwner()
     // make sure owner has been fetched before getting the ingredients and nutrients (these are for choosing in the 'add ingredients' and 'add nutrients')
     if (owner && formulation) {
       fetchIngredients()
       fetchNutrients()
     }
+    setIsLoading(false)
   }, [formulation])
 
   useEffect(() => {
+    setIsLoading(true)
     fetchCollaboratorData()
     setIsLoading(false)
   }, [formulation.collaborators])
