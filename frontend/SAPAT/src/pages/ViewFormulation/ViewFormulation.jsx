@@ -22,6 +22,7 @@ const COLORS = ['#DC2626', '#D97706', '#059669', '#7C3AED', '#DB2777']
 
 function ViewFormulation({
   formulation,
+  owner,
   userAccess,
   id,
   user,
@@ -62,7 +63,6 @@ function ViewFormulation({
   const [listOfNutrients, setListOfNutrients] = useState([])
 
   // choosing ingredients and nutrients to create feeds
-  const [owner, setOwner] = useState()
   const [ingredientsMenu, setIngredientsMenu] = useState([])
   const [nutrientsMenu, setNutrientsMenu] = useState([])
   const [isChooseIngredientsModalOpen, setIsChooseIngredientsModalOpen] =
@@ -90,13 +90,11 @@ function ViewFormulation({
     const loadData = async () => {
       setIsLoading(true);
       try {
-        await fetchOwner();
-        // Now that fetchOwner has completed, check if owner exists
         if (owner && formulation) {
           await Promise.all([fetchIngredients(), fetchNutrients()]);
         }
       } catch (error) {
-        console.error("Error loading data:", error);
+        console.log(error)
       } finally {
         setIsLoading(false);
       }
@@ -115,16 +113,16 @@ function ViewFormulation({
     isDirty && updateCost(0)
   }, [isDirty])
 
-  const fetchOwner = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/formulation/owner/${id}`
-      )
-      setOwner(res.data.owner)
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  // const fetchOwner = async () => {
+  //   try {
+  //     const res = await axios.get(
+  //       `${import.meta.env.VITE_API_URL}/formulation/owner/${id}`
+  //     )
+  //     setOwner(res.data.owner)
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // }
 
   // Sync on saving using 'ctrl + s'
   useEffect(() => {

@@ -90,6 +90,7 @@ function ViewFormulationEntry({ id }) {
     ingredients: [],
     nutrients: [],
   })
+  const [ownerId, setOwnerId] = useState(null)
   const [shouldRedirect, setShouldRedirect] = useState(false)
   const [userAccess, setUserAccess] = useState('')
   // toast visibility
@@ -131,6 +132,9 @@ function ViewFormulationEntry({ id }) {
         updateIngredients(formulationData.ingredients)
         updateNutrients(formulationData.nutrients)
       }
+      // set owner id
+      const owner = formulationData?.collaborators?.find((collaborator) => collaborator.access === "owner")
+      setOwnerId(owner)
     } catch (err) {
       console.log(err)
     }
@@ -195,6 +199,7 @@ function ViewFormulationEntry({ id }) {
     <>
       <ViewFormulation
         formulation={formulation}
+        owner={ownerId}
         userAccess={userAccess}
         id={id}
         user={user}
