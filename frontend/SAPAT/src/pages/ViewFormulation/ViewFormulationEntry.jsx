@@ -97,6 +97,7 @@ function ViewFormulationEntry({ id }) {
   const [showToast, setShowToast] = useState(false)
   const [message, setMessage] = useState('')
   const [toastAction, setToastAction] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   const formulationRef = useRef(formulationRealTime)
 
@@ -135,6 +136,7 @@ function ViewFormulationEntry({ id }) {
       // set owner id
       const owner = formulationData?.collaborators?.find((collaborator) => collaborator.access === "owner")
       setOwnerId(owner)
+      setIsLoading(false)
     } catch (err) {
       console.log(err)
     }
@@ -193,6 +195,10 @@ function ViewFormulationEntry({ id }) {
   }
   if (!user) {
     return <Navigate to="/" />
+  }
+
+  if (isLoading) {
+    return <Loading />
   }
 
   return (
