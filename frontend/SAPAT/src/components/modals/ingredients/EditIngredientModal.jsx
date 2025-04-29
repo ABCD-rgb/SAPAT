@@ -263,7 +263,7 @@ function EditIngredientModal({
               <textarea
                 disabled={isDisabled}
                 name="description"
-                value={ingredient?.description}
+                value={formData?.description}
                 onChange={handleChange}
                 placeholder="Enter description"
                 className="textarea textarea-bordered w-full rounded-xl text-xs"

@@ -87,15 +87,23 @@ function ViewFormulation({
   }, [formulation])
 
   useEffect(() => {
-    setIsLoading(true)
-    fetchOwner()
-    // make sure owner has been fetched before getting the ingredients and nutrients (these are for choosing in the 'add ingredients' and 'add nutrients')
-    if (owner && formulation) {
-      fetchIngredients()
-      fetchNutrients()
-    }
-    setIsLoading(false)
-  }, [formulation])
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await fetchOwner();
+        // Now that fetchOwner has completed, check if owner exists
+        if (owner && formulation) {
+          await Promise.all([fetchIngredients(), fetchNutrients()]);
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [formulation]);
 
   useEffect(() => {
     setIsLoading(true)
