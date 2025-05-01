@@ -76,6 +76,7 @@ function Formulations() {
         setSortOrder(order)
       }
     }
+    setPage(1)
   }
 
   const handleEditClick = (formulation) => {

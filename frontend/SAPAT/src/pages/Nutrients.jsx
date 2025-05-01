@@ -74,6 +74,7 @@ function Nutrients() {
         setSortOrder(order)
       }
     }
+    setPage(1)
   }
 
   const handleEditClick = (nutrient) => {

@@ -78,6 +78,7 @@ function Ingredients() {
         setSortOrder(order)
       }
     }
+    setPage(1)
   }
 
   const handleEditClick = (ingredient) => {
